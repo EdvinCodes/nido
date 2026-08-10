@@ -13,39 +13,68 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { SpaceSwitcher } from '@/components/layout/space-switcher';
 import { cn } from '@/lib/utils';
+import { route } from '@/lib/routes';
+import type { MemberRole } from '@/lib/auth';
+import type { getUserSpaces } from '@/features/spaces/queries';
 
-/** Static sidebar navigation for the app shell. Wired to real routes in later phases. */
+type SpaceList = Awaited<ReturnType<typeof getUserSpaces>>;
+
 const NAV_ITEMS = [
-  { key: 'dashboard', href: '/demo', icon: LayoutDashboard },
-  { key: 'ledger', href: '/demo/ledger', icon: Receipt },
-  { key: 'budgets', href: '/demo/budgets', icon: PiggyBank },
-  { key: 'goals', href: '/demo/goals', icon: CircleDollarSign },
-  { key: 'balances', href: '/demo/balances', icon: Scale },
-  { key: 'subscriptions', href: '/demo/subscriptions', icon: Repeat },
-  { key: 'reports', href: '/demo/reports', icon: BarChart3 },
-  { key: 'assistant', href: '/demo/assistant', icon: Bot },
-  { key: 'settings', href: '/demo/settings', icon: Settings },
+  { key: 'dashboard', href: '', icon: LayoutDashboard, ready: true },
+  { key: 'ledger', href: '/ledger', icon: Receipt, ready: false },
+  { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: false },
+  { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: false },
+  { key: 'balances', href: '/balances', icon: Scale, ready: false },
+  { key: 'subscriptions', href: '/subscriptions', icon: Repeat, ready: false },
+  { key: 'reports', href: '/reports', icon: BarChart3, ready: false },
+  { key: 'assistant', href: '/assistant', icon: Bot, ready: false },
+  { key: 'settings', href: '/settings/members', icon: Settings, ready: true },
 ] as const;
 
-export function AppSidebar({ activePath }: { activePath: string }) {
+export function AppSidebar({
+  activePath,
+  spaceId,
+  spaces,
+  spaceName,
+}: {
+  activePath: string;
+  spaceId: string;
+  spaces: SpaceList;
+  role: MemberRole;
+  spaceName: string;
+}) {
   const t = useTranslations('nav');
-  const tShell = useTranslations('shell');
+  void spaceName;
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="border-b border-sidebar-border px-4 py-4">
-        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          {tShell('spacePlaceholder')}
-        </p>
+        <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Primary">
-        {NAV_ITEMS.map(({ key, href, icon: Icon }) => {
-          const active = activePath === href || activePath.startsWith(`${href}/`);
+        {NAV_ITEMS.map(({ key, href, icon: Icon, ready }) => {
+          const fullHref = `/s/${spaceId}${href}`;
+          const active =
+            href === '' ? activePath === `/s/${spaceId}` : activePath.startsWith(fullHref);
+          if (!ready) {
+            return (
+              <span
+                key={key}
+                className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground"
+                aria-disabled
+              >
+                <Icon className="size-4 shrink-0" aria-hidden />
+                <span className="flex-1">{t(key)}</span>
+                <span className="text-[10px] tracking-wide uppercase">{t('comingSoon')}</span>
+              </span>
+            );
+          }
           return (
             <Link
               key={key}
-              href={href}
+              href={route(fullHref)}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
                 active

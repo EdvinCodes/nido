@@ -89,6 +89,7 @@ export function LedgerClient({
     from: parseAsString.withDefault(''),
     to: parseAsString.withDefault(''),
     tags: parseAsArrayOf(parseAsString).withDefault([]),
+    category: parseAsArrayOf(parseAsString).withDefault([]),
     min: parseAsInteger,
     max: parseAsInteger,
     shared: parseAsBoolean.withDefault(false),
@@ -105,6 +106,7 @@ export function LedgerClient({
           from: urlState.from,
           to: urlState.to,
           tags: urlState.tags,
+          categoryIds: urlState.category,
           amountMin: urlState.min,
           amountMax: urlState.max,
           shared: urlState.shared,
@@ -168,6 +170,7 @@ export function LedgerClient({
       from: '',
       to: '',
       tags: [],
+      category: [],
       min: null,
       max: null,
       shared: false,
@@ -259,6 +262,7 @@ export function LedgerClient({
     filters.dateFrom ||
     filters.dateTo ||
     filters.tagIds?.length ||
+    filters.categoryIds?.length ||
     filters.amountMin != null ||
     filters.amountMax != null ||
     filters.sharedOnly ||

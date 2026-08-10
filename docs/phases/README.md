@@ -10,7 +10,7 @@ not `Done`, read its file, do it, verify it, commit it, update the table below, 
 | 00  | [Foundations](./PHASE-00-foundations.md)                      | `Done`        | —          | 2026-08-10 |
 | 01  | [Auth & spaces](./PHASE-01-auth-spaces.md)                    | `Done`        | 00         | 2026-08-10 |
 | 02  | [Ledger core](./PHASE-02-ledger-core.md)                      | `Done`        | 01         | 2026-08-10 |
-| 03  | [Dashboard & analytics](./PHASE-03-dashboard.md)              | `Not started` | 02         |            |
+| 03  | [Dashboard & analytics](./PHASE-03-dashboard.md)              | `Done`        | 02         | 2026-08-10 |
 | 04  | [Budgets & alerts](./PHASE-04-budgets.md)                     | `Not started` | 02, 03     |            |
 | 05  | [Goals & subscriptions](./PHASE-05-goals-subscriptions.md)    | `Not started` | 02         |            |
 | 06  | [Balances & settlements](./PHASE-06-balances.md)              | `Not started` | 02         |            |

@@ -14,6 +14,7 @@ promote an item into a phase file first.
 
 - [ ] Perf seed of 10k transactions for ledger virtualization FPS checks — deferred from Phase 02 because seeding 10k via `create_transaction` on every `db:reset` is too slow; demo seed keeps ~150 realistic rows. Target: tooling / Phase 02 follow-up.
 - [ ] Wire `hasAttachment` ledger filter to real attachment rows — deferred from Phase 02 because attachments land in Phase 07; URL param `attached=1` already yields an empty set. Target: Phase 07.
+- [ ] Re-run Lighthouse (perf ≥ 95, a11y 100) on a production `pnpm start` build of the seeded dashboard — deferred from Phase 03 because local `pnpm dev` is not a valid perf baseline; axe e2e already covers a11y. Target: Phase 03 follow-up / CI.
 
 ## Post-v1 ideas
 

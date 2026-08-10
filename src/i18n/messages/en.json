@@ -164,7 +164,70 @@
     "empty": "No matching commands",
     "actions": "Actions",
     "navigate": "Navigate",
-    "addTransaction": "Add transaction"
+    "results": "Transactions",
+    "spaces": "Spaces",
+    "switchSpace": "Switch to",
+    "untitled": "Untitled",
+    "addTransaction": "Add transaction",
+    "addExpense": "Add expense",
+    "addIncome": "Add income"
+  },
+  "charts": {
+    "empty": "Nothing to chart in this period",
+    "showTable": "Show data table",
+    "hideTable": "Hide data table"
+  },
+  "period": {
+    "from": "From",
+    "to": "To",
+    "reset": "This month",
+    "customMonthHint": "Household months start on day {day}",
+    "presets": {
+      "this_month": "This month",
+      "last_month": "Last month",
+      "last_3_months": "Last 3 months",
+      "this_year": "This year",
+      "last_year": "Last year",
+      "custom": "Custom"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "add": "Add",
+    "vsPrevious": "vs previous",
+    "acrossAccounts": "across accounts",
+    "emptyTitle": "Your nest is ready",
+    "emptyBody": "Log the first expense and this screen fills with totals, trends, and where the money went.",
+    "emptyCta": "Add first expense",
+    "cards": {
+      "income": "Income",
+      "expense": "Expenses",
+      "net": "Net",
+      "balance": "Balance"
+    },
+    "evolution": {
+      "title": "Evolution",
+      "area": "Cumulative",
+      "bars": "Daily"
+    },
+    "categories": {
+      "title": "Where it goes",
+      "ranked": "Top categories",
+      "total": "Total"
+    },
+    "participants": {
+      "title": "By person",
+      "paid": "Paid",
+      "owed": "Owed"
+    },
+    "merchants": {
+      "title": "Top merchants"
+    },
+    "rail": {
+      "accounts": "Accounts",
+      "alerts": "Alerts",
+      "alertsSoon": "Budget alerts arrive in the next phase."
+    }
   },
 
   "auth": {

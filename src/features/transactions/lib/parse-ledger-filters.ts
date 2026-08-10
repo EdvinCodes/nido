@@ -6,6 +6,7 @@ type UrlLedgerParams = {
   from?: string | undefined;
   to?: string | undefined;
   tags?: string[] | undefined;
+  categoryIds?: string[] | undefined;
   amountMin?: number | null | undefined;
   amountMax?: number | null | undefined;
   shared?: boolean | undefined;
@@ -24,6 +25,7 @@ export function parseLedgerFilters(
       : undefined;
 
   const tagIds = params.tags?.filter(Boolean);
+  const categoryIds = params.categoryIds?.filter(Boolean);
   const mineOnly = params.mine === true;
 
   return transactionFiltersSchema.parse({
@@ -31,6 +33,7 @@ export function parseLedgerFilters(
     kind,
     dateFrom: params.from || undefined,
     dateTo: params.to || undefined,
+    categoryIds: categoryIds?.length ? categoryIds : undefined,
     tagIds: tagIds?.length ? tagIds : undefined,
     amountMin: params.amountMin ?? undefined,
     amountMax: params.amountMax ?? undefined,
@@ -54,6 +57,14 @@ export function parseLedgerFiltersFromSearchParams(
         ? tagParam.filter((t): t is string => typeof t === 'string')
         : [];
 
+  const categoryParam = sp.category;
+  const categoryIds =
+    typeof categoryParam === 'string'
+      ? categoryParam.split(',').filter(Boolean)
+      : Array.isArray(categoryParam)
+        ? categoryParam.filter((t): t is string => typeof t === 'string')
+        : [];
+
   const amountMin = parseMinorParam(sp.min);
   const amountMax = parseMinorParam(sp.max);
 
@@ -64,6 +75,7 @@ export function parseLedgerFiltersFromSearchParams(
       from: typeof sp.from === 'string' ? sp.from : undefined,
       to: typeof sp.to === 'string' ? sp.to : undefined,
       tags,
+      categoryIds,
       amountMin,
       amountMax,
       shared: truthySearchParam(sp.shared),

@@ -319,6 +319,9 @@ export type Database = {
           avatar_url: string | null
           colourblind_safe: boolean
           created_at: string
+          default_period_from: string | null
+          default_period_preset: string
+          default_period_to: string | null
           display_name: string
           id: string
           last_active_space_id: string | null
@@ -331,6 +334,9 @@ export type Database = {
           avatar_url?: string | null
           colourblind_safe?: boolean
           created_at?: string
+          default_period_from?: string | null
+          default_period_preset?: string
+          default_period_to?: string | null
           display_name: string
           id: string
           last_active_space_id?: string | null
@@ -343,6 +349,9 @@ export type Database = {
           avatar_url?: string | null
           colourblind_safe?: boolean
           created_at?: string
+          default_period_from?: string | null
+          default_period_preset?: string
+          default_period_to?: string | null
           display_name?: string
           id?: string
           last_active_space_id?: string | null
@@ -967,9 +976,31 @@ export type Database = {
         Args: { p_id: string; p_request_id?: string }
         Returns: Json
       }
+      search_transactions: {
+        Args: { p_limit?: number; p_query: string; p_space_id: string }
+        Returns: Json
+      }
       seed_default_categories: {
         Args: { p_category_keys?: string[]; p_space_id: string }
         Returns: undefined
+      }
+      space_series: {
+        Args: {
+          p_from: string
+          p_granularity?: string
+          p_space_id: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      space_summary: {
+        Args: {
+          p_from: string
+          p_participant_id?: string
+          p_space_id: string
+          p_to: string
+        }
+        Returns: Json
       }
       update_transaction: { Args: { p: Json; p_id: string }; Returns: Json }
     }

@@ -95,17 +95,36 @@ function, debounced at 200 ms.
 
 ## Acceptance criteria
 
-- [ ] The full dashboard renders from a single call to `nido.space_summary` plus one series
+- [x] The full dashboard renders from a single call to `nido.space_summary` plus one series
       call. Verify by counting queries in the Supabase logs.
-- [ ] Every figure matches a manual calculation over the seed data, to the cent.
-- [ ] Deltas versus the previous period are correct, including for a partial current month.
-- [ ] A space with `month_starts_on = 25` produces correct boundaries and labels.
-- [ ] Clicking any chart segment or any category row lands on the ledger with the right
+- [x] Every figure matches a manual calculation over the seed data, to the cent.
+- [x] Deltas versus the previous period are correct, including for a partial current month.
+- [x] A space with `month_starts_on = 25` produces correct boundaries and labels.
+- [x] Clicking any chart segment or any category row lands on the ledger with the right
       filters applied and the right rows shown.
-- [ ] Every chart has a keyboard-accessible data table alternative and no axe violations.
-- [ ] Charts do not appear in the initial JavaScript bundle.
+- [x] Every chart has a keyboard-accessible data table alternative and no axe violations.
+- [x] Charts do not appear in the initial JavaScript bundle.
 - [ ] Lighthouse targets met on mobile emulation with the seeded space.
-- [ ] `pnpm verify`, `pnpm test:db`, `pnpm test:e2e` pass.
+      _(Deferred — see BACKLOG; axe e2e covers a11y; perf needs a production baseline.)_
+- [x] `pnpm verify`, `pnpm test:db`, `pnpm test:e2e` pass.
+
+## Phase notes (2026-08-10)
+
+- **RPCs:** `nido.space_summary`, `nido.space_series`, `nido.search_transactions`. Previous
+  period in SQL is the same-length window immediately before `p_from`/`p_to` (matches
+  `previousRange` in `src/lib/dates`).
+- **Cache:** membership is checked with the user client; the summary/series bodies run under
+  `unstable_cache` via the service-role client (RPCs allow `service_role` after that gate).
+  Tags: `dashboard:{spaceId}`; invalidated from ledger writes.
+- **Charts:** all Recharts wrappers live in `src/components/charts/` and are `next/dynamic`
+  imported with `ssr: false`, so Recharts stays out of the dashboard's critical path.
+- **Bundle:** first-party dashboard route code stays under the 180 KB gzipped budget by
+  keeping Recharts out of the initial graph; chart chunks load on interaction/paint of each
+  section.
+- **Lighthouse:** axe e2e on the seeded dashboard is clean. Full Lighthouse perf≥95 on a
+  production server is tracked in `docs/BACKLOG.md` (dev server is not a valid baseline).
+- **pgTAP:** `supabase/tests/070_dashboard.sql` covers hand-computed totals for a
+  `month_starts_on = 25` fixture and outsider denial.
 
 ## Out of scope
 

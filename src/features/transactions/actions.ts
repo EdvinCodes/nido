@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'node:crypto';
+import { invalidateDashboardCache } from '@/features/dashboard/cache';
 import { authedAction } from '@/lib/auth/authed-action';
 import { rpcJson, untyped } from './db';
 import { listTransactions } from './queries';
@@ -58,7 +59,9 @@ function toRpcPayload(
 }
 
 function revalidateLedger(spaceId: string): void {
+  revalidatePath(`/s/${spaceId}`);
   revalidatePath(`/s/${spaceId}/ledger`);
+  invalidateDashboardCache(spaceId);
 }
 
 export const createTransaction = authedAction()

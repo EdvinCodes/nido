@@ -164,7 +164,70 @@
     "empty": "Sin comandos coincidentes",
     "actions": "Acciones",
     "navigate": "Ir a",
-    "addTransaction": "Añadir movimiento"
+    "results": "Movimientos",
+    "spaces": "Espacios",
+    "switchSpace": "Cambiar a",
+    "untitled": "Sin título",
+    "addTransaction": "Añadir movimiento",
+    "addExpense": "Añadir gasto",
+    "addIncome": "Añadir ingreso"
+  },
+  "charts": {
+    "empty": "Nada que graficar en este periodo",
+    "showTable": "Mostrar tabla",
+    "hideTable": "Ocultar tabla"
+  },
+  "period": {
+    "from": "Desde",
+    "to": "Hasta",
+    "reset": "Este mes",
+    "customMonthHint": "El mes del hogar empieza el día {day}",
+    "presets": {
+      "this_month": "Este mes",
+      "last_month": "Mes pasado",
+      "last_3_months": "Últimos 3 meses",
+      "this_year": "Este año",
+      "last_year": "Año pasado",
+      "custom": "Personalizado"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "add": "Añadir",
+    "vsPrevious": "vs anterior",
+    "acrossAccounts": "entre cuentas",
+    "emptyTitle": "Tu nido está listo",
+    "emptyBody": "Registra el primer gasto y esta pantalla se llena con totales, tendencias y a dónde va el dinero.",
+    "emptyCta": "Añadir primer gasto",
+    "cards": {
+      "income": "Ingresos",
+      "expense": "Gastos",
+      "net": "Neto",
+      "balance": "Saldo"
+    },
+    "evolution": {
+      "title": "Evolución",
+      "area": "Acumulado",
+      "bars": "Diario"
+    },
+    "categories": {
+      "title": "A dónde va",
+      "ranked": "Top categorías",
+      "total": "Total"
+    },
+    "participants": {
+      "title": "Por persona",
+      "paid": "Pagado",
+      "owed": "Adeudado"
+    },
+    "merchants": {
+      "title": "Top comercios"
+    },
+    "rail": {
+      "accounts": "Cuentas",
+      "alerts": "Alertas",
+      "alertsSoon": "Las alertas de presupuesto llegan en la siguiente fase."
+    }
   },
 
   "auth": {

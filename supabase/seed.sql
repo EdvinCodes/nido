@@ -197,6 +197,7 @@ declare
   v_kind text;
   v_split_mode text;
   v_booked date;
+  v_hist record;
   v_amount bigint;
   v_range bigint;
   v_category_id uuid;
@@ -542,8 +543,409 @@ begin
   from nido.categories c
   where c.space_id = v_space_id and c.name = 'Eating out' and c.kind = 'expense' and c.parent_id is null;
 
+  -- Planted recurring-candidate series (unique merchant, ~monthly, ±5% amounts).
+  perform nido.create_transaction(jsonb_build_object(
+    'space_id', v_space_id,
+    'kind', 'expense',
+    'booked_on', (date_trunc('month', current_date) - interval '2 months')::date + 11,
+    'amount_minor', 1299,
+    'currency', 'EUR',
+    'category_id', (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+    'account_id', v_account_checking,
+    'payer_participant_id', v_alex_participant,
+    'split_mode', 'equal',
+    'description', 'Streamflix Candidate',
+    'merchant', 'Streamflix Candidate',
+    'participants', jsonb_build_array(
+      jsonb_build_object('participant_id', v_alex_participant),
+      jsonb_build_object('participant_id', v_sam_participant)
+    )
+  ));
+  perform nido.create_transaction(jsonb_build_object(
+    'space_id', v_space_id,
+    'kind', 'expense',
+    'booked_on', (date_trunc('month', current_date) - interval '1 months')::date + 11,
+    'amount_minor', 1299,
+    'currency', 'EUR',
+    'category_id', (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+    'account_id', v_account_checking,
+    'payer_participant_id', v_alex_participant,
+    'split_mode', 'equal',
+    'description', 'Streamflix Candidate',
+    'merchant', 'Streamflix Candidate',
+    'participants', jsonb_build_array(
+      jsonb_build_object('participant_id', v_alex_participant),
+      jsonb_build_object('participant_id', v_sam_participant)
+    )
+  ));
+  perform nido.create_transaction(jsonb_build_object(
+    'space_id', v_space_id,
+    'kind', 'expense',
+    'booked_on', date_trunc('month', current_date)::date + 11,
+    'amount_minor', 1349,
+    'currency', 'EUR',
+    'category_id', (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+    'account_id', v_account_checking,
+    'payer_participant_id', v_alex_participant,
+    'split_mode', 'equal',
+    'description', 'Streamflix Candidate',
+    'merchant', 'Streamflix Candidate',
+    'participants', jsonb_build_array(
+      jsonb_build_object('participant_id', v_alex_participant),
+      jsonb_build_object('participant_id', v_sam_participant)
+    )
+  ));
+  v_n_expenses := v_n_expenses + 3;
+  v_n_transactions := v_n_transactions + 3;
+
+  -- Two goals.
+  insert into nido.goals (
+    id, space_id, name, description, target_minor, currency, target_date,
+    account_id, color, icon, created_by
+  ) values
+    (
+      '00000000-0000-4000-8000-0000000000d1',
+      v_space_id,
+      'Fondo de emergencia',
+      '3 meses de gastos',
+      500000,
+      'EUR',
+      (current_date + 180),
+      v_account_savings,
+      '#2F6F4E',
+      'shield',
+      v_alex_id
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000d2',
+      v_space_id,
+      'Viaje a Lisboa',
+      null,
+      120000,
+      'EUR',
+      (current_date + 90),
+      null,
+      '#C45C26',
+      'plane',
+      v_alex_id
+    );
+
+  insert into nido.goal_contributions (
+    goal_id, space_id, participant_id, amount_minor, contributed_on, note
+  ) values
+    (
+      '00000000-0000-4000-8000-0000000000d1',
+      v_space_id,
+      v_alex_participant,
+      50000,
+      (date_trunc('month', current_date) - interval '2 months')::date + 3,
+      null
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000d1',
+      v_space_id,
+      v_sam_participant,
+      40000,
+      (date_trunc('month', current_date) - interval '1 months')::date + 3,
+      null
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000d1',
+      v_space_id,
+      v_alex_participant,
+      35000,
+      date_trunc('month', current_date)::date + 2,
+      null
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000d2',
+      v_space_id,
+      v_alex_participant,
+      30000,
+      (date_trunc('month', current_date) - interval '1 months')::date + 8,
+      null
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000d2',
+      v_space_id,
+      v_sam_participant,
+      25000,
+      date_trunc('month', current_date)::date + 4,
+      null
+    );
+
+  -- Four subscriptions; one with a prior price increase.
+  insert into nido.recurring_rules (
+    id, space_id, kind, name, merchant, amount_minor, currency, category_id, account_id,
+    payer_participant_id, split_mode, split_config, freq, interval_count, by_month_day,
+    starts_on, next_run_on, last_run_on, auto_create, reminder_days_before, created_by
+  ) values
+    (
+      '00000000-0000-4000-8000-0000000000e1',
+      v_space_id,
+      'subscription',
+      'Netflix',
+      'Netflix',
+      1599,
+      'EUR',
+      (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+      v_account_checking,
+      v_alex_participant,
+      'equal',
+      jsonb_build_array(
+        jsonb_build_object('participant_id', v_alex_participant),
+        jsonb_build_object('participant_id', v_sam_participant)
+      ),
+      'month',
+      1,
+      12,
+      (date_trunc('month', current_date) - interval '4 months')::date + 11,
+      (date_trunc('month', current_date) + interval '1 month')::date + 11,
+      date_trunc('month', current_date)::date + 11,
+      true,
+      2,
+      v_alex_id
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000e2',
+      v_space_id,
+      'subscription',
+      'Spotify Duo',
+      'Spotify',
+      1499,
+      'EUR',
+      (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+      v_account_sam_card,
+      v_sam_participant,
+      'equal',
+      jsonb_build_array(
+        jsonb_build_object('participant_id', v_alex_participant),
+        jsonb_build_object('participant_id', v_sam_participant)
+      ),
+      'month',
+      1,
+      3,
+      (date_trunc('month', current_date) - interval '6 months')::date + 2,
+      (date_trunc('month', current_date) + interval '1 month')::date + 2,
+      date_trunc('month', current_date)::date + 2,
+      true,
+      2,
+      v_alex_id
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000e3',
+      v_space_id,
+      'bill',
+      'Internet fibra',
+      'Movistar',
+      4590,
+      'EUR',
+      (select id from nido.categories where space_id = v_space_id and name = 'Housing' and kind = 'expense' and parent_id is null limit 1),
+      v_account_checking,
+      v_alex_participant,
+      'equal',
+      jsonb_build_array(
+        jsonb_build_object('participant_id', v_alex_participant),
+        jsonb_build_object('participant_id', v_sam_participant)
+      ),
+      'month',
+      1,
+      1,
+      (date_trunc('month', current_date) - interval '8 months')::date,
+      (date_trunc('month', current_date) + interval '1 month')::date,
+      date_trunc('month', current_date)::date,
+      true,
+      3,
+      v_alex_id
+    ),
+    (
+      '00000000-0000-4000-8000-0000000000e4',
+      v_space_id,
+      'subscription',
+      'Gym',
+      'Basic-Fit',
+      2990,
+      'EUR',
+      (select id from nido.categories where space_id = v_space_id and name = 'Health' and kind = 'expense' and parent_id is null limit 1),
+      v_account_checking,
+      v_alex_participant,
+      'personal',
+      jsonb_build_array(jsonb_build_object('participant_id', v_alex_participant)),
+      'month',
+      1,
+      8,
+      (date_trunc('month', current_date) - interval '5 months')::date + 7,
+      (date_trunc('month', current_date) + interval '1 month')::date + 7,
+      date_trunc('month', current_date)::date + 7,
+      false,
+      2,
+      v_alex_id
+    );
+
+  insert into nido.recurring_price_changes (
+    rule_id, space_id, old_amount_minor, new_amount_minor, detected_on, source
+  ) values (
+    '00000000-0000-4000-8000-0000000000e1',
+    v_space_id,
+    1299,
+    1599,
+    (current_date - 40),
+    'manual'
+  );
+
+  -- History charges for the four rules (linked), so totals / ghosts have data.
+  for v_hist in
+    select * from (values
+      (
+        '00000000-0000-4000-8000-0000000000e1'::uuid,
+        2, 11, 1599::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Netflix', 'Netflix'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e1'::uuid,
+        1, 11, 1599::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Netflix', 'Netflix'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e1'::uuid,
+        0, 11, 1599::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Netflix', 'Netflix'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e2'::uuid,
+        2, 2, 1499::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_sam_card, v_sam_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Spotify Duo', 'Spotify'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e2'::uuid,
+        1, 2, 1499::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_sam_card, v_sam_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Spotify Duo', 'Spotify'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e2'::uuid,
+        0, 2, 1499::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Subscriptions' and kind = 'expense' and parent_id is null limit 1),
+        v_account_sam_card, v_sam_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Spotify Duo', 'Spotify'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e3'::uuid,
+        2, 0, 4590::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Housing' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Internet fibra', 'Movistar'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e3'::uuid,
+        1, 0, 4590::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Housing' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Internet fibra', 'Movistar'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e3'::uuid,
+        0, 0, 4590::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Housing' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'equal'::nido.split_mode,
+        jsonb_build_array(
+          jsonb_build_object('participant_id', v_alex_participant),
+          jsonb_build_object('participant_id', v_sam_participant)
+        ),
+        'Internet fibra', 'Movistar'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e4'::uuid,
+        3, 7, 2990::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Health' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'personal'::nido.split_mode,
+        jsonb_build_array(jsonb_build_object('participant_id', v_alex_participant)),
+        'Gym', 'Basic-Fit'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e4'::uuid,
+        2, 7, 2990::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Health' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'personal'::nido.split_mode,
+        jsonb_build_array(jsonb_build_object('participant_id', v_alex_participant)),
+        'Gym', 'Basic-Fit'
+      ),
+      (
+        '00000000-0000-4000-8000-0000000000e4'::uuid,
+        1, 7, 2990::bigint,
+        (select id from nido.categories where space_id = v_space_id and name = 'Health' and kind = 'expense' and parent_id is null limit 1),
+        v_account_checking, v_alex_participant, 'personal'::nido.split_mode,
+        jsonb_build_array(jsonb_build_object('participant_id', v_alex_participant)),
+        'Gym', 'Basic-Fit'
+      )
+    ) as t(
+      rule_id, months, day_offset, amount, category_id,
+      account_id, payer, split_mode, participants,
+      name, merchant
+    )
+  loop
+    perform nido.create_transaction(jsonb_build_object(
+      'space_id', v_space_id,
+      'kind', 'expense',
+      'booked_on', (date_trunc('month', current_date) - make_interval(months => v_hist.months))::date + v_hist.day_offset,
+      'amount_minor', v_hist.amount,
+      'currency', 'EUR',
+      'category_id', v_hist.category_id,
+      'account_id', v_hist.account_id,
+      'payer_participant_id', v_hist.payer,
+      'split_mode', v_hist.split_mode,
+      'participants', v_hist.participants,
+      'description', v_hist.name,
+      'merchant', v_hist.merchant,
+      'recurring_rule_id', v_hist.rule_id
+    ));
+    v_n_expenses := v_n_expenses + 1;
+    v_n_transactions := v_n_transactions + 1;
+  end loop;
+
   raise notice
-    'Seeded space % ("Casa de Alex y Sam") with % transactions (% expenses, % incomes, % transfers) and 2 budgets.',
+    'Seeded space % ("Casa de Alex y Sam") with % transactions (% expenses, % incomes, % transfers), 2 budgets, 2 goals, 4 subscriptions.',
     v_space_id, v_n_transactions, v_n_expenses, v_n_incomes, v_n_transfers;
 end $$;
 

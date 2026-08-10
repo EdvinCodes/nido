@@ -355,6 +355,157 @@ export type Database = {
         }
         Relationships: []
       }
+      goal_contributions: {
+        Row: {
+          amount_minor: number
+          contributed_on: string
+          created_at: string
+          goal_id: string
+          id: string
+          note: string | null
+          participant_id: string
+          space_id: string
+          transaction_id: string | null
+        }
+        Insert: {
+          amount_minor: number
+          contributed_on?: string
+          created_at?: string
+          goal_id: string
+          id?: string
+          note?: string | null
+          participant_id: string
+          space_id: string
+          transaction_id?: string | null
+        }
+        Update: {
+          amount_minor?: number
+          contributed_on?: string
+          created_at?: string
+          goal_id?: string
+          id?: string
+          note?: string | null
+          participant_id?: string
+          space_id?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          account_id: string | null
+          auto_contribute_minor: number | null
+          color: string
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          saved_minor: number
+          space_id: string
+          status: Database["nido"]["Enums"]["goal_status"]
+          target_date: string | null
+          target_minor: number
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          auto_contribute_minor?: number | null
+          color?: string
+          created_at?: string
+          created_by: string
+          currency: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name: string
+          saved_minor?: number
+          space_id: string
+          status?: Database["nido"]["Enums"]["goal_status"]
+          target_date?: string | null
+          target_minor: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          auto_contribute_minor?: number | null
+          color?: string
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          saved_minor?: number
+          space_id?: string
+          status?: Database["nido"]["Enums"]["goal_status"]
+          target_date?: string | null
+          target_minor?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       idempotency_keys: {
         Row: {
           action: string
@@ -602,6 +753,199 @@ export type Database = {
             columns: ["last_active_space_id"]
             isOneToOne: false
             referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_price_changes: {
+        Row: {
+          detected_on: string
+          id: string
+          new_amount_minor: number
+          old_amount_minor: number
+          rule_id: string
+          source: string
+          space_id: string
+        }
+        Insert: {
+          detected_on?: string
+          id?: string
+          new_amount_minor: number
+          old_amount_minor: number
+          rule_id: string
+          source?: string
+          space_id: string
+        }
+        Update: {
+          detected_on?: string
+          id?: string
+          new_amount_minor?: number
+          old_amount_minor?: number
+          rule_id?: string
+          source?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_price_changes_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_price_changes_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_rules: {
+        Row: {
+          account_id: string | null
+          amount_minor: number
+          auto_create: boolean
+          by_month_day: number | null
+          by_weekday: number | null
+          cancel_url: string | null
+          cancelled_at: string | null
+          category_id: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          ends_on: string | null
+          freq: Database["nido"]["Enums"]["recurrence_freq"]
+          ghost_snoozed_until: string | null
+          id: string
+          interval_count: number
+          is_active: boolean
+          kind: Database["nido"]["Enums"]["recurring_kind"]
+          last_run_on: string | null
+          marked_in_use_at: string | null
+          merchant: string | null
+          name: string
+          next_run_on: string
+          notes: string | null
+          payer_participant_id: string | null
+          reminder_days_before: number
+          space_id: string
+          split_config: Json
+          split_mode: Database["nido"]["Enums"]["split_mode"]
+          starts_on: string
+          to_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount_minor: number
+          auto_create?: boolean
+          by_month_day?: number | null
+          by_weekday?: number | null
+          cancel_url?: string | null
+          cancelled_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by: string
+          currency: string
+          ends_on?: string | null
+          freq?: Database["nido"]["Enums"]["recurrence_freq"]
+          ghost_snoozed_until?: string | null
+          id?: string
+          interval_count?: number
+          is_active?: boolean
+          kind?: Database["nido"]["Enums"]["recurring_kind"]
+          last_run_on?: string | null
+          marked_in_use_at?: string | null
+          merchant?: string | null
+          name: string
+          next_run_on: string
+          notes?: string | null
+          payer_participant_id?: string | null
+          reminder_days_before?: number
+          space_id: string
+          split_config?: Json
+          split_mode?: Database["nido"]["Enums"]["split_mode"]
+          starts_on: string
+          to_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          amount_minor?: number
+          auto_create?: boolean
+          by_month_day?: number | null
+          by_weekday?: number | null
+          cancel_url?: string | null
+          cancelled_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          ends_on?: string | null
+          freq?: Database["nido"]["Enums"]["recurrence_freq"]
+          ghost_snoozed_until?: string | null
+          id?: string
+          interval_count?: number
+          is_active?: boolean
+          kind?: Database["nido"]["Enums"]["recurring_kind"]
+          last_run_on?: string | null
+          marked_in_use_at?: string | null
+          merchant?: string | null
+          name?: string
+          next_run_on?: string
+          notes?: string | null
+          payer_participant_id?: string | null
+          reminder_days_before?: number
+          space_id?: string
+          split_config?: Json
+          split_mode?: Database["nido"]["Enums"]["split_mode"]
+          starts_on?: string
+          to_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_rules_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_rules_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -941,6 +1285,7 @@ export type Database = {
           deleted_at: string | null
           description: string
           external_id: string | null
+          goal_id: string | null
           id: string
           is_pending: boolean
           kind: Database["nido"]["Enums"]["tx_kind"]
@@ -948,6 +1293,7 @@ export type Database = {
           notes: string | null
           occurred_at: string | null
           payer_participant_id: string | null
+          recurring_rule_id: string | null
           space_id: string
           split_mode: Database["nido"]["Enums"]["split_mode"]
           to_account_id: string | null
@@ -966,6 +1312,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           external_id?: string | null
+          goal_id?: string | null
           id?: string
           is_pending?: boolean
           kind: Database["nido"]["Enums"]["tx_kind"]
@@ -973,6 +1320,7 @@ export type Database = {
           notes?: string | null
           occurred_at?: string | null
           payer_participant_id?: string | null
+          recurring_rule_id?: string | null
           space_id: string
           split_mode?: Database["nido"]["Enums"]["split_mode"]
           to_account_id?: string | null
@@ -991,6 +1339,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           external_id?: string | null
+          goal_id?: string | null
           id?: string
           is_pending?: boolean
           kind?: Database["nido"]["Enums"]["tx_kind"]
@@ -998,6 +1347,7 @@ export type Database = {
           notes?: string | null
           occurred_at?: string | null
           payer_participant_id?: string | null
+          recurring_rule_id?: string | null
           space_id?: string
           split_mode?: Database["nido"]["Enums"]["split_mode"]
           to_account_id?: string | null
@@ -1033,10 +1383,24 @@ export type Database = {
             referencedColumns: ["code"]
           },
           {
+            foreignKeyName: "transactions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transactions_payer_participant_id_fkey"
             columns: ["payer_participant_id"]
             isOneToOne: false
             referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_recurring_rule_id_fkey"
+            columns: ["recurring_rule_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_rules"
             referencedColumns: ["id"]
           },
           {
@@ -1147,10 +1511,18 @@ export type Database = {
       }
     }
     Functions: {
+      _apply_recurring_price_change: {
+        Args: { p_new_amount: number; p_rule_id: string; p_source: string }
+        Returns: undefined
+      }
       _assert_contributor: { Args: { p_space_id: string }; Returns: string }
       _can_mutate_transaction: {
         Args: { p_tx: Database["nido"]["Tables"]["transactions"]["Row"] }
         Returns: boolean
+      }
+      _clamp_month_day: {
+        Args: { p_day: number; p_month: number; p_year: number }
+        Returns: string
       }
       _insert_splits: {
         Args: {
@@ -1164,9 +1536,34 @@ export type Database = {
         }
         Returns: undefined
       }
+      _last_day_of_month: { Args: { p_date: string }; Returns: string }
+      _notify_recurring_due: {
+        Args: {
+          p_due_on: string
+          p_reason: string
+          p_rule: Database["nido"]["Tables"]["recurring_rules"]["Row"]
+        }
+        Returns: undefined
+      }
+      _notify_recurring_price_change: {
+        Args: {
+          p_new: number
+          p_old: number
+          p_rule: Database["nido"]["Tables"]["recurring_rules"]["Row"]
+        }
+        Returns: undefined
+      }
       _set_transaction_tags: {
         Args: { p_space_id: string; p_tag_ids: string[]; p_tx_id: string }
         Returns: undefined
+      }
+      _split_config_to_participants: {
+        Args: { p_split_config: Json }
+        Returns: Json
+      }
+      _week_start: {
+        Args: { p_date: string; p_week_starts_on: number }
+        Returns: string
       }
       accept_invitation: { Args: { p_token: string }; Returns: string }
       account_balance: { Args: { p_account_id: string }; Returns: number }
@@ -1200,6 +1597,14 @@ export type Database = {
         Args: { p_id: string; p_request_id?: string }
         Returns: Json
       }
+      detect_ghost_subscriptions: {
+        Args: { p_space_id: string }
+        Returns: Json
+      }
+      detect_recurring_candidates: {
+        Args: { p_space_id: string }
+        Returns: Json
+      }
       ensure_budget_periods: {
         Args: { p_budget_id: string; p_through: string }
         Returns: number
@@ -1212,6 +1617,7 @@ export type Database = {
         Args: { p_period_id: string }
         Returns: number
       }
+      goal_projection: { Args: { p_goal_id: string }; Returns: Json }
       has_role: {
         Args: {
           p_roles: Database["nido"]["Enums"]["member_role"][]
@@ -1231,7 +1637,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      materialize_recurring: {
+        Args: { p_rule_id: string; p_through: string }
+        Returns: number
+      }
       my_participant_id: { Args: { p_space_id: string }; Returns: string }
+      next_occurrence: {
+        Args: {
+          p_after: string
+          p_rule: Database["nido"]["Tables"]["recurring_rules"]["Row"]
+        }
+        Returns: string
+      }
+      next_occurrence_after: {
+        Args: { p_after: string; p_rule_id: string }
+        Returns: string
+      }
+      normalize_merchant: { Args: { p_merchant: string }; Returns: string }
       period_bounds: {
         Args: {
           p_month_starts_on: number
@@ -1276,6 +1698,11 @@ export type Database = {
         Returns: Json
       }
       run_budget_alerts: { Args: { p_through?: string }; Returns: number }
+      run_recurring_all: { Args: { p_today?: string }; Returns: Json }
+      run_recurring_for_space: {
+        Args: { p_space_id: string; p_today?: string }
+        Returns: Json
+      }
       search_transactions: {
         Args: { p_limit?: number; p_query: string; p_space_id: string }
         Returns: Json

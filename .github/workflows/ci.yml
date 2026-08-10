@@ -39,7 +39,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm lint && pnpm check:i18n
 
       - name: Unit tests
         run: pnpm test
@@ -47,7 +47,7 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.113.0
 
       - name: Start Supabase
         run: supabase start

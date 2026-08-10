@@ -134,7 +134,7 @@ values (
 );
 select set_config('test.third_participant', '10000000-0000-0000-0000-0000000000p3', true);
 
-select plan(16);
+select plan(17);
 
 -- 1. Equal split of 1000 across three participants sums exactly.
 select lives_ok(

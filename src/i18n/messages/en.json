@@ -146,6 +146,7 @@
     "categories": "Categories",
     "accounts": "Accounts",
     "profile": "Profile",
+    "notifications": "Notifications",
     "add": "Add",
     "more": "More",
     "comingSoon": "Soon"
@@ -225,8 +226,9 @@
     },
     "rail": {
       "accounts": "Accounts",
-      "alerts": "Alerts",
-      "alertsSoon": "Budget alerts arrive in the next phase."
+      "alerts": "Budgets needing attention",
+      "alertsSoon": "Budget alerts arrive in the next phase.",
+      "alertsEmpty": "All budgets look healthy right now."
     }
   },
 
@@ -478,6 +480,96 @@
       "savings": "Savings",
       "shared_pot": "Shared pot",
       "other": "Other"
+    }
+  },
+
+  "budgets": {
+    "title": "Budgets",
+    "create": "New budget",
+    "edit": "Edit",
+    "archive": "Archive",
+    "suggest": "Suggest",
+    "suggestTitle": "Suggested budgets",
+    "suggestBody": "Based on the median of the last three complete months, rounded up.",
+    "acceptAll": "Accept all",
+    "acceptSelected": "Accept selected",
+    "emptyTitle": "No budgets yet",
+    "emptyBody": "Set a monthly cap on groceries or a personal limit — progress updates as soon as you log a spend.",
+    "untitled": "Budget",
+    "untitledTx": "Untitled",
+    "sparkline": "Recent periods",
+    "history": "Period history",
+    "transactions": "Spending in this period",
+    "noTransactions": "No matching expenses in this period.",
+    "remaining": "{amount} left",
+    "overBy": "{amount} over",
+    "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+    "daily": "{amount}/day",
+    "fields": {
+      "name": "Name",
+      "scope": "Scope",
+      "category": "Category",
+      "participant": "Person",
+      "limit": "Limit",
+      "period": "Period",
+      "startsOn": "Starts on",
+      "rollover": "Roll over unspent",
+      "rolloverHelp": "Leftover limit carries into the next period. Overspend does not.",
+      "thresholds": "Alert thresholds"
+    },
+    "scopeLabel": {
+      "space": "Everyone · all categories",
+      "category": "One category",
+      "participant": "One person",
+      "category_participant": "Category × person"
+    },
+    "scope": {
+      "space": "Everyone · all categories",
+      "category": "{category} · everyone",
+      "participant": "{participant} · all categories",
+      "category_participant": "{category} · {participant}"
+    },
+    "period": {
+      "day": "daily",
+      "week": "weekly",
+      "month": "monthly",
+      "quarter": "quarterly",
+      "year": "yearly"
+    },
+    "errors": {
+      "limit": "Enter a positive limit.",
+      "thresholds": "Pick at least one threshold."
+    }
+  },
+
+  "notifications": {
+    "title": "Notifications",
+    "bellLabel": "Notifications, {count} unread",
+    "markAllRead": "Mark all read",
+    "empty": "Nothing new.",
+    "settingsLink": "Notification settings",
+    "settingsTitle": "Notifications",
+    "settingsBody": "Choose which alerts appear in the app. Email and push arrive in a later phase.",
+    "columns": {
+      "kind": "Kind",
+      "inApp": "In-app",
+      "email": "Email",
+      "push": "Push"
+    },
+    "soon": "Soon",
+    "disabledUntilP10": "Available in a later phase",
+    "kinds": {
+      "budget_threshold": "Budget threshold",
+      "budget_exceeded": "Budget exceeded",
+      "recurring_due": "Recurring due",
+      "recurring_price_change": "Price change",
+      "goal_reached": "Goal reached",
+      "settlement_request": "Settlement request",
+      "settlement_confirmed": "Settlement confirmed",
+      "member_joined": "Member joined",
+      "import_finished": "Import finished",
+      "bank_sync_failed": "Bank sync failed",
+      "insight": "Insight"
     }
   }
 }

@@ -461,8 +461,89 @@ begin
     v_n_transactions := v_n_transactions + 1;
   end loop;
 
+  -- Current-month fixtures so the dashboard shows one healthy and one over-limit budget.
+  perform set_config('request.jwt.claim.sub', v_alex_id::text, true);
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', v_alex_id::text, 'role', 'authenticated', 'email', 'alex@demo.nido.local')::text,
+    true
+  );
+
+  perform nido.create_transaction(jsonb_build_object(
+    'space_id', v_space_id,
+    'kind', 'expense',
+    'booked_on', current_date,
+    'amount_minor', 2200,
+    'currency', 'EUR',
+    'category_id', (select id from nido.categories where space_id = v_space_id and name = 'Groceries' and kind = 'expense' and parent_id is null),
+    'account_id', v_account_checking,
+    'payer_participant_id', v_alex_participant,
+    'split_mode', 'equal',
+    'description', 'Current month groceries',
+    'merchant', 'Mercadona',
+    'participants', jsonb_build_array(
+      jsonb_build_object('participant_id', v_alex_participant),
+      jsonb_build_object('participant_id', v_sam_participant)
+    )
+  ));
+
+  perform nido.create_transaction(jsonb_build_object(
+    'space_id', v_space_id,
+    'kind', 'expense',
+    'booked_on', current_date,
+    'amount_minor', 8500,
+    'currency', 'EUR',
+    'category_id', (select id from nido.categories where space_id = v_space_id and name = 'Eating out' and kind = 'expense' and parent_id is null),
+    'account_id', v_account_checking,
+    'payer_participant_id', v_sam_participant,
+    'split_mode', 'equal',
+    'description', 'Current month dinner',
+    'merchant', 'Casa Paco',
+    'participants', jsonb_build_array(
+      jsonb_build_object('participant_id', v_alex_participant),
+      jsonb_build_object('participant_id', v_sam_participant)
+    )
+  ));
+
+  -- Two budgets: groceries comfortably under (80 EUR vs ~22), eating-out over (50 vs ~85).
+  insert into nido.budgets (
+    space_id, name, scope, category_id, period, limit_minor, currency,
+    starts_on, alert_thresholds, created_by
+  )
+  select
+    v_space_id,
+    'Compra semanal',
+    'category',
+    c.id,
+    'month',
+    8000,
+    'EUR',
+    date_trunc('month', current_date)::date,
+    '{50,80,100}',
+    v_alex_id
+  from nido.categories c
+  where c.space_id = v_space_id and c.name = 'Groceries' and c.kind = 'expense' and c.parent_id is null;
+
+  insert into nido.budgets (
+    space_id, name, scope, category_id, period, limit_minor, currency,
+    starts_on, alert_thresholds, created_by
+  )
+  select
+    v_space_id,
+    'Salir a comer',
+    'category',
+    c.id,
+    'month',
+    5000,
+    'EUR',
+    date_trunc('month', current_date)::date,
+    '{50,80,100}',
+    v_alex_id
+  from nido.categories c
+  where c.space_id = v_space_id and c.name = 'Eating out' and c.kind = 'expense' and c.parent_id is null;
+
   raise notice
-    'Seeded space % ("Casa de Alex y Sam") with % transactions (% expenses, % incomes, % transfers).',
+    'Seeded space % ("Casa de Alex y Sam") with % transactions (% expenses, % incomes, % transfers) and 2 budgets.',
     v_space_id, v_n_transactions, v_n_expenses, v_n_incomes, v_n_transfers;
 end $$;
 

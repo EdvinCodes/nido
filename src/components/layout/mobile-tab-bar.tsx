@@ -21,7 +21,7 @@ export function MobileTabBar({ activePath, spaceId }: { activePath: string; spac
       href: `${base}/budgets`,
       icon: PiggyBank,
       primary: false,
-      ready: false,
+      ready: true,
     },
     {
       key: 'more' as const,

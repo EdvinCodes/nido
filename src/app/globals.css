@@ -22,13 +22,14 @@
   --muted-foreground: oklch(0.52 0.012 65);
 
   /* ---------- Accent and semantics ---------- */
-  --primary: oklch(0.68 0.145 68);
-  --primary-foreground: oklch(0.99 0.004 85);
+  /* Amber CTAs use dark ink — white-on-amber fails WCAG AA at this chroma. */
+  --primary: oklch(0.78 0.14 68);
+  --primary-foreground: oklch(0.22 0.03 55);
   --secondary: oklch(0.955 0.006 75);
   --secondary-foreground: oklch(0.25 0.01 65);
   --accent: oklch(0.955 0.012 75);
   --accent-foreground: oklch(0.25 0.01 65);
-  --ring: oklch(0.68 0.145 68);
+  --ring: oklch(0.78 0.14 68);
 
   --income: oklch(0.55 0.115 165);
   --income-foreground: oklch(0.99 0.004 85);
@@ -94,13 +95,13 @@
   --muted: oklch(0.235 0.008 65);
   --muted-foreground: oklch(0.64 0.012 65);
 
-  --primary: oklch(0.78 0.15 72);
-  --primary-foreground: oklch(0.18 0.02 72);
+  --primary: oklch(0.8 0.14 72);
+  --primary-foreground: oklch(0.2 0.03 55);
   --secondary: oklch(0.255 0.009 65);
   --secondary-foreground: oklch(0.965 0.004 85);
   --accent: oklch(0.265 0.012 70);
   --accent-foreground: oklch(0.965 0.004 85);
-  --ring: oklch(0.78 0.15 72);
+  --ring: oklch(0.8 0.14 72);
 
   --income: oklch(0.76 0.13 165);
   --income-foreground: oklch(0.18 0.02 165);

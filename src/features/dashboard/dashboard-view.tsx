@@ -8,9 +8,11 @@ import { useState } from 'react';
 import { Amount } from '@/components/money/amount';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendDelta } from '@/components/ui/trend-delta';
 import { PeriodPicker } from '@/components/period/period-picker';
+import type { AttentionBudget } from '@/features/budgets/types';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { formatMoney, money } from '@/lib/money';
 import { route } from '@/lib/routes';
@@ -54,6 +56,8 @@ export function DashboardView({
   summary,
   series,
   isEmptySpace,
+  attentionBudgets = [],
+  categoryBudgetProgress = {},
 }: {
   spaceId: string;
   spaceKind: string;
@@ -64,6 +68,8 @@ export function DashboardView({
   summary: SpaceSummary;
   series: SpaceSeriesPoint[];
   isEmptySpace: boolean;
+  attentionBudgets?: AttentionBudget[];
+  categoryBudgetProgress?: Record<string, { ratio: number; budgetId: string }>;
 }) {
   const t = useTranslations('dashboard');
   const locale = useLocale();
@@ -313,15 +319,23 @@ export function DashboardView({
                             label={t('vsPrevious')}
                           />
                         </span>
-                        <span
-                          className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
-                          aria-hidden
-                        >
-                          <span
-                            className="block h-full rounded-full bg-primary"
-                            style={{ width: `${Math.min(100, category.share * 100)}%` }}
+                        {category.id && categoryBudgetProgress[category.id] ? (
+                          <ProgressBar
+                            className="mt-1"
+                            value={categoryBudgetProgress[category.id]?.ratio ?? 0}
+                            label={category.name}
                           />
-                        </span>
+                        ) : (
+                          <span
+                            className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
+                            aria-hidden
+                          >
+                            <span
+                              className="block h-full rounded-full bg-primary"
+                              style={{ width: `${Math.min(100, category.share * 100)}%` }}
+                            />
+                          </span>
+                        )}
                       </span>
                       <Amount
                         minor={category.total_minor}
@@ -411,9 +425,34 @@ export function DashboardView({
               ))}
             </ul>
           </section>
-          <section className="rounded-xl border border-dashed border-border bg-surface/20 p-4">
+          <section className="rounded-xl border border-border bg-surface/40 p-4">
             <h2 className="text-sm font-medium tracking-tight">{t('rail.alerts')}</h2>
-            <p className="mt-2 text-xs text-muted-foreground">{t('rail.alertsSoon')}</p>
+            {attentionBudgets.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">{t('rail.alertsEmpty')}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {attentionBudgets.map((budget) => (
+                  <li key={budget.id}>
+                    <Link
+                      href={route(`/s/${spaceId}/budgets/${budget.id}`)}
+                      className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-sm">
+                        <span className="truncate font-medium">{budget.name}</span>
+                        <span
+                          className={
+                            budget.urgency === 'over' ? 'text-danger' : 'text-muted-foreground'
+                          }
+                        >
+                          {Math.round(budget.ratio * 100)}%
+                        </span>
+                      </div>
+                      <ProgressBar className="mt-1.5" value={budget.ratio} label={budget.name} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </aside>
       </div>

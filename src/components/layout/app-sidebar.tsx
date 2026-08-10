@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 import { SpaceSwitcher } from '@/components/layout/space-switcher';
 import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
@@ -24,7 +25,7 @@ type SpaceList = Awaited<ReturnType<typeof getUserSpaces>>;
 const NAV_ITEMS = [
   { key: 'dashboard', href: '', icon: LayoutDashboard, ready: true },
   { key: 'ledger', href: '/ledger', icon: Receipt, ready: true },
-  { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: false },
+  { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: true },
   { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: false },
   { key: 'balances', href: '/balances', icon: Scale, ready: false },
   { key: 'subscriptions', href: '/subscriptions', icon: Repeat, ready: false },
@@ -38,20 +39,25 @@ export function AppSidebar({
   spaceId,
   spaces,
   spaceName,
+  headerAction,
 }: {
   activePath: string;
   spaceId: string;
   spaces: SpaceList;
   role: MemberRole;
   spaceName: string;
+  headerAction?: ReactNode;
 }) {
   const t = useTranslations('nav');
   void spaceName;
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
-      <div className="border-b border-sidebar-border px-4 py-4">
-        <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
+      <div className="flex items-start justify-between gap-2 border-b border-sidebar-border px-4 py-4">
+        <div className="min-w-0 flex-1">
+          <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
+        </div>
+        {headerAction}
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Primary">
         {NAV_ITEMS.map(({ key, href, icon: Icon, ready }) => {

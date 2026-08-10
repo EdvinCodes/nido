@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getAttentionBudgets, getCategoryBudgetProgress } from '@/features/budgets/queries';
 import { DashboardView } from '@/features/dashboard/dashboard-view';
 import { resolveDashboardPeriod } from '@/features/dashboard/lib/resolve-period';
 import {
@@ -115,7 +116,11 @@ async function DashboardLoaded({
     );
   }
 
-  const summary = await getSpaceSummary({ spaceId, from, to });
+  const [summary, attentionBudgets, categoryBudgetProgress] = await Promise.all([
+    getSpaceSummary({ spaceId, from, to }),
+    getAttentionBudgets(spaceId),
+    getCategoryBudgetProgress(spaceId),
+  ]);
   const previousSeries = await getSpaceSeries({
     spaceId,
     from: summary.previous_from,
@@ -134,6 +139,8 @@ async function DashboardLoaded({
       summary={summary}
       series={toCumulativeSeries(previousSeries)}
       isEmptySpace={false}
+      attentionBudgets={attentionBudgets}
+      categoryBudgetProgress={categoryBudgetProgress}
     />
   );
 }

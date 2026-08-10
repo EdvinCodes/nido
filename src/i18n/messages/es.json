@@ -146,6 +146,7 @@
     "categories": "Categorías",
     "accounts": "Cuentas",
     "profile": "Perfil",
+    "notifications": "Notificaciones",
     "add": "Añadir",
     "more": "Más",
     "comingSoon": "Pronto"
@@ -225,8 +226,9 @@
     },
     "rail": {
       "accounts": "Cuentas",
-      "alerts": "Alertas",
-      "alertsSoon": "Las alertas de presupuesto llegan en la siguiente fase."
+      "alerts": "Presupuestos a vigilar",
+      "alertsSoon": "Las alertas de presupuesto llegan en la siguiente fase.",
+      "alertsEmpty": "Todos los presupuestos van bien por ahora."
     }
   },
 
@@ -478,6 +480,96 @@
       "savings": "Ahorros",
       "shared_pot": "Bote común",
       "other": "Otra"
+    }
+  },
+
+  "budgets": {
+    "title": "Presupuestos",
+    "create": "Nuevo presupuesto",
+    "edit": "Editar",
+    "archive": "Archivar",
+    "suggest": "Sugerir",
+    "suggestTitle": "Presupuestos sugeridos",
+    "suggestBody": "Según la mediana de los últimos tres meses completos, redondeada al alza.",
+    "acceptAll": "Aceptar todos",
+    "acceptSelected": "Aceptar selección",
+    "emptyTitle": "Aún no hay presupuestos",
+    "emptyBody": "Pon un tope mensual a la compra o un límite personal: el progreso se actualiza al registrar un gasto.",
+    "untitled": "Presupuesto",
+    "untitledTx": "Sin título",
+    "sparkline": "Periodos recientes",
+    "history": "Historial de periodos",
+    "transactions": "Gastos de este periodo",
+    "noTransactions": "No hay gastos que coincidan en este periodo.",
+    "remaining": "Quedan {amount}",
+    "overBy": "{amount} de más",
+    "daysLeft": "{count, plural, one {Queda # día} other {Quedan # días}}",
+    "daily": "{amount}/día",
+    "fields": {
+      "name": "Nombre",
+      "scope": "Alcance",
+      "category": "Categoría",
+      "participant": "Persona",
+      "limit": "Límite",
+      "period": "Periodo",
+      "startsOn": "Empieza el",
+      "rollover": "Arrastrar lo no gastado",
+      "rolloverHelp": "El sobrante pasa al siguiente periodo. El exceso no.",
+      "thresholds": "Umbrales de alerta"
+    },
+    "scopeLabel": {
+      "space": "Todos · todas las categorías",
+      "category": "Una categoría",
+      "participant": "Una persona",
+      "category_participant": "Categoría × persona"
+    },
+    "scope": {
+      "space": "Todos · todas las categorías",
+      "category": "{category} · todos",
+      "participant": "{participant} · todas las categorías",
+      "category_participant": "{category} · {participant}"
+    },
+    "period": {
+      "day": "diario",
+      "week": "semanal",
+      "month": "mensual",
+      "quarter": "trimestral",
+      "year": "anual"
+    },
+    "errors": {
+      "limit": "Introduce un límite positivo.",
+      "thresholds": "Elige al menos un umbral."
+    }
+  },
+
+  "notifications": {
+    "title": "Notificaciones",
+    "bellLabel": "Notificaciones, {count} sin leer",
+    "markAllRead": "Marcar todo leído",
+    "empty": "Nada nuevo.",
+    "settingsLink": "Ajustes de notificaciones",
+    "settingsTitle": "Notificaciones",
+    "settingsBody": "Elige qué alertas ves en la app. Email y push llegan en una fase posterior.",
+    "columns": {
+      "kind": "Tipo",
+      "inApp": "En la app",
+      "email": "Email",
+      "push": "Push"
+    },
+    "soon": "Pronto",
+    "disabledUntilP10": "Disponible en una fase posterior",
+    "kinds": {
+      "budget_threshold": "Umbral de presupuesto",
+      "budget_exceeded": "Presupuesto superado",
+      "recurring_due": "Recurrente pendiente",
+      "recurring_price_change": "Cambio de precio",
+      "goal_reached": "Meta alcanzada",
+      "settlement_request": "Solicitud de ajuste",
+      "settlement_confirmed": "Ajuste confirmado",
+      "member_joined": "Miembro unido",
+      "import_finished": "Importación lista",
+      "bank_sync_failed": "Fallo de sync bancaria",
+      "insight": "Insight"
     }
   }
 }

@@ -193,7 +193,7 @@ export function LedgerClient({
   }
 
   function onDelete(tx: TransactionView): void {
-    startTransition(async () => {
+    void (async () => {
       const requestId = crypto.randomUUID();
       const result = await deleteTransaction({
         spaceId,
@@ -222,7 +222,7 @@ export function LedgerClient({
         },
       });
       void query.refetch();
-    });
+    })();
   }
 
   function onDuplicate(tx: TransactionView): void {

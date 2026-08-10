@@ -7,6 +7,7 @@ import { SpaceProvider } from '@/features/spaces/space-context';
 import { TransactionComposerProvider } from '@/features/transactions/composer-context';
 import { getActiveParticipants } from '@/features/transactions/queries';
 import { TransactionComposerHost } from '@/features/transactions/transaction-form';
+import { getUnreadNotificationCount, listNotifications } from '@/features/notifications/queries';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function SpaceLayout({
@@ -26,12 +27,15 @@ export default async function SpaceLayout({
     .update({ last_active_space_id: spaceId })
     .eq('id', membership.userId);
 
-  const [spaces, categories, accounts, participants] = await Promise.all([
-    getUserSpaces(),
-    getCategories(spaceId),
-    listAccounts(spaceId),
-    getActiveParticipants(spaceId),
-  ]);
+  const [spaces, categories, accounts, participants, notifications, unreadCount] =
+    await Promise.all([
+      getUserSpaces(),
+      getCategories(spaceId),
+      listAccounts(spaceId),
+      getActiveParticipants(spaceId),
+      listNotifications(spaceId),
+      getUnreadNotificationCount(spaceId),
+    ]);
 
   return (
     <SpaceProvider
@@ -49,6 +53,8 @@ export default async function SpaceLayout({
           spaces={spaces}
           role={membership.role}
           spaceName={membership.space.name}
+          notifications={notifications}
+          unreadCount={unreadCount}
         >
           {children}
         </AppShell>

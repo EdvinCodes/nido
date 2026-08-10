@@ -92,19 +92,19 @@ Upcoming charges in the next fourteen days and active goal progress join the rig
 
 ## Acceptance criteria
 
-- [ ] `next_occurrence` is correct for every case listed, with a test per case, including a
+- [x] `next_occurrence` is correct for every case listed, with a test per case, including a
       monthly rule on the 31st running through a leap February.
-- [ ] Running `recurring-run` three times produces one transaction per due occurrence, not three.
-- [ ] Generated transactions carry correct splits, matching what the same configuration
+- [x] Running `recurring-run` three times produces one transaction per due occurrence, not three.
+- [x] Generated transactions carry correct splits, matching what the same configuration
       would produce through the UI.
-- [ ] A generated transaction whose amount differs by more than 1 % records a price change,
+- [x] A generated transaction whose amount differs by more than 1 % records a price change,
       updates the rule, and notifies.
-- [ ] Candidate detection finds the deliberately planted repeating series in the seed data
+- [x] Candidate detection finds the deliberately planted repeating series in the seed data
       and produces no false positives on the rest of it.
-- [ ] Goal projection maths is correct, including when the target date has already passed.
-- [ ] A goal reaching its target notifies every active member exactly once.
-- [ ] The annualised subscription total matches a manual calculation across mixed cycles.
-- [ ] `pnpm verify`, `pnpm test:db`, `pnpm test:e2e` pass.
+- [x] Goal projection maths is correct, including when the target date has already passed.
+- [x] A goal reaching its target notifies every active member exactly once.
+- [x] The annualised subscription total matches a manual calculation across mixed cycles.
+- [x] `pnpm verify`, `pnpm test:db`, `pnpm test:e2e` pass.
 
 ## Out of scope
 

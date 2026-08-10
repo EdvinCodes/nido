@@ -17,6 +17,7 @@ promote an item into a phase file first.
 - [ ] Re-run Lighthouse (perf ≥ 95, a11y 100) on a production `pnpm start` build of the seeded dashboard — deferred from Phase 03 because local `pnpm dev` is not a valid perf baseline; axe e2e already covers a11y. Target: Phase 03 follow-up / CI.
 - [ ] Fix `nido.update_transaction` so amount changes update splits before the balance trigger fires (or defer the check) — deferred from Phase 04; budget-fuzz avoids the RPC for amount edits via delete+create. Target: Phase 02 follow-up / ledger hardening.
 - [ ] Schedule `budget-alerts` (hourly) and `budget-reconcile` (nightly) via `pg_cron` against deployed Edge Function URLs — deferred from Phase 04 because local cron→functions wiring needs project-specific URLs and `CRON_SECRET`. Target: deploy / Phase 10 ops.
+- [ ] Schedule `recurring-run` daily (space-local 03:00) via `pg_cron` against the Edge Function URL — deferred from Phase 05 for the same deploy/ops reason as budget cron. Target: deploy / Phase 10 ops.
 
 ## Post-v1 ideas
 

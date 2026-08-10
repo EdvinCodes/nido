@@ -125,14 +125,14 @@ values
 -- Third participant so three-way equal splits are legal.
 insert into nido.participants (id, space_id, user_id, display_name, color, position)
 values (
-  '10000000-0000-0000-0000-0000000000p3',
+  '10000000-0000-0000-0000-0000000000d3',
   current_setting('test.ledger_space')::uuid,
   null,
   'Ghost Rio',
   '#D4849A',
   2
 );
-select set_config('test.third_participant', '10000000-0000-0000-0000-0000000000p3', true);
+select set_config('test.third_participant', '10000000-0000-0000-0000-0000000000d3', true);
 
 select plan(17);
 
@@ -309,6 +309,7 @@ select throws_ok(
           v_tx, %L::uuid, %L::uuid, 1, 400, 400
         );
         -- Deferred constraint triggers only fire at commit unless forced immediate.
+        set local search_path to nido, public;
         set constraints all immediate;
       end;
       $body$;

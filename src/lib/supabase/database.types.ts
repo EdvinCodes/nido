@@ -16,6 +16,79 @@ export type Json =
 export type Database = {
   nido: {
     Tables: {
+      accounts: {
+        Row: {
+          archived_at: string | null
+          color: string
+          created_at: string
+          currency: string
+          icon: string
+          id: string
+          include_in_totals: boolean
+          kind: Database["nido"]["Enums"]["account_kind"]
+          name: string
+          opening_balance_minor: number
+          owner_participant_id: string | null
+          position: number
+          space_id: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          color?: string
+          created_at?: string
+          currency: string
+          icon?: string
+          id?: string
+          include_in_totals?: boolean
+          kind?: Database["nido"]["Enums"]["account_kind"]
+          name: string
+          opening_balance_minor?: number
+          owner_participant_id?: string | null
+          position?: number
+          space_id: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          color?: string
+          created_at?: string
+          currency?: string
+          icon?: string
+          id?: string
+          include_in_totals?: boolean
+          kind?: Database["nido"]["Enums"]["account_kind"]
+          name?: string
+          opening_balance_minor?: number
+          owner_participant_id?: string | null
+          position?: number
+          space_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "accounts_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -141,6 +214,51 @@ export type Database = {
           symbol?: string
         }
         Relationships: []
+      }
+      idempotency_keys: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          request_id: string
+          result: Json
+          space_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          request_id: string
+          result: Json
+          space_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+          result?: Json
+          space_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idempotency_keys_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idempotency_keys_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       participants: {
         Row: {
@@ -426,12 +544,387 @@ export type Database = {
           },
         ]
       }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          space_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          space_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tags_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_splits: {
+        Row: {
+          base_owed_minor: number
+          id: string
+          owed_minor: number
+          participant_id: string
+          space_id: string
+          transaction_id: string
+          weight: number
+        }
+        Insert: {
+          base_owed_minor: number
+          id?: string
+          owed_minor: number
+          participant_id: string
+          space_id: string
+          transaction_id: string
+          weight?: number
+        }
+        Update: {
+          base_owed_minor?: number
+          id?: string
+          owed_minor?: number
+          participant_id?: string
+          space_id?: string
+          transaction_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_splits_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_splits_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_splits_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_splits_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_tags: {
+        Row: {
+          space_id: string
+          tag_id: string
+          transaction_id: string
+        }
+        Insert: {
+          space_id: string
+          tag_id: string
+          transaction_id: string
+        }
+        Update: {
+          space_id?: string
+          tag_id?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_tags_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tags_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tags_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          account_id: string | null
+          amount_minor: number
+          base_amount_minor: number
+          base_rate: number
+          booked_on: string
+          category_id: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          deleted_at: string | null
+          description: string
+          external_id: string | null
+          id: string
+          is_pending: boolean
+          kind: Database["nido"]["Enums"]["tx_kind"]
+          merchant: string | null
+          notes: string | null
+          occurred_at: string | null
+          payer_participant_id: string | null
+          space_id: string
+          split_mode: Database["nido"]["Enums"]["split_mode"]
+          to_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount_minor: number
+          base_amount_minor: number
+          base_rate?: number
+          booked_on: string
+          category_id?: string | null
+          created_at?: string
+          created_by: string
+          currency: string
+          deleted_at?: string | null
+          description?: string
+          external_id?: string | null
+          id?: string
+          is_pending?: boolean
+          kind: Database["nido"]["Enums"]["tx_kind"]
+          merchant?: string | null
+          notes?: string | null
+          occurred_at?: string | null
+          payer_participant_id?: string | null
+          space_id: string
+          split_mode?: Database["nido"]["Enums"]["split_mode"]
+          to_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          amount_minor?: number
+          base_amount_minor?: number
+          base_rate?: number
+          booked_on?: string
+          category_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          deleted_at?: string | null
+          description?: string
+          external_id?: string | null
+          id?: string
+          is_pending?: boolean
+          kind?: Database["nido"]["Enums"]["tx_kind"]
+          merchant?: string | null
+          notes?: string | null
+          occurred_at?: string | null
+          payer_participant_id?: string | null
+          space_id?: string
+          split_mode?: Database["nido"]["Enums"]["split_mode"]
+          to_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "transactions_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      v_transactions: {
+        Row: {
+          account_color: string | null
+          account_id: string | null
+          account_name: string | null
+          amount_minor: number | null
+          base_amount_minor: number | null
+          base_rate: number | null
+          booked_on: string | null
+          category_color: string | null
+          category_icon: string | null
+          category_id: string | null
+          category_name: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          description: string | null
+          external_id: string | null
+          id: string | null
+          is_pending: boolean | null
+          kind: Database["nido"]["Enums"]["tx_kind"] | null
+          merchant: string | null
+          notes: string | null
+          occurred_at: string | null
+          payer_avatar_url: string | null
+          payer_color: string | null
+          payer_name: string | null
+          payer_participant_id: string | null
+          space_id: string | null
+          split_mode: Database["nido"]["Enums"]["split_mode"] | null
+          splits: Json | null
+          tags: Json | null
+          to_account_id: string | null
+          to_account_name: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_currency_fkey"
+            columns: ["currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "transactions_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      _assert_contributor: { Args: { p_space_id: string }; Returns: string }
+      _can_mutate_transaction: {
+        Args: { p_tx: Database["nido"]["Tables"]["transactions"]["Row"] }
+        Returns: boolean
+      }
+      _insert_splits: {
+        Args: {
+          p_amount_minor: number
+          p_base_amount_minor: number
+          p_base_rate: number
+          p_participants: Json
+          p_space_id: string
+          p_split_mode: Database["nido"]["Enums"]["split_mode"]
+          p_tx_id: string
+        }
+        Returns: undefined
+      }
+      _set_transaction_tags: {
+        Args: { p_space_id: string; p_tag_ids: string[]; p_tx_id: string }
+        Returns: undefined
+      }
       accept_invitation: { Args: { p_token: string }; Returns: string }
+      account_balance: { Args: { p_account_id: string }; Returns: number }
       allocate: {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]
@@ -449,6 +942,11 @@ export type Database = {
         }
         Returns: string
       }
+      create_transaction: { Args: { p: Json }; Returns: Json }
+      delete_transaction: {
+        Args: { p_id: string; p_request_id?: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           p_roles: Database["nido"]["Enums"]["member_role"][]
@@ -465,10 +963,15 @@ export type Database = {
         Returns: boolean
       }
       my_participant_id: { Args: { p_space_id: string }; Returns: string }
+      restore_transaction: {
+        Args: { p_id: string; p_request_id?: string }
+        Returns: Json
+      }
       seed_default_categories: {
         Args: { p_category_keys?: string[]; p_space_id: string }
         Returns: undefined
       }
+      update_transaction: { Args: { p: Json; p_id: string }; Returns: Json }
     }
     Enums: {
       account_kind:

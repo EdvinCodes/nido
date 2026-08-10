@@ -7,12 +7,11 @@ seed (incl. third demo participant for 3-way splits; RFC UUID v4 + GoTrue token 
 pgTAP `060_ledger.sql`, TS domain, server actions + queries, Amount/AmountInput/SplitEditor/
 composer, `/ledger` virtualized list with URL filters (kind/date/search/tags/amount/shared/mine),
 FAB + desktop add button, optimistic insert, accounts settings CRUD UI, Playwright
-`e2e/ledger.spec.ts`, realtime subscription + highlight animation.
+`e2e/ledger.spec.ts`, realtime subscription + highlight animation, ⌘K command palette shell.
 
 **Still open before Done:**
 
-- Confirm Playwright ledger flow green in CI after seed/auth fixes
-- Swipe/long-press bulk selection bar, ⌘K palette
+- Swipe/long-press bulk selection bar
 - `has-attachment` filter (column arrives in Phase 07 — stub URL param or defer)
 - Optional: retire `transactions/db.ts` untyped facade now that `database.types.ts` has Phase 02
 - Perf seed of 10k rows (see `docs/BACKLOG.md`)

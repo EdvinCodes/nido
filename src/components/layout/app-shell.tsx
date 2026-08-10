@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { AppSidebar } from '@/components/layout/app-sidebar';
+import { CommandPalette } from '@/components/layout/command-palette';
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
 import { SpaceSwitcher } from '@/components/layout/space-switcher';
 import type { MemberRole } from '@/lib/auth';
@@ -40,6 +41,7 @@ export function AppShell({
         </div>
         {children}
         <MobileTabBar activePath={pathname} spaceId={spaceId} />
+        <CommandPalette spaceId={spaceId} />
       </div>
     </div>
   );

@@ -157,6 +157,15 @@
     "createSpace": "Create new space",
     "switchSpace": "Switch space"
   },
+  "commandPalette": {
+    "title": "Command palette",
+    "placeholder": "Type a command or search…",
+    "empty": "No matching commands",
+    "actions": "Actions",
+    "navigate": "Navigate",
+    "addTransaction": "Add transaction"
+  },
+
   "auth": {
     "signInTitle": "Welcome back",
     "signInSubtitle": "Sign in to your nest",

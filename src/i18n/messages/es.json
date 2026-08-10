@@ -157,6 +157,15 @@
     "createSpace": "Crear nuevo espacio",
     "switchSpace": "Cambiar de espacio"
   },
+  "commandPalette": {
+    "title": "Paleta de comandos",
+    "placeholder": "Escribe un comando o busca…",
+    "empty": "Sin comandos coincidentes",
+    "actions": "Acciones",
+    "navigate": "Ir a",
+    "addTransaction": "Añadir movimiento"
+  },
+
   "auth": {
     "signInTitle": "Bienvenido de nuevo",
     "signInSubtitle": "Entra en tu nido",

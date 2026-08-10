@@ -20,7 +20,13 @@ const eslintConfig = defineConfig([
 
   ...nextVitals,
   ...nextTs,
-  jsxA11y.flatConfigs.recommended,
+  // `next/core-web-vitals` already registers the jsx-a11y plugin instance; re-declaring it
+  // via `jsxA11y.flatConfigs.recommended` throws a "cannot redefine plugin" error, so only
+  // the rule set is added here, reusing the plugin next.js already wired up.
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: jsxA11y.flatConfigs.recommended.rules,
+  },
 
   // Type-aware linting for our own source only. See docs/06-CONVENTIONS.md §2.
   {

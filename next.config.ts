@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   // Standalone output keeps the self-hosted Docker image small. See docs/01-ARCHITECTURE.md §10.
-  output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
+  ...(process.env.BUILD_STANDALONE === 'true' ? { output: 'standalone' as const } : {}),
 
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -18,9 +18,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
 
   async headers() {
     return [

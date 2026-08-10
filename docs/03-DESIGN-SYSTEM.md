@@ -8,7 +8,7 @@ pleasure to read, and motion that explains rather than decorates.
 
 ## 1. Brand
 
-**Nido** — Spanish for *nest*. The place where things are gathered and kept safe. Warm,
+**Nido** — Spanish for _nest_. The place where things are gathered and kept safe. Warm,
 domestic, shared. The visual language leans warm-neutral rather than the cold blue-grey
 every finance app defaults to, which is the single cheapest way to not look like everyone else.
 
@@ -33,26 +33,26 @@ directive. Never write a raw hex in a component.
 Dark is the primary theme and is designed first; light is a genuine second theme, not an
 inversion.
 
-| Token | Dark | Light | Use |
-| --- | --- | --- | --- |
-| `--color-background` | `oklch(0.155 0.006 65)` | `oklch(0.990 0.004 85)` | Page |
-| `--color-surface` | `oklch(0.195 0.007 65)` | `oklch(1 0 0)` | Cards |
+| Token                    | Dark                    | Light                   | Use              |
+| ------------------------ | ----------------------- | ----------------------- | ---------------- |
+| `--color-background`     | `oklch(0.155 0.006 65)` | `oklch(0.990 0.004 85)` | Page             |
+| `--color-surface`        | `oklch(0.195 0.007 65)` | `oklch(1 0 0)`          | Cards            |
 | `--color-surface-raised` | `oklch(0.235 0.008 65)` | `oklch(0.985 0.003 85)` | Popovers, sheets |
-| `--color-border` | `oklch(0.290 0.008 65)` | `oklch(0.915 0.005 85)` | Hairlines |
-| `--color-muted` | `oklch(0.640 0.012 65)` | `oklch(0.520 0.012 65)` | Secondary text |
-| `--color-foreground` | `oklch(0.965 0.004 85)` | `oklch(0.200 0.008 65)` | Primary text |
+| `--color-border`         | `oklch(0.290 0.008 65)` | `oklch(0.915 0.005 85)` | Hairlines        |
+| `--color-muted`          | `oklch(0.640 0.012 65)` | `oklch(0.520 0.012 65)` | Secondary text   |
+| `--color-foreground`     | `oklch(0.965 0.004 85)` | `oklch(0.200 0.008 65)` | Primary text     |
 
 ### Accent and semantics
 
-| Token | Value | Meaning |
-| --- | --- | --- |
-| `--color-primary` | `oklch(0.780 0.150 72)` | Honey amber. The one accent. Primary actions, focus rings, active nav. |
-| `--color-primary-foreground` | `oklch(0.180 0.020 72)` | Text on primary |
-| `--color-income` | `oklch(0.760 0.130 165)` | Money in. Sage green, not neon. |
-| `--color-expense` | `oklch(0.690 0.165 28)` | Money out. Warm coral, not alarm red. |
-| `--color-warning` | `oklch(0.820 0.150 85)` | Budget approaching |
-| `--color-danger` | `oklch(0.620 0.200 22)` | Destructive actions only |
-| `--color-info` | `oklch(0.720 0.100 240)` | Neutral informational |
+| Token                        | Value                    | Meaning                                                                |
+| ---------------------------- | ------------------------ | ---------------------------------------------------------------------- |
+| `--color-primary`            | `oklch(0.780 0.150 72)`  | Honey amber. The one accent. Primary actions, focus rings, active nav. |
+| `--color-primary-foreground` | `oklch(0.180 0.020 72)`  | Text on primary                                                        |
+| `--color-income`             | `oklch(0.760 0.130 165)` | Money in. Sage green, not neon.                                        |
+| `--color-expense`            | `oklch(0.690 0.165 28)`  | Money out. Warm coral, not alarm red.                                  |
+| `--color-warning`            | `oklch(0.820 0.150 85)`  | Budget approaching                                                     |
+| `--color-danger`             | `oklch(0.620 0.200 22)`  | Destructive actions only                                               |
+| `--color-info`               | `oklch(0.720 0.100 240)` | Neutral informational                                                  |
 
 Income and expense are deliberately **not** pure green and red. Red-green is the worst
 possible pair for the ~8 % of men with deuteranomaly, and this app has exactly one male
@@ -77,11 +77,11 @@ regression. Focus rings are 2 px `--color-primary` with a 2 px offset and are ne
 
 ## 3. Typography
 
-| Role | Family | Notes |
-| --- | --- | --- |
-| Display | **Instrument Serif** | Landing headlines and empty-state headings only. Loaded on the marketing routes; never on the app shell. |
-| UI | **Geist Sans** (variable) | Everything else |
-| Numbers | **Geist Mono** (variable) | All amounts, with `font-variant-numeric: tabular-nums` |
+| Role    | Family                    | Notes                                                                                                                                                       |
+| ------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display | **Instrument Serif**      | Landing headlines, auth panel wordmark, and empty-state headings only. Loaded once on the root layout via CSS variable; never used for app-shell UI chrome. |
+| UI      | **Geist Sans** (variable) | Everything else                                                                                                                                             |
+| Numbers | **Geist Mono** (variable) | All amounts, with `font-variant-numeric: tabular-nums`                                                                                                      |
 
 Amounts are always tabular. A column of numbers whose digits do not line up is the fastest
 way to make a finance app feel amateur.
@@ -134,19 +134,19 @@ spaces) · Subscriptions · Reports · Assistant · Settings.
 Built on shadcn/ui (new-york), copied into `src/components/ui` and edited freely. On top of
 the primitives, these product-specific components are shared across features:
 
-| Component | Behaviour |
-| --- | --- |
-| `<Amount>` | Formats minor units with currency, locale, tabular figures, optional sign colouring, optional `±` glyph, optional "approximately" marker when converted from another currency. **The only place money is ever rendered.** |
-| `<AmountInput>` | Numeric keypad on mobile, locale-aware decimal separator, inline arithmetic (`12,50+3` evaluates on blur), currency selector, never produces a float. |
-| `<CategoryBadge>` | Icon + name in the category colour at the correct contrast. |
-| `<ParticipantAvatar>` / `<ParticipantStack>` | Initials fallback, deterministic colour, overflow counter. |
-| `<SplitEditor>` | The heart of the app. Mode switcher, per-participant rows, live remainder indicator that turns amber when the split does not balance, one-tap presets ("even", "all mine", "all theirs"). |
-| `<PeriodPicker>` | Presets (this month, last month, last 3 months, this year, custom) with a keyboard-navigable range calendar. State lives in the URL via `nuqs`. |
-| `<ProgressRing>` / `<ProgressBar>` | Budget and goal progress, with the over-limit portion rendered in `--color-danger` beyond 100 %. |
-| `<TrendDelta>` | "+12 % vs last month" with an arrow, coloured by whether the change is good, which depends on whether it is income or expense. |
-| `<EmptyState>` | Display-serif heading, one sentence, one action. Every list has one, and it is written, not generic. |
-| `<QuickAdd>` | The 10-second capture flow: amount, category, done. Everything else is progressive disclosure. |
-| `<CommandPalette>` | ⌘K / Ctrl+K. Navigate, search transactions, add an expense, switch space. |
+| Component                                    | Behaviour                                                                                                                                                                                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<Amount>`                                   | Formats minor units with currency, locale, tabular figures, optional sign colouring, optional `±` glyph, optional "approximately" marker when converted from another currency. **The only place money is ever rendered.** |
+| `<AmountInput>`                              | Numeric keypad on mobile, locale-aware decimal separator, inline arithmetic (`12,50+3` evaluates on blur), currency selector, never produces a float.                                                                     |
+| `<CategoryBadge>`                            | Icon + name in the category colour at the correct contrast.                                                                                                                                                               |
+| `<ParticipantAvatar>` / `<ParticipantStack>` | Initials fallback, deterministic colour, overflow counter.                                                                                                                                                                |
+| `<SplitEditor>`                              | The heart of the app. Mode switcher, per-participant rows, live remainder indicator that turns amber when the split does not balance, one-tap presets ("even", "all mine", "all theirs").                                 |
+| `<PeriodPicker>`                             | Presets (this month, last month, last 3 months, this year, custom) with a keyboard-navigable range calendar. State lives in the URL via `nuqs`.                                                                           |
+| `<ProgressRing>` / `<ProgressBar>`           | Budget and goal progress, with the over-limit portion rendered in `--color-danger` beyond 100 %.                                                                                                                          |
+| `<TrendDelta>`                               | "+12 % vs last month" with an arrow, coloured by whether the change is good, which depends on whether it is income or expense.                                                                                            |
+| `<EmptyState>`                               | Display-serif heading, one sentence, one action. Every list has one, and it is written, not generic.                                                                                                                      |
+| `<QuickAdd>`                                 | The 10-second capture flow: amount, category, done. Everything else is progressive disclosure.                                                                                                                            |
+| `<CommandPalette>`                           | ⌘K / Ctrl+K. Navigate, search transactions, add an expense, switch space.                                                                                                                                                 |
 
 Every list, chart, and table has four explicit visual states: **loading** (skeleton matching
 the real layout, never a spinner), **empty**, **error** (with a retry), and **populated**.
@@ -162,15 +162,15 @@ currency-abbreviated ticks (`1,2 k €`), tooltips as a card with the full amoun
 transaction count, and animated entry only on first mount (never on data refresh, which is
 nauseating).
 
-| Chart | Where |
-| --- | --- |
-| Area with gradient | Daily balance evolution on the dashboard |
-| Grouped bars | Income vs expense by month, with the previous period ghosted behind |
-| Donut with centre total | Spend by category, click to filter the ledger |
-| Horizontal bars | Top merchants, top categories |
-| Stacked bars | Spend by participant over time |
-| Sparklines | Inside budget and subscription cards |
-| Calendar heatmap | Spending intensity by day of month |
+| Chart                   | Where                                                               |
+| ----------------------- | ------------------------------------------------------------------- |
+| Area with gradient      | Daily balance evolution on the dashboard                            |
+| Grouped bars            | Income vs expense by month, with the previous period ghosted behind |
+| Donut with centre total | Spend by category, click to filter the ledger                       |
+| Horizontal bars         | Top merchants, top categories                                       |
+| Stacked bars            | Spend by participant over time                                      |
+| Sparklines              | Inside budget and subscription cards                                |
+| Calendar heatmap        | Spending intensity by day of month                                  |
 
 ---
 

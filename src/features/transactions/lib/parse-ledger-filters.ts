@@ -66,12 +66,18 @@ export function parseLedgerFiltersFromSearchParams(
       tags,
       amountMin,
       amountMax,
-      shared: sp.shared === '1',
-      mine: sp.mine === '1',
-      hasAttachment: sp.attached === '1',
+      shared: truthySearchParam(sp.shared),
+      mine: truthySearchParam(sp.mine),
+      hasAttachment: truthySearchParam(sp.attached),
     },
     viewerParticipantId,
   );
+}
+
+/** nuqs `parseAsBoolean` writes `true`/`false`; shareable links may also use `1`/`0`. */
+function truthySearchParam(value: string | string[] | undefined): boolean {
+  if (Array.isArray(value)) return value.some((entry) => entry === '1' || entry === 'true');
+  return value === '1' || value === 'true';
 }
 
 function parseMinorParam(value: string | string[] | undefined): number | null {

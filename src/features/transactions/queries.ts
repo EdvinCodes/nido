@@ -51,7 +51,10 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
   }
 
   if (filters.mineOnly && filters.viewerParticipantId) {
-    query = query.contains('splits', [{ participant_id: filters.viewerParticipantId }]);
+    // "Mine" = I paid or I appear in the split. Prefer an explicit `or` + `cs` clause
+    // (same shape as the tags filter) over `.contains` on the view's aggregated jsonb.
+    const pid = filters.viewerParticipantId;
+    query = query.or(`payer_participant_id.eq.${pid},splits.cs.[{"participant_id":"${pid}"}]`);
   }
 
   // Phase 07 will filter on a real attachment relation. Until then "has attachment"

@@ -23,9 +23,10 @@
     "name": "Name"
   },
   "marketing": {
+    "brand": "nido",
     "eyebrow": "Household finance",
-    "headline": "All your household money, in one nest",
-    "subhead": "Shared expenses, fair splits, and clear accounts for couples, flatmates, or solo budgeting. Your data, your database.",
+    "headline": "All your household money, in one place",
+    "subhead": "Shared expenses, fair splits, and clear accounts. Your data, your database.",
     "ctaApp": "Start free",
     "ctaSignIn": "Sign in",
     "ctaGithub": "View on GitHub",

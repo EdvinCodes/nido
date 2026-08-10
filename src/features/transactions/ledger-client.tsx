@@ -32,6 +32,7 @@ import { useLedgerRealtime } from '@/features/transactions/use-ledger-realtime';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { formatMoney, money, parseMoney } from '@/lib/money';
+import { cn } from '@/lib/utils';
 
 type ListItem =
   | { type: 'header'; day: string; subtotal: number; currency: string }
@@ -279,11 +280,19 @@ export function LedgerClient({
     });
   }
 
+  const filterChipClass = (active: boolean) =>
+    cn(
+      'h-9 rounded-md border px-3 text-sm transition-colors',
+      active
+        ? 'border-primary/45 bg-primary/15 text-foreground'
+        : 'border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+    );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex flex-col gap-2 px-4 pt-4 lg:px-8">
+      <div className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 pt-4 pb-3 backdrop-blur-md lg:px-8">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-display text-2xl tracking-tight">{t('title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
           <Button
             type="button"
             className="hidden lg:inline-flex"
@@ -294,7 +303,7 @@ export function LedgerClient({
             {t('add')}
           </Button>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <Input
             value={urlState.q}
             onChange={(e) => {
@@ -377,39 +386,36 @@ export function LedgerClient({
             aria-label={t('amountMax')}
             className="w-24"
           />
-          <label className="flex items-center gap-1.5 text-sm">
-            <input
-              type="checkbox"
-              checked={urlState.shared}
-              onChange={(e) => {
-                void setUrlState({ shared: e.target.checked });
-              }}
-              className="size-4 rounded border-input"
-            />
+          <button
+            type="button"
+            aria-pressed={urlState.shared}
+            className={filterChipClass(urlState.shared)}
+            onClick={() => {
+              void setUrlState({ shared: !urlState.shared });
+            }}
+          >
             {t('sharedOnly')}
-          </label>
-          <label className="flex items-center gap-1.5 text-sm">
-            <input
-              type="checkbox"
-              checked={urlState.mine}
-              onChange={(e) => {
-                void setUrlState({ mine: e.target.checked });
-              }}
-              className="size-4 rounded border-input"
-            />
+          </button>
+          <button
+            type="button"
+            aria-pressed={urlState.mine}
+            className={filterChipClass(urlState.mine)}
+            onClick={() => {
+              void setUrlState({ mine: !urlState.mine });
+            }}
+          >
             {t('mineOnly')}
-          </label>
-          <label className="flex items-center gap-1.5 text-sm">
-            <input
-              type="checkbox"
-              checked={urlState.attached}
-              onChange={(e) => {
-                void setUrlState({ attached: e.target.checked });
-              }}
-              className="size-4 rounded border-input"
-            />
+          </button>
+          <button
+            type="button"
+            aria-pressed={urlState.attached}
+            className={filterChipClass(urlState.attached)}
+            onClick={() => {
+              void setUrlState({ attached: !urlState.attached });
+            }}
+          >
             {t('hasAttachment')}
-          </label>
+          </button>
           {hasFilters ? (
             <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
               {t('clearFilters')}

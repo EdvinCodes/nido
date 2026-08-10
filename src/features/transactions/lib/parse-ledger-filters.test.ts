@@ -73,4 +73,17 @@ describe('parseLedgerFiltersFromSearchParams', () => {
       viewerParticipantId: VIEWER,
     });
   });
+
+  it('accepts nuqs boolean true/false in the URL', () => {
+    expect(
+      parseLedgerFiltersFromSearchParams(
+        { mine: 'true', shared: 'false', attached: 'true' },
+        VIEWER,
+      ),
+    ).toEqual({
+      mineOnly: true,
+      viewerParticipantId: VIEWER,
+      hasAttachment: true,
+    });
+  });
 });

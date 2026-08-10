@@ -23,9 +23,10 @@
     "name": "Nombre"
   },
   "marketing": {
+    "brand": "nido",
     "eyebrow": "Finanzas del hogar",
-    "headline": "Todo el dinero de casa, en un solo nido",
-    "subhead": "Gastos compartidos, reparto justo y cuentas claras para parejas, pisos compartidos o tu economía personal. Tus datos, tu base de datos.",
+    "headline": "Todo el dinero de casa, en un solo sitio",
+    "subhead": "Gastos compartidos, reparto justo y cuentas claras. Tus datos, tu base de datos.",
     "ctaApp": "Empezar gratis",
     "ctaSignIn": "Iniciar sesión",
     "ctaGithub": "Ver en GitHub",

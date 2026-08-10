@@ -10,6 +10,7 @@ type UrlLedgerParams = {
   amountMax?: number | null | undefined;
   shared?: boolean | undefined;
   mine?: boolean | undefined;
+  hasAttachment?: boolean | undefined;
 };
 
 /** Maps ledger URL / nuqs state into a validated filter object for list queries. */
@@ -35,6 +36,7 @@ export function parseLedgerFilters(
     amountMax: params.amountMax ?? undefined,
     sharedOnly: params.shared === true ? true : undefined,
     mineOnly: mineOnly ? true : undefined,
+    hasAttachment: params.hasAttachment === true ? true : undefined,
     viewerParticipantId: mineOnly && viewerParticipantId ? viewerParticipantId : undefined,
   });
 }
@@ -66,6 +68,7 @@ export function parseLedgerFiltersFromSearchParams(
       amountMax,
       shared: sp.shared === '1',
       mine: sp.mine === '1',
+      hasAttachment: sp.attached === '1',
     },
     viewerParticipantId,
   );

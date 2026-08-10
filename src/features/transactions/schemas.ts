@@ -140,6 +140,11 @@ export const transactionFiltersSchema = z.object({
   amountMax: minorUnits.nonnegative().optional(),
   sharedOnly: z.boolean().optional(),
   mineOnly: z.boolean().optional(),
+  /**
+   * Attachment rows land in Phase 07. Until then this filter is wired in the URL and
+   * query layer so shares/bookmarks keep working; matches are empty by design.
+   */
+  hasAttachment: z.boolean().optional(),
   /** Resolved from the signed-in member; not stored in the URL. */
   viewerParticipantId: z.uuid().optional(),
 });

@@ -344,7 +344,11 @@
     "amountMin": "Importe mín.",
     "amountMax": "Importe máx.",
     "sharedOnly": "Solo compartidos",
-    "mineOnly": "Solo míos"
+    "mineOnly": "Solo míos",
+    "hasAttachment": "Con adjunto",
+    "selectedCount": "{count} seleccionados",
+    "clearSelection": "Limpiar",
+    "bulkDeleted": "Se eliminaron {count} movimientos"
   },
   "transactions": {
     "addTitle": "Añadir movimiento",
@@ -371,9 +375,12 @@
     "giveRest": "Dar el resto",
     "created": "Movimiento guardado",
     "deleted": "Movimiento eliminado",
+    "duplicated": "Movimiento duplicado",
     "restored": "Movimiento restaurado",
     "undo": "Deshacer",
     "delete": "Eliminar",
+    "edit": "Editar",
+    "duplicate": "Duplicar",
     "kind": {
       "expense": "Gasto",
       "income": "Ingreso",

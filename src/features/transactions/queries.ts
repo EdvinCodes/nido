@@ -54,6 +54,12 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
     query = query.contains('splits', [{ participant_id: filters.viewerParticipantId }]);
   }
 
+  // Phase 07 will filter on a real attachment relation. Until then "has attachment"
+  // is a shareable URL flag that correctly yields an empty result set.
+  if (filters.hasAttachment) {
+    query = query.eq('id', '00000000-0000-4000-8000-00000000dead');
+  }
+
   if (filters.tagIds?.length) {
     const tagClauses = filters.tagIds.map((id) => `tags.cs.[{"id":"${id}"}]`).join(',');
     query = query.or(tagClauses);

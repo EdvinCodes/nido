@@ -18,6 +18,7 @@ describe('parseLedgerFilters', () => {
           amountMax: 5000,
           shared: true,
           mine: false,
+          hasAttachment: true,
         },
         VIEWER,
       ),
@@ -30,6 +31,7 @@ describe('parseLedgerFilters', () => {
       amountMin: 100,
       amountMax: 5000,
       sharedOnly: true,
+      hasAttachment: true,
     });
   });
 

@@ -1,20 +1,11 @@
 # Phase 02 — Ledger core
 
-## Status note (session checkpoint)
+## Status note
 
-**In progress.** Landed: DB migrations (accounts/tags/transactions/splits/view/RPCs/idempotency),
-seed (incl. third demo participant for 3-way splits; RFC UUID v4 + GoTrue token columns),
-pgTAP `060_ledger.sql`, TS domain, server actions + queries, Amount/AmountInput/SplitEditor/
-composer, `/ledger` virtualized list with URL filters (kind/date/search/tags/amount/shared/mine),
-FAB + desktop add button, optimistic insert, accounts settings CRUD UI, Playwright
-`e2e/ledger.spec.ts`, realtime subscription + highlight animation, ⌘K command palette shell.
-
-**Still open before Done:**
-
-- Swipe/long-press bulk selection bar
-- `has-attachment` filter (column arrives in Phase 07 — stub URL param or defer)
-- Optional: retire `transactions/db.ts` untyped facade now that `database.types.ts` has Phase 02
-- Perf seed of 10k rows (see `docs/BACKLOG.md`)
+**Done** (2026-08-10). Core ledger shipped: schema/RPCs/RLS/pgTAP, domain + actions,
+composer, virtualized ledger with URL filters (incl. `hasAttachment` stub for Phase 07),
+accounts settings, realtime highlight, ⌘K palette, swipe/long-press bulk delete,
+Playwright coverage. Perf seed of 10k rows remains in `docs/BACKLOG.md`.
 
 ---
 
@@ -142,18 +133,20 @@ Fast path: amount, category, save. Everything else defaulted and collapsed.
 
 ## Acceptance criteria
 
-- [ ] An expense can be created in under ten seconds on a mobile viewport using only the
+- [x] An expense can be created in under ten seconds on a mobile viewport using only the
       fast path, and it appears in the ledger immediately.
-- [ ] All five split modes work, and no combination of inputs can produce splits that do
+- [x] All five split modes work, and no combination of inputs can produce splits that do
       not sum exactly to the total — attempting it via a direct RPC call is rejected by the
       database.
-- [ ] Transfers are excluded from income and expense figures and from all splits.
-- [ ] Every filter works, combines with the others, survives a page reload, and is
-      shareable as a URL.
+- [x] Transfers are excluded from income and expense figures and from all splits.
+- [x] Every filter works, combines with the others, survives a page reload, and is
+      shareable as a URL. (`hasAttachment` is URL-wired; real matches arrive in Phase 07.)
 - [ ] Ten thousand seeded transactions scroll at 60 fps and the page still loads under 1.5 s.
-- [ ] A transaction added by one member appears on the other's open ledger within a second.
-- [ ] Soft delete plus undo works, and a deleted transaction is excluded from every query.
-- [ ] `pnpm verify`, `pnpm test:db`, and `pnpm test:e2e` pass.
+      — deferred to `docs/BACKLOG.md` (demo seed ~150 rows; full 10k seed is too slow for
+      every `db:reset`).
+- [x] A transaction added by one member appears on the other's open ledger within a second.
+- [x] Soft delete plus undo works, and a deleted transaction is excluded from every query.
+- [x] `pnpm verify`, `pnpm test:db`, and `pnpm test:e2e` pass.
 
 ## Out of scope
 

@@ -16,17 +16,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { deleteTransaction, restoreTransaction } from '@/features/transactions/actions';
+import {
+  bulkDelete,
+  deleteTransaction,
+  duplicateTransaction,
+  restoreTransaction,
+} from '@/features/transactions/actions';
 import { useInfiniteTransactions } from '@/features/transactions/hooks';
 import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
 import type { TagRow, TransactionView } from '@/features/transactions/types';
 import { parseLedgerFilters } from '@/features/transactions/lib/parse-ledger-filters';
+import { LedgerRow } from '@/features/transactions/ledger-row';
 import { useLedgerRealtime } from '@/features/transactions/use-ledger-realtime';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { formatMoney, money, parseMoney } from '@/lib/money';
-import { cn } from '@/lib/utils';
 
 type ListItem =
   | { type: 'header'; day: string; subtotal: number; currency: string }
@@ -73,7 +78,9 @@ export function LedgerClient({
   const { space, participantId } = useSpaceContext();
   const composer = useTransactionComposerOptional();
   const [detail, setDetail] = useState<TransactionView | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [pending, startTransition] = useTransition();
+  const selectionMode = selectedIds.size > 0;
 
   const [urlState, setUrlState] = useQueryStates({
     q: parseAsString.withDefault(''),
@@ -85,6 +92,7 @@ export function LedgerClient({
     max: parseAsInteger,
     shared: parseAsBoolean.withDefault(false),
     mine: parseAsBoolean.withDefault(false),
+    attached: parseAsBoolean.withDefault(false),
   });
 
   const filters: TransactionFilters = useMemo(
@@ -100,6 +108,7 @@ export function LedgerClient({
           amountMax: urlState.max,
           shared: urlState.shared,
           mine: urlState.mine,
+          hasAttachment: urlState.attached,
         },
         participantId,
       ),
@@ -162,6 +171,20 @@ export function LedgerClient({
       max: null,
       shared: false,
       mine: false,
+      attached: false,
+    });
+  }
+
+  function clearSelection(): void {
+    setSelectedIds(new Set());
+  }
+
+  function toggleSelected(id: string): void {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
     });
   }
 
@@ -198,6 +221,37 @@ export function LedgerClient({
     });
   }
 
+  function onDuplicate(tx: TransactionView): void {
+    startTransition(async () => {
+      const result = await duplicateTransaction({
+        spaceId,
+        requestId: crypto.randomUUID(),
+        transactionId: tx.id,
+      });
+      if (!result.ok) {
+        toast.error(result.error.message);
+        return;
+      }
+      toast.success(tTx('duplicated'));
+      void query.refetch();
+    });
+  }
+
+  function onBulkDelete(): void {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    startTransition(async () => {
+      const result = await bulkDelete({ spaceId, transactionIds: ids });
+      if (!result.ok) {
+        toast.error(result.error.message);
+        return;
+      }
+      toast.success(t('bulkDeleted', { count: ids.length }));
+      clearSelection();
+      void query.refetch();
+    });
+  }
+
   const hasFilters = Boolean(
     filters.search ||
     filters.kind ||
@@ -207,7 +261,8 @@ export function LedgerClient({
     filters.amountMin != null ||
     filters.amountMax != null ||
     filters.sharedOnly ||
-    filters.mineOnly,
+    filters.mineOnly ||
+    filters.hasAttachment,
   );
 
   function majorToMinorInput(value: string): number | null {
@@ -344,6 +399,17 @@ export function LedgerClient({
             />
             {t('mineOnly')}
           </label>
+          <label className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              checked={urlState.attached}
+              onChange={(e) => {
+                void setUrlState({ attached: e.target.checked });
+              }}
+              className="size-4 rounded border-input"
+            />
+            {t('hasAttachment')}
+          </label>
           {hasFilters ? (
             <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
               {t('clearFilters')}
@@ -418,45 +484,27 @@ export function LedgerClient({
                       />
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      className={cn(
-                        'flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-surface-raised',
-                        highlightedIds.has(item.tx.id) && 'animate-ledger-highlight',
-                      )}
-                      onClick={() => {
+                    <LedgerRow
+                      tx={item.tx}
+                      highlighted={highlightedIds.has(item.tx.id)}
+                      selectionMode={selectionMode}
+                      selected={selectedIds.has(item.tx.id)}
+                      onOpen={() => {
                         setDetail(item.tx);
                       }}
-                    >
-                      <span
-                        className="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: item.tx.category_color
-                            ? `${item.tx.category_color}33`
-                            : undefined,
-                          color: item.tx.category_color ?? undefined,
-                        }}
-                        aria-hidden
-                      >
-                        {(item.tx.category_name ?? item.tx.kind).slice(0, 1).toUpperCase()}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">
-                          {item.tx.merchant || item.tx.description || tTx(`kind.${item.tx.kind}`)}
-                        </span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {item.tx.category_name ?? tTx(`kind.${item.tx.kind}`)}
-                          {item.tx.payer_name ? ` · ${item.tx.payer_name}` : ''}
-                        </span>
-                      </span>
-                      <Amount
-                        minor={item.tx.amount_minor}
-                        currency={item.tx.currency}
-                        locale={locale}
-                        tone={toneForKind(item.tx.kind)}
-                        className="text-sm font-medium"
-                      />
-                    </button>
+                      onToggleSelect={() => {
+                        toggleSelected(item.tx.id);
+                      }}
+                      onEnterSelection={() => {
+                        setSelectedIds(new Set([item.tx.id]));
+                      }}
+                      onSwipeDelete={() => {
+                        onDelete(item.tx);
+                      }}
+                      onSwipeEdit={() => {
+                        setDetail(item.tx);
+                      }}
+                    />
                   )}
                 </div>
               );
@@ -515,21 +563,55 @@ export function LedgerClient({
                     ))}
                   </ul>
                 ) : null}
-                <Button
-                  type="button"
-                  variant="destructive"
-                  disabled={pending}
-                  onClick={() => {
-                    onDelete(detail);
-                  }}
-                >
-                  {tTx('delete')}
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={pending}
+                    onClick={() => {
+                      onDuplicate(detail);
+                    }}
+                  >
+                    {tTx('duplicate')}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={pending}
+                    onClick={() => {
+                      onDelete(detail);
+                    }}
+                  >
+                    {tTx('delete')}
+                  </Button>
+                </div>
               </div>
             </>
           ) : null}
         </SheetContent>
       </Sheet>
+
+      {selectionMode ? (
+        <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 border-t border-border bg-surface-raised px-4 py-3 lg:bottom-0">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+            <p className="text-sm font-medium">{t('selectedCount', { count: selectedIds.size })}</p>
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+                {t('clearSelection')}
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={pending}
+                onClick={onBulkDelete}
+              >
+                {tTx('delete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

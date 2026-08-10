@@ -344,7 +344,11 @@
     "amountMin": "Min amount",
     "amountMax": "Max amount",
     "sharedOnly": "Shared only",
-    "mineOnly": "Mine only"
+    "mineOnly": "Mine only",
+    "hasAttachment": "Has attachment",
+    "selectedCount": "{count} selected",
+    "clearSelection": "Clear",
+    "bulkDeleted": "Deleted {count} transactions"
   },
   "transactions": {
     "addTitle": "Add transaction",
@@ -371,9 +375,12 @@
     "giveRest": "Give the rest",
     "created": "Transaction saved",
     "deleted": "Transaction deleted",
+    "duplicated": "Transaction duplicated",
     "restored": "Transaction restored",
     "undo": "Undo",
     "delete": "Delete",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
     "kind": {
       "expense": "Expense",
       "income": "Income",

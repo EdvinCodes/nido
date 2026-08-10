@@ -12,7 +12,8 @@ promote an item into a phase file first.
 
 ## Open
 
-- [ ] Perf seed of 10k transactions for ledger virtualization FPS checks — deferred from Phase 02 because seeding 10k via `create_transaction` on every `db:reset` is too slow; demo seed keeps ~150 realistic rows. Target: Phase 02 follow-up / tooling.
+- [ ] Perf seed of 10k transactions for ledger virtualization FPS checks — deferred from Phase 02 because seeding 10k via `create_transaction` on every `db:reset` is too slow; demo seed keeps ~150 realistic rows. Target: tooling / Phase 02 follow-up.
+- [ ] Wire `hasAttachment` ledger filter to real attachment rows — deferred from Phase 02 because attachments land in Phase 07; URL param `attached=1` already yields an empty set. Target: Phase 07.
 
 ## Post-v1 ideas
 

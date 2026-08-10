@@ -1,15 +1,19 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import type { TransactionView } from '@/features/transactions/types';
 
 type ComposerMode = 'closed' | 'create' | 'edit';
 
 type ComposerState = {
   mode: ComposerMode;
   transactionId: string | null;
+  optimisticTransaction: TransactionView | null;
   openCreate: () => void;
   openEdit: (transactionId: string) => void;
   close: () => void;
+  insertOptimistic: (tx: TransactionView) => void;
+  clearOptimistic: () => void;
 };
 
 const ComposerContext = createContext<ComposerState | null>(null);
@@ -17,6 +21,7 @@ const ComposerContext = createContext<ComposerState | null>(null);
 export function TransactionComposerProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ComposerMode>('closed');
   const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [optimisticTransaction, setOptimisticTransaction] = useState<TransactionView | null>(null);
 
   const openCreate = useCallback(() => {
     setTransactionId(null);
@@ -33,9 +38,35 @@ export function TransactionComposerProvider({ children }: { children: ReactNode 
     setTransactionId(null);
   }, []);
 
+  const insertOptimistic = useCallback((tx: TransactionView) => {
+    setOptimisticTransaction(tx);
+  }, []);
+
+  const clearOptimistic = useCallback(() => {
+    setOptimisticTransaction(null);
+  }, []);
+
   const value = useMemo(
-    () => ({ mode, transactionId, openCreate, openEdit, close }),
-    [mode, transactionId, openCreate, openEdit, close],
+    () => ({
+      mode,
+      transactionId,
+      optimisticTransaction,
+      openCreate,
+      openEdit,
+      close,
+      insertOptimistic,
+      clearOptimistic,
+    }),
+    [
+      mode,
+      transactionId,
+      optimisticTransaction,
+      openCreate,
+      openEdit,
+      close,
+      insertOptimistic,
+      clearOptimistic,
+    ],
   );
 
   return <ComposerContext.Provider value={value}>{children}</ComposerContext.Provider>;

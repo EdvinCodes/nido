@@ -27,6 +27,9 @@ export default async function SpaceDashboardPage({
           <Button variant="outline" asChild>
             <Link href={route(`/s/${spaceId}/settings/categories`)}>{tNav('categories')}</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link href={route(`/s/${spaceId}/settings/accounts`)}>{tNav('accounts')}</Link>
+          </Button>
           <Button variant="ghost" asChild>
             <Link href={route(`/s/${spaceId}/settings/profile`)}>{tNav('profile')}</Link>
           </Button>

@@ -84,6 +84,7 @@ declare
   v_alex_id constant uuid := '00000000-0000-0000-0000-0000000000a1';
   v_sam_id  constant uuid := '00000000-0000-0000-0000-0000000000a2';
   v_sam_participant constant uuid := '00000000-0000-0000-0000-0000000000a3';
+  v_guest_participant constant uuid := '00000000-0000-0000-0000-0000000000a4';
 
   v_account_checking constant uuid := '00000000-0000-0000-0000-0000000000b1';
   v_account_savings  constant uuid := '00000000-0000-0000-0000-0000000000b2';
@@ -196,6 +197,9 @@ begin
 
   insert into nido.space_members (space_id, user_id, participant_id, role, status)
   values (v_space_id, v_sam_id, v_sam_participant, 'member', 'active');
+
+  insert into nido.participants (id, space_id, user_id, display_name, color, position)
+  values (v_guest_participant, v_space_id, null, 'Invitado', '#B5A642', 2);
 
   -- 2c. Four accounts.
   insert into nido.accounts (

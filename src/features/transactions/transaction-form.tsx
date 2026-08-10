@@ -18,6 +18,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { createTransaction } from '@/features/transactions/actions';
 import { useTransactionComposer } from '@/features/transactions/composer-context';
+import { buildOptimisticTransaction } from '@/features/transactions/lib/build-optimistic-transaction';
 import { SplitEditor, type SplitEditorParticipant } from '@/features/transactions/split-editor';
 import type { SplitParticipantInput } from '@/features/transactions/lib/compute-splits';
 import type { SplitMode } from '@/features/transactions/lib/compute-splits';
@@ -25,6 +26,8 @@ import { validateSplit } from '@/features/transactions/lib/validate-split';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useMediaQuery } from '@/lib/use-media-query';
 import type { AccountRow } from '@/features/transactions/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { transactionsQueryKey } from '@/features/transactions/hooks';
 
 type CategoryOption = {
   id: string;
@@ -134,7 +137,9 @@ function TransactionForm({
   const t = useTranslations('transactions');
   const tCommon = useTranslations('common');
   const locale = useLocale();
-  const { space, participantId } = useSpaceContext();
+  const { space, participantId, userId } = useSpaceContext();
+  const { insertOptimistic, clearOptimistic } = useTransactionComposer();
+  const queryClient = useQueryClient();
   const [pending, startTransition] = useTransition();
 
   const defaultSplit: SplitMode = space.kind === 'solo' ? 'personal' : 'equal';
@@ -187,6 +192,33 @@ function TransactionForm({
   function save(): void {
     if (amountMinor == null || amountMinor <= 0) return;
     if (!canSave) return;
+
+    const category = filteredCategories.find((c) => c.id === categoryId) ?? null;
+    const account = accounts.find((a) => a.id === accountId) ?? null;
+    const toAccount = accounts.find((a) => a.id === toAccountId) ?? null;
+    const payer = participants.find((p) => p.id === payerId) ?? null;
+    const optimisticId = `optimistic-${crypto.randomUUID()}`;
+    const optimisticTx = buildOptimisticTransaction({
+      id: optimisticId,
+      spaceId: space.id,
+      userId,
+      kind,
+      amountMinor,
+      currency: space.base_currency,
+      bookedOn,
+      description: description || merchant || t(`kind.${kind}`),
+      merchant,
+      category,
+      account: kind === 'transfer' ? account : (account ?? null),
+      toAccount: kind === 'transfer' ? toAccount : null,
+      payer: kind === 'transfer' ? null : (payer ?? null),
+      splitMode: kind === 'transfer' ? 'personal' : splitMode,
+      selected: kind === 'transfer' ? [] : selected,
+      participants,
+    });
+
+    insertOptimistic(optimisticTx);
+
     startTransition(async () => {
       const result = await createTransaction({
         spaceId: space.id,
@@ -219,11 +251,14 @@ function TransactionForm({
         tagIds: [],
       });
 
+      clearOptimistic();
+
       if (!result.ok) {
         toast.error(result.error.message);
         return;
       }
       toast.success(t('created'));
+      await queryClient.invalidateQueries({ queryKey: transactionsQueryKey(space.id, {}) });
       onDone();
     });
   }
@@ -268,7 +303,7 @@ function TransactionForm({
         <div className="flex flex-col gap-1.5">
           <Label>{t('category')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger>
+            <SelectTrigger aria-label={t('category')}>
               <SelectValue placeholder={t('categoryPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
@@ -285,7 +320,7 @@ function TransactionForm({
           <div className="flex flex-col gap-1.5">
             <Label>{t('fromAccount')}</Label>
             <Select value={accountId} onValueChange={setAccountId}>
-              <SelectTrigger>
+              <SelectTrigger aria-label={t('fromAccount')}>
                 <SelectValue placeholder={t('accountPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
@@ -300,7 +335,7 @@ function TransactionForm({
           <div className="flex flex-col gap-1.5">
             <Label>{t('toAccount')}</Label>
             <Select value={toAccountId} onValueChange={setToAccountId}>
-              <SelectTrigger>
+              <SelectTrigger aria-label={t('toAccount')}>
                 <SelectValue placeholder={t('accountPlaceholder')} />
               </SelectTrigger>
               <SelectContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState, useTransition } from 'react';
+import { useMemo, useRef, useEffect, useOptimistic, useState, useTransition } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useLocale, useTranslations } from 'next-intl';
 import { useQueryStates, parseAsString } from 'nuqs';
@@ -16,6 +16,7 @@ import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
 import type { TransactionView } from '@/features/transactions/types';
 import { useSpaceContext } from '@/features/spaces/space-context';
+import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { cn } from '@/lib/utils';
 
 type ListItem =
@@ -59,6 +60,7 @@ export function LedgerClient({
   const tTx = useTranslations('transactions');
   const locale = useLocale();
   const { space } = useSpaceContext();
+  const composer = useTransactionComposerOptional();
   const [detail, setDetail] = useState<TransactionView | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -89,7 +91,23 @@ export function LedgerClient({
   };
   const query = useInfiniteTransactions(queryArgs);
 
-  const rows = useMemo(() => query.data?.pages.flatMap((p) => p.rows) ?? [], [query.data]);
+  const fetchedRows = useMemo(() => query.data?.pages.flatMap((p) => p.rows) ?? [], [query.data]);
+  const [rows, applyOptimistic] = useOptimistic(
+    fetchedRows,
+    (current, pendingTx: TransactionView | null) => {
+      if (!pendingTx) return current;
+      if (current.some((row) => row.id === pendingTx.id)) return current;
+      return [pendingTx, ...current];
+    },
+  );
+
+  useEffect(() => {
+    if (!composer?.optimisticTransaction) return;
+    startTransition(() => {
+      applyOptimistic(composer.optimisticTransaction);
+    });
+  }, [composer?.optimisticTransaction, applyOptimistic]);
+
   const items = useMemo(() => groupRows(rows), [rows]);
 
   const parentRef = useRef<HTMLDivElement>(null);
@@ -152,7 +170,18 @@ export function LedgerClient({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex flex-col gap-2 px-4 pt-4 lg:px-8">
-        <h1 className="font-display text-2xl tracking-tight">{t('title')}</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-2xl tracking-tight">{t('title')}</h1>
+          <Button
+            type="button"
+            className="hidden lg:inline-flex"
+            onClick={() => {
+              composer?.openCreate();
+            }}
+          >
+            {t('add')}
+          </Button>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={urlState.q}

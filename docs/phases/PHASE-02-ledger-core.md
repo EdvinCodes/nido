@@ -3,17 +3,17 @@
 ## Status note (session checkpoint)
 
 **In progress.** Landed: DB migrations (accounts/tags/transactions/splits/view/RPCs/idempotency),
-seed, pgTAP `060_ledger.sql`, TS domain (`computeSplits`/`validateSplit`/…), server actions +
-queries, Amount/AmountInput/SplitEditor/composer, `/ledger` virtualized list with URL filters,
-FAB + nav. `pnpm typecheck` / `lint` / `test` / `build` green locally.
+seed (incl. third demo participant for 3-way splits), pgTAP `060_ledger.sql`, TS domain,
+server actions + queries, Amount/AmountInput/SplitEditor/composer, `/ledger` virtualized list
+with URL filters, FAB + desktop add button, optimistic insert, accounts settings CRUD UI,
+Playwright `e2e/ledger.spec.ts`. `pnpm verify` green locally.
 
 **Still open before Done:**
 
 - Run `pnpm db:reset && pnpm db:types` (needs Docker/Supabase) and commit generated types
-- `pnpm test:db` + Playwright ledger flow
-- Realtime highlight, swipe/long-press bulk, ⌘K palette, optimistic insert
+- `pnpm test:db` + confirm Playwright ledger flow in CI
+- Realtime highlight, swipe/long-press bulk, ⌘K palette
 - Remaining filters (tags, amount range, shared/mine, has-attachment)
-- Accounts settings CRUD UI
 - Perf seed of 10k rows (see `docs/BACKLOG.md`)
 
 ---

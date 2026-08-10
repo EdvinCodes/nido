@@ -228,7 +228,11 @@
       "accounts": "Cuentas",
       "alerts": "Presupuestos a vigilar",
       "alertsSoon": "Las alertas de presupuesto llegan en la siguiente fase.",
-      "alertsEmpty": "Todos los presupuestos van bien por ahora."
+      "alertsEmpty": "Todos los presupuestos van bien por ahora.",
+      "upcoming": "Cargos próximos",
+      "upcomingEmpty": "Nada en las próximas dos semanas.",
+      "goals": "Progreso de metas",
+      "goalsEmpty": "Aún no hay metas activas."
     }
   },
 
@@ -539,6 +543,92 @@
     "errors": {
       "limit": "Introduce un límite positivo.",
       "thresholds": "Elige al menos un umbral."
+    }
+  },
+
+  "goals": {
+    "title": "Metas",
+    "create": "Nueva meta",
+    "edit": "Editar",
+    "archive": "Archivar",
+    "back": "Todas las metas",
+    "emptyTitle": "Aún no hay metas",
+    "emptyBody": "Define un objetivo de ahorro para un viaje, un fondo de emergencia o lo que la casa esté construyendo.",
+    "untitled": "Meta",
+    "remaining": "Quedan {amount}",
+    "pace": "Necesitas {need}/mes; habéis promediado {avg}/mes",
+    "projected": "Al ritmo actual: {date}",
+    "contribute": "Aportar",
+    "withdraw": "Retirar",
+    "history": "Historial de aportes",
+    "noContributions": "Todavía no hay aportes.",
+    "byParticipant": "Por persona",
+    "chart": "Progreso",
+    "fields": {
+      "name": "Nombre",
+      "target": "Objetivo",
+      "targetDate": "Fecha objetivo",
+      "color": "Color",
+      "icon": "Icono",
+      "account": "Cuenta vinculada",
+      "noAccount": "Ninguna",
+      "amount": "Importe",
+      "participant": "Persona",
+      "date": "Fecha",
+      "note": "Nota",
+      "withdrawal": "Es una retirada",
+      "asTransfer": "Registrar también como transferencia"
+    },
+    "errors": {
+      "target": "Introduce un objetivo positivo.",
+      "amount": "Introduce un importe positivo.",
+      "withdrawalNote": "Una retirada necesita un motivo."
+    }
+  },
+
+  "subscriptions": {
+    "title": "Suscripciones",
+    "create": "Nueva suscripción",
+    "back": "Todas las suscripciones",
+    "monthly": "Total mensual",
+    "annual": "Al año",
+    "activeCount": "{count, plural, one {# activa} other {# activas}}",
+    "candidates": "Sugeridas desde el libro",
+    "dismiss": "Descartar",
+    "accept": "Crear regla",
+    "ghosts": "¿Seguís usándolas?",
+    "ghostQuestion": "Habéis pagado {amount} por {name} en {months, plural, one {# mes} other {# meses}}. ¿La seguís usando?",
+    "ghostYes": "Sí — recordar en 6 meses",
+    "ghostNo": "No — cancelarla",
+    "ghostUnsure": "No sé — preguntar en un mes",
+    "calendar": "Este mes",
+    "emptyTitle": "Aún no hay suscripciones",
+    "emptyBody": "Controla streaming, facturas y otros cargos repetidos para que las subidas de precio no pasen desapercibidas.",
+    "next": "Próximo {date}",
+    "paidToDate": "{amount} pagados hasta ahora",
+    "priceTrend": "Tendencia de precio",
+    "cancelled": "Canceladas ({count})",
+    "savedAnnual": "{amount} / año que ya no salen del nido",
+    "charges": "Historial de cargos",
+    "noCharges": "Todavía no hay cargos.",
+    "priceHistory": "Cambios de precio",
+    "noPriceChanges": "Sin cambios de precio.",
+    "split": "Reparto",
+    "cancel": "Cancelar suscripción",
+    "fields": {
+      "name": "Nombre",
+      "amount": "Importe",
+      "next": "Próximo cargo",
+      "cancelUrl": "URL de cancelación"
+    },
+    "cycle": {
+      "day": "{count, plural, one {Diario} other {Cada # días}}",
+      "week": "{count, plural, one {Semanal} other {Cada # semanas}}",
+      "month": "{count, plural, one {Mensual} other {Cada # meses}}",
+      "year": "{count, plural, one {Anual} other {Cada # años}}"
+    },
+    "errors": {
+      "amount": "Introduce un nombre y un importe positivo."
     }
   },
 

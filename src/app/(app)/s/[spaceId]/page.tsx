@@ -9,7 +9,9 @@ import {
   getSpaceSummary,
   spaceHasTransactions,
 } from '@/features/dashboard/queries';
+import { getActiveGoalProgress } from '@/features/goals/queries';
 import { getProfile, getSpaceForMember } from '@/features/spaces/queries';
+import { getUpcomingCharges } from '@/features/subscriptions/queries';
 
 export default async function SpaceDashboardPage({
   params,
@@ -116,11 +118,14 @@ async function DashboardLoaded({
     );
   }
 
-  const [summary, attentionBudgets, categoryBudgetProgress] = await Promise.all([
-    getSpaceSummary({ spaceId, from, to }),
-    getAttentionBudgets(spaceId),
-    getCategoryBudgetProgress(spaceId),
-  ]);
+  const [summary, attentionBudgets, categoryBudgetProgress, upcomingCharges, goalProgress] =
+    await Promise.all([
+      getSpaceSummary({ spaceId, from, to }),
+      getAttentionBudgets(spaceId),
+      getCategoryBudgetProgress(spaceId),
+      getUpcomingCharges(spaceId, 14),
+      getActiveGoalProgress(spaceId),
+    ]);
   const previousSeries = await getSpaceSeries({
     spaceId,
     from: summary.previous_from,
@@ -141,6 +146,8 @@ async function DashboardLoaded({
       isEmptySpace={false}
       attentionBudgets={attentionBudgets}
       categoryBudgetProgress={categoryBudgetProgress}
+      upcomingCharges={upcomingCharges}
+      goalProgress={goalProgress}
     />
   );
 }

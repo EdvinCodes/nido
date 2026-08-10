@@ -228,7 +228,11 @@
       "accounts": "Accounts",
       "alerts": "Budgets needing attention",
       "alertsSoon": "Budget alerts arrive in the next phase.",
-      "alertsEmpty": "All budgets look healthy right now."
+      "alertsEmpty": "All budgets look healthy right now.",
+      "upcoming": "Upcoming charges",
+      "upcomingEmpty": "Nothing due in the next two weeks.",
+      "goals": "Goal progress",
+      "goalsEmpty": "No active goals yet."
     }
   },
 
@@ -539,6 +543,92 @@
     "errors": {
       "limit": "Enter a positive limit.",
       "thresholds": "Pick at least one threshold."
+    }
+  },
+
+  "goals": {
+    "title": "Goals",
+    "create": "New goal",
+    "edit": "Edit",
+    "archive": "Archive",
+    "back": "All goals",
+    "emptyTitle": "No goals yet",
+    "emptyBody": "Set a savings target for a trip, emergency fund, or anything the household is working toward.",
+    "untitled": "Goal",
+    "remaining": "{amount} left",
+    "pace": "You need {need}/month; you have averaged {avg}/month",
+    "projected": "On pace for {date}",
+    "contribute": "Contribute",
+    "withdraw": "Withdraw",
+    "history": "Contribution history",
+    "noContributions": "No contributions yet.",
+    "byParticipant": "By person",
+    "chart": "Progress",
+    "fields": {
+      "name": "Name",
+      "target": "Target",
+      "targetDate": "Target date",
+      "color": "Colour",
+      "icon": "Icon",
+      "account": "Linked account",
+      "noAccount": "None",
+      "amount": "Amount",
+      "participant": "Person",
+      "date": "Date",
+      "note": "Note",
+      "withdrawal": "This is a withdrawal",
+      "asTransfer": "Also record as a transfer"
+    },
+    "errors": {
+      "target": "Enter a positive target.",
+      "amount": "Enter a positive amount.",
+      "withdrawalNote": "A withdrawal needs a reason."
+    }
+  },
+
+  "subscriptions": {
+    "title": "Subscriptions",
+    "create": "New subscription",
+    "back": "All subscriptions",
+    "monthly": "Monthly total",
+    "annual": "Per year",
+    "activeCount": "{count, plural, one {# active} other {# active}}",
+    "candidates": "Suggested from your ledger",
+    "dismiss": "Dismiss",
+    "accept": "Create rule",
+    "ghosts": "Still using these?",
+    "ghostQuestion": "You have paid {amount} for {name} over {months, plural, one {# month} other {# months}}. Still using it?",
+    "ghostYes": "Yes — snooze 6 months",
+    "ghostNo": "No — cancel it",
+    "ghostUnsure": "Not sure — ask again in a month",
+    "calendar": "This month",
+    "emptyTitle": "No subscriptions yet",
+    "emptyBody": "Track streaming, bills, and other repeating charges so price hikes stop sneaking up.",
+    "next": "Next {date}",
+    "paidToDate": "{amount} paid to date",
+    "priceTrend": "Price trend",
+    "cancelled": "Cancelled ({count})",
+    "savedAnnual": "{amount} / year no longer leaving the nest",
+    "charges": "Charge history",
+    "noCharges": "No charges yet.",
+    "priceHistory": "Price changes",
+    "noPriceChanges": "No price changes recorded.",
+    "split": "Split",
+    "cancel": "Cancel subscription",
+    "fields": {
+      "name": "Name",
+      "amount": "Amount",
+      "next": "Next charge",
+      "cancelUrl": "Cancellation URL"
+    },
+    "cycle": {
+      "day": "{count, plural, one {Daily} other {Every # days}}",
+      "week": "{count, plural, one {Weekly} other {Every # weeks}}",
+      "month": "{count, plural, one {Monthly} other {Every # months}}",
+      "year": "{count, plural, one {Yearly} other {Every # years}}"
+    },
+    "errors": {
+      "amount": "Enter a name and positive amount."
     }
   },
 

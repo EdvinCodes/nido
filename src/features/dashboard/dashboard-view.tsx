@@ -58,6 +58,8 @@ export function DashboardView({
   isEmptySpace,
   attentionBudgets = [],
   categoryBudgetProgress = {},
+  upcomingCharges = [],
+  goalProgress = [],
 }: {
   spaceId: string;
   spaceKind: string;
@@ -70,6 +72,20 @@ export function DashboardView({
   isEmptySpace: boolean;
   attentionBudgets?: AttentionBudget[];
   categoryBudgetProgress?: Record<string, { ratio: number; budgetId: string }>;
+  upcomingCharges?: Array<{
+    ruleId: string;
+    name: string;
+    amountMinor: number;
+    currency: string;
+    on: string;
+  }>;
+  goalProgress?: Array<{
+    id: string;
+    name: string;
+    ratio: number;
+    remainingMinor: number;
+    currency: string;
+  }>;
 }) {
   const t = useTranslations('dashboard');
   const locale = useLocale();
@@ -448,6 +464,60 @@ export function DashboardView({
                         </span>
                       </div>
                       <ProgressBar className="mt-1.5" value={budget.ratio} label={budget.name} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+          <section className="rounded-xl border border-border bg-surface/40 p-4">
+            <h2 className="text-sm font-medium tracking-tight">{t('rail.upcoming')}</h2>
+            {upcomingCharges.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">{t('rail.upcomingEmpty')}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {upcomingCharges.map((charge) => (
+                  <li key={`${charge.ruleId}-${charge.on}`}>
+                    <Link
+                      href={route(`/s/${spaceId}/subscriptions/${charge.ruleId}`)}
+                      className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
+                    >
+                      <span className="min-w-0 truncate">
+                        <span className="font-medium">{charge.name}</span>
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {charge.on}
+                        </span>
+                      </span>
+                      <Amount
+                        minor={charge.amountMinor}
+                        currency={charge.currency}
+                        className="text-sm"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+          <section className="rounded-xl border border-border bg-surface/40 p-4">
+            <h2 className="text-sm font-medium tracking-tight">{t('rail.goals')}</h2>
+            {goalProgress.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">{t('rail.goalsEmpty')}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {goalProgress.map((goal) => (
+                  <li key={goal.id}>
+                    <Link
+                      href={route(`/s/${spaceId}/goals/${goal.id}`)}
+                      className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-sm">
+                        <span className="truncate font-medium">{goal.name}</span>
+                        <span className="text-muted-foreground">
+                          {Math.round(goal.ratio * 100)}%
+                        </span>
+                      </div>
+                      <ProgressBar className="mt-1.5" value={goal.ratio} label={goal.name} />
                     </Link>
                   </li>
                 ))}

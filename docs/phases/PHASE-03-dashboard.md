@@ -108,7 +108,9 @@ function, debounced at 200 ms.
       _(Deferred — see BACKLOG; axe e2e covers a11y; perf needs a production baseline.)_
 - [x] `pnpm verify`, `pnpm test:db`, `pnpm test:e2e` pass.
 
-## Phase notes (2026-08-10)
+## Phase notes
+
+Completed 2026-08-10.
 
 - **RPCs:** `nido.space_summary`, `nido.space_series`, `nido.search_transactions`. Previous
   period in SQL is the same-length window immediately before `p_from`/`p_to` (matches

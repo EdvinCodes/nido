@@ -135,22 +135,22 @@ app in the new language without a full reload.
 
 ## Acceptance criteria
 
-- [ ] A new user can sign up, complete onboarding, and reach a dashboard placeholder inside
+- [x] A new user can sign up, complete onboarding, and reach a dashboard placeholder inside
       their own space, all without touching the database by hand.
-- [ ] Creating a space seeds the owner's participant, the membership, ghost participants,
+- [x] Creating a space seeds the owner's participant, the membership, ghost participants,
       and the full default category tree in a single atomic call.
-- [ ] Inviting a second user by link works end to end in an incognito window, and the new
+- [x] Inviting a second user by link works end to end in an incognito window, and the new
       member sees the same space with the same categories.
-- [ ] A user belonging to two spaces can switch between them, and the URL reflects the
+- [x] A user belonging to two spaces can switch between them, and the URL reflects the
       active space.
-- [ ] Every pgTAP test passes, including every negative case listed above.
-- [ ] Visiting another space's URL as a non-member returns 404.
-- [ ] A `viewer` sees the UI without any create or edit affordance, and the corresponding
+- [x] Every pgTAP test passes, including every negative case listed above.
+- [x] Visiting another space's URL as a non-member returns 404.
+- [x] A `viewer` sees the UI without any create or edit affordance, and the corresponding
       Server Actions reject them even when called directly.
-- [ ] The auth pages, onboarding, and settings all work at 375 px and 1440 px in both themes
+- [x] The auth pages, onboarding, and settings all work at 375 px and 1440 px in both themes
       and report no axe violations.
-- [ ] Every string is translated in both `es` and `en`.
-- [ ] `pnpm verify` and `pnpm test:db` pass.
+- [x] Every string is translated in both `es` and `en`.
+- [x] `pnpm verify` and `pnpm test:db` pass.
 
 ## Out of scope
 

@@ -137,6 +137,146 @@ export type Database = {
           },
         ]
       }
+      budget_periods: {
+        Row: {
+          budget_id: string
+          ends_on: string
+          id: string
+          limit_minor: number
+          notified: number[]
+          space_id: string
+          spent_minor: number
+          starts_on: string
+        }
+        Insert: {
+          budget_id: string
+          ends_on: string
+          id?: string
+          limit_minor: number
+          notified?: number[]
+          space_id: string
+          spent_minor?: number
+          starts_on: string
+        }
+        Update: {
+          budget_id?: string
+          ends_on?: string
+          id?: string
+          limit_minor?: number
+          notified?: number[]
+          space_id?: string
+          spent_minor?: number
+          starts_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_periods_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_periods_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budgets: {
+        Row: {
+          alert_thresholds: number[]
+          category_id: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          ends_on: string | null
+          id: string
+          include_subcategories: boolean
+          is_active: boolean
+          limit_minor: number
+          name: string
+          participant_id: string | null
+          period: Database["nido"]["Enums"]["budget_period"]
+          rollover: boolean
+          scope: Database["nido"]["Enums"]["budget_scope"]
+          space_id: string
+          starts_on: string
+          updated_at: string
+        }
+        Insert: {
+          alert_thresholds?: number[]
+          category_id?: string | null
+          created_at?: string
+          created_by: string
+          currency: string
+          ends_on?: string | null
+          id?: string
+          include_subcategories?: boolean
+          is_active?: boolean
+          limit_minor: number
+          name: string
+          participant_id?: string | null
+          period?: Database["nido"]["Enums"]["budget_period"]
+          rollover?: boolean
+          scope: Database["nido"]["Enums"]["budget_scope"]
+          space_id: string
+          starts_on?: string
+          updated_at?: string
+        }
+        Update: {
+          alert_thresholds?: number[]
+          category_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          ends_on?: string | null
+          id?: string
+          include_subcategories?: boolean
+          is_active?: boolean
+          limit_minor?: number
+          name?: string
+          participant_id?: string | null
+          period?: Database["nido"]["Enums"]["budget_period"]
+          rollover?: boolean
+          scope?: Database["nido"]["Enums"]["budget_scope"]
+          space_id?: string
+          starts_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           archived_at: string | null
@@ -253,6 +393,102 @@ export type Database = {
           },
           {
             foreignKeyName: "idempotency_keys_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          email: boolean
+          in_app: boolean
+          kind: Database["nido"]["Enums"]["notification_kind"]
+          push: boolean
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          email?: boolean
+          in_app?: boolean
+          kind: Database["nido"]["Enums"]["notification_kind"]
+          push?: boolean
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          email?: boolean
+          in_app?: boolean
+          kind?: Database["nido"]["Enums"]["notification_kind"]
+          push?: boolean
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: Database["nido"]["Enums"]["notification_kind"]
+          link: string | null
+          payload: Json
+          read_at: string | null
+          space_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: Database["nido"]["Enums"]["notification_kind"]
+          link?: string | null
+          payload?: Json
+          read_at?: string | null
+          space_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: Database["nido"]["Enums"]["notification_kind"]
+          link?: string | null
+          payload?: Json
+          read_at?: string | null
+          space_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -938,6 +1174,14 @@ export type Database = {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]
       }
+      budget_category_ids: {
+        Args: { p_budget: Database["nido"]["Tables"]["budgets"]["Row"] }
+        Returns: string[]
+      }
+      compute_budget_spent: {
+        Args: { p_budget_id: string; p_from: string; p_to: string }
+        Returns: number
+      }
       create_space: {
         Args: {
           p_category_keys?: string[]
@@ -956,6 +1200,18 @@ export type Database = {
         Args: { p_id: string; p_request_id?: string }
         Returns: Json
       }
+      ensure_budget_periods: {
+        Args: { p_budget_id: string; p_through: string }
+        Returns: number
+      }
+      ensure_default_notification_prefs: {
+        Args: { p_space_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      evaluate_budget_thresholds: {
+        Args: { p_period_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           p_roles: Database["nido"]["Enums"]["member_role"][]
@@ -964,6 +1220,10 @@ export type Database = {
         Returns: boolean
       }
       hash_invite_token: { Args: { p_token: string }; Returns: string }
+      household_month_start: {
+        Args: { p_date: string; p_month_starts_on: number }
+        Returns: string
+      }
       is_member: {
         Args: {
           p_roles?: Database["nido"]["Enums"]["member_role"][]
@@ -972,10 +1232,50 @@ export type Database = {
         Returns: boolean
       }
       my_participant_id: { Args: { p_space_id: string }; Returns: string }
+      period_bounds: {
+        Args: {
+          p_month_starts_on: number
+          p_period: Database["nido"]["Enums"]["budget_period"]
+          p_reference: string
+          p_week_starts_on: number
+        }
+        Returns: {
+          ends_on: string
+          starts_on: string
+        }[]
+      }
+      recompute_budget_period: {
+        Args: { p_period_id: string }
+        Returns: number
+      }
+      reconcile_open_budget_periods: {
+        Args: never
+        Returns: {
+          after_minor: number
+          before_minor: number
+          budget_id: string
+          period_id: string
+        }[]
+      }
+      refresh_budgets_for_transaction: {
+        Args: {
+          p_booked_on: string
+          p_category_id: string
+          p_old_booked_on?: string
+          p_old_category_id?: string
+          p_space_id: string
+        }
+        Returns: undefined
+      }
+      refresh_rollover_limits: {
+        Args: { p_budget_id: string }
+        Returns: undefined
+      }
       restore_transaction: {
         Args: { p_id: string; p_request_id?: string }
         Returns: Json
       }
+      run_budget_alerts: { Args: { p_through?: string }; Returns: number }
       search_transactions: {
         Args: { p_limit?: number; p_query: string; p_space_id: string }
         Returns: Json
@@ -1002,6 +1302,7 @@ export type Database = {
         }
         Returns: Json
       }
+      suggest_budgets: { Args: { p_space_id: string }; Returns: Json }
       update_transaction: { Args: { p: Json; p_id: string }; Returns: Json }
     }
     Enums: {

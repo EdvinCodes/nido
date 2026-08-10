@@ -11,14 +11,14 @@ function setLocaleCookie(locale: Locale): void {
 
 export function MarketingLocaleSwitcher({ className }: { className?: string }) {
   const locale = useLocale();
-  const t = useTranslations('settings');
+  const t = useTranslations('marketing');
   const [pending, startTransition] = useTransition();
 
   return (
     <div
       className={cn('inline-flex rounded-md border border-border p-0.5', className)}
       role="group"
-      aria-label={t('locale')}
+      aria-label={t('localeLabel')}
     >
       {locales.map((loc) => (
         <button

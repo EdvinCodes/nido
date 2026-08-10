@@ -6,6 +6,15 @@ export const DEMO_ALEX = {
   password: 'password123',
 } as const;
 
+const SPACE_URL = /\/s\/[0-9a-f-]{36}/i;
+
+function parseSpaceId(url: string): string {
+  const spaceId = url.match(/\/s\/([0-9a-f-]{36})/i)?.[1];
+  if (!spaceId) throw new Error(`Could not parse space id from ${url}`);
+  return spaceId;
+}
+
+/** Lands on a space dashboard after sign-in (seed users must exist — `pnpm db:reset`). */
 export async function signInDemo(
   page: Page,
   email = DEMO_ALEX.email,
@@ -14,22 +23,28 @@ export async function signInDemo(
   await page.goto('/sign-in');
 
   const devAlex = page.getByRole('button', { name: /entrar como alex|sign in as alex/i });
-  if (await devAlex.isVisible()) {
+  const useDevPanel = !process.env.CI && (await devAlex.isVisible());
+
+  if (useDevPanel) {
     await devAlex.click();
-    await page.waitForURL(/\/s\/[0-9a-f-]{36}/i, { timeout: 30_000 });
-    const spaceId = page.url().match(/\/s\/([0-9a-f-]{36})/i)?.[1];
-    if (!spaceId) throw new Error(`Could not parse space id from ${page.url()}`);
-    return spaceId;
+  } else {
+    await page.getByLabel(/correo|email/i).fill(email);
+    await page.getByLabel(/contraseña|password/i).fill(password);
+    await page
+      .locator('form')
+      .getByRole('button', { name: /^(entrar|sign in)$/i })
+      .click();
   }
 
-  await page.getByLabel(/correo|email/i).fill(email);
-  await page.getByLabel(/contraseña|password/i).fill(password);
-  await page
-    .locator('form')
-    .getByRole('button', { name: /^(entrar|sign in)$/i })
-    .click();
-  await page.waitForURL(/\/s\/[0-9a-f-]{36}/i, { timeout: 30_000 });
-  const spaceId = page.url().match(/\/s\/([0-9a-f-]{36})/i)?.[1];
-  if (!spaceId) throw new Error(`Could not parse space id from ${page.url()}`);
-  return spaceId;
+  // App sign-in redirects to `/` first; marketing page then server-redirects to `/s/:id`.
+  await page.waitForURL((url) => SPACE_URL.test(url.pathname) || url.pathname === '/', {
+    timeout: 30_000,
+  });
+
+  if (!SPACE_URL.test(new URL(page.url()).pathname)) {
+    await page.goto('/');
+    await page.waitForURL(SPACE_URL, { timeout: 30_000 });
+  }
+
+  return parseSpaceId(page.url());
 }

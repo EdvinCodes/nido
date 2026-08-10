@@ -257,7 +257,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background font-sans text-foreground antialiased;
     text-rendering: optimizeLegibility;
   }
 
@@ -280,7 +280,7 @@
   }
 
   :focus-visible {
-    @apply outline-ring outline-2 outline-offset-2;
+    @apply outline-2 outline-offset-2 outline-ring;
   }
 
   ::selection {
@@ -303,4 +303,18 @@
 @utility scrollbar-subtle {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+}
+
+/* Partner ledger inserts: accent wash that fades over 1.2s (docs/03-DESIGN-SYSTEM.md §8). */
+@keyframes ledger-highlight {
+  0% {
+    background-color: color-mix(in oklch, var(--primary) 28%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@utility animate-ledger-highlight {
+  animation: ledger-highlight 1.2s var(--ease-emphasized) forwards;
 }

@@ -3,17 +3,18 @@
 ## Status note (session checkpoint)
 
 **In progress.** Landed: DB migrations (accounts/tags/transactions/splits/view/RPCs/idempotency),
-seed (incl. third demo participant for 3-way splits), pgTAP `060_ledger.sql`, TS domain,
-server actions + queries, Amount/AmountInput/SplitEditor/composer, `/ledger` virtualized list
-with URL filters, FAB + desktop add button, optimistic insert, accounts settings CRUD UI,
-Playwright `e2e/ledger.spec.ts`. `pnpm verify` green locally.
+seed (incl. third demo participant for 3-way splits; RFC UUID v4 + GoTrue token columns),
+pgTAP `060_ledger.sql`, TS domain, server actions + queries, Amount/AmountInput/SplitEditor/
+composer, `/ledger` virtualized list with URL filters (kind/date/search/tags/amount/shared/mine),
+FAB + desktop add button, optimistic insert, accounts settings CRUD UI, Playwright
+`e2e/ledger.spec.ts`, realtime subscription + highlight animation.
 
 **Still open before Done:**
 
-- Run `pnpm db:reset && pnpm db:types` (needs Docker/Supabase) and commit generated types
-- `pnpm test:db` + confirm Playwright ledger flow in CI
-- Realtime highlight, swipe/long-press bulk, ⌘K palette
-- Remaining filters (tags, amount range, shared/mine, has-attachment)
+- Confirm Playwright ledger flow green in CI after seed/auth fixes
+- Swipe/long-press bulk selection bar, ⌘K palette
+- `has-attachment` filter (column arrives in Phase 07 — stub URL param or defer)
+- Optional: retire `transactions/db.ts` untyped facade now that `database.types.ts` has Phase 02
 - Perf seed of 10k rows (see `docs/BACKLOG.md`)
 
 ---

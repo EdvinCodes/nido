@@ -22,6 +22,7 @@ import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
 import type { TagRow, TransactionView } from '@/features/transactions/types';
 import { parseLedgerFilters } from '@/features/transactions/lib/parse-ledger-filters';
+import { useLedgerRealtime } from '@/features/transactions/use-ledger-realtime';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { formatMoney, money, parseMoney } from '@/lib/money';
@@ -111,6 +112,7 @@ export function LedgerClient({
     ...(JSON.stringify(filters) === JSON.stringify(initialFilters) ? { initialPage } : {}),
   };
   const query = useInfiniteTransactions(queryArgs);
+  const highlightedIds = useLedgerRealtime(spaceId);
 
   const fetchedRows = useMemo(() => query.data?.pages.flatMap((p) => p.rows) ?? [], [query.data]);
   const [rows, applyOptimistic] = useOptimistic(
@@ -420,6 +422,7 @@ export function LedgerClient({
                       type="button"
                       className={cn(
                         'flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-surface-raised',
+                        highlightedIds.has(item.tx.id) && 'animate-ledger-highlight',
                       )}
                       onClick={() => {
                         setDetail(item.tx);

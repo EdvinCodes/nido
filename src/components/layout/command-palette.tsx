@@ -34,13 +34,11 @@ export function CommandPalette({ spaceId }: { spaceId: string }) {
     router.push(route(path));
   }
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent
-        className="overflow-hidden p-0 sm:max-w-lg"
-        showCloseButton={false}
-        aria-describedby={undefined}
-      >
+    <Dialog open onOpenChange={setOpen}>
+      <DialogContent className="overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
         <DialogTitle className="sr-only">{t('title')}</DialogTitle>
         <Command className="flex max-h-[min(80vh,28rem)] flex-col" label={t('title')} loop>
           <Command.Input

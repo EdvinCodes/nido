@@ -93,10 +93,15 @@ create table nido.profiles (
   locale        text not null default 'es' check (locale in ('es','en')),
   timezone      text not null default 'Europe/Madrid',
   theme         text not null default 'system' check (theme in ('light','dark','system')),
+  colourblind_safe boolean not null default false,
+  last_active_space_id uuid references nido.spaces(id) on delete set null,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
 ```
+
+`last_active_space_id` is added after `spaces` exists (circular FK). `colourblind_safe`
+toggles the teal/violet alternate palette from the design system.
 
 ### `spaces`
 
@@ -166,7 +171,7 @@ create table nido.space_invitations (
   id           uuid primary key default gen_random_uuid(),
   space_id     uuid not null references nido.spaces(id) on delete cascade,
   email        citext,
-  token_hash   bytea not null unique,          -- sha256 of a 32-byte random token
+  token_hash   text not null unique,          -- sha256 hex of a 32-byte random token
   role         nido.member_role not null default 'member',
   participant_id uuid references nido.participants(id) on delete set null,
   invited_by   uuid not null references nido.profiles(id),
@@ -334,13 +339,13 @@ in the database and it is enforced by the database, not by hope.
 
 Split modes and how they produce weights:
 
-| Mode | Meaning | Weights |
-| --- | --- | --- |
-| `personal` | One participant owes it all | single split, weight 1 |
-| `equal` | Split evenly between the selected participants | all weights 1 |
-| `shares` | "He counts double, she counts once" | user-supplied integers |
-| `percent` | 70 / 30 | percentages as weights, must total 100 |
-| `exact` | Explicit cent amounts | weights ignored, `owed_minor` given directly, must total the amount |
+| Mode       | Meaning                                        | Weights                                                             |
+| ---------- | ---------------------------------------------- | ------------------------------------------------------------------- |
+| `personal` | One participant owes it all                    | single split, weight 1                                              |
+| `equal`    | Split evenly between the selected participants | all weights 1                                                       |
+| `shares`   | "He counts double, she counts once"            | user-supplied integers                                              |
+| `percent`  | 70 / 30                                        | percentages as weights, must total 100                              |
+| `exact`    | Explicit cent amounts                          | weights ignored, `owed_minor` given directly, must total the amount |
 
 For `income`, splits mean "who this income belongs to" — the same machinery, different
 sign at read time.
@@ -591,7 +596,7 @@ recipient is a ghost participant). Only confirmed settlements affect balances.
 
 **Minimum-transfer simplification** is a pure TypeScript function: take the net balance
 vector, repeatedly match the largest debtor with the largest creditor, emit a transfer for
-the smaller absolute amount, and continue. For *n* participants this yields at most *n − 1*
+the smaller absolute amount, and continue. For _n_ participants this yields at most _n − 1_
 transfers, which is optimal for the greedy formulation and is what every user actually
 wants. Unit tests cover 2, 3, 5, and 8 participants plus the all-zero case.
 
@@ -899,15 +904,15 @@ without those two tests fails review.
 
 The queries that must be fast, and what makes them fast:
 
-| Query | Index |
-| --- | --- |
-| Ledger page, newest first, filtered by date range | `(space_id, booked_on desc) where deleted_at is null` |
-| Spend by category for a period | `(space_id, category_id, booked_on)` + partial aggregate in SQL |
-| Spend by participant for a period | `transaction_splits (space_id, participant_id)` joined on the date-filtered transaction set |
-| Full-text search of the ledger | GIN on the concatenated tsvector |
-| Budget progress | `budget_periods (budget_id, starts_on)`, `spent_minor` maintained by trigger |
-| Balances | the view above; add a materialized variant only if it measurably matters |
-| Duplicate detection on import | `import_rows (space_id, fingerprint)` and `transactions (space_id, external_id)` |
+| Query                                             | Index                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Ledger page, newest first, filtered by date range | `(space_id, booked_on desc) where deleted_at is null`                                       |
+| Spend by category for a period                    | `(space_id, category_id, booked_on)` + partial aggregate in SQL                             |
+| Spend by participant for a period                 | `transaction_splits (space_id, participant_id)` joined on the date-filtered transaction set |
+| Full-text search of the ledger                    | GIN on the concatenated tsvector                                                            |
+| Budget progress                                   | `budget_periods (budget_id, starts_on)`, `spent_minor` maintained by trigger                |
+| Balances                                          | the view above; add a materialized variant only if it measurably matters                    |
+| Duplicate detection on import                     | `import_rows (space_id, fingerprint)` and `transactions (space_id, external_id)`            |
 
 Monthly aggregates for the dashboard come from a Postgres function
 `nido.space_summary(p_space_id uuid, p_from date, p_to date)` returning a single JSON

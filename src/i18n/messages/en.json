@@ -329,7 +329,13 @@
     "error": "Could not load the ledger.",
     "retry": "Retry",
     "loadingMore": "Loading more…",
-    "add": "Add"
+    "add": "Add",
+    "filterTags": "Tag",
+    "allTags": "All tags",
+    "amountMin": "Min amount",
+    "amountMax": "Max amount",
+    "sharedOnly": "Shared only",
+    "mineOnly": "Mine only"
   },
   "transactions": {
     "addTitle": "Add transaction",

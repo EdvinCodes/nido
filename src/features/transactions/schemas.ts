@@ -138,6 +138,10 @@ export const transactionFiltersSchema = z.object({
   tagIds: z.array(z.uuid()).optional(),
   amountMin: minorUnits.nonnegative().optional(),
   amountMax: minorUnits.nonnegative().optional(),
+  sharedOnly: z.boolean().optional(),
+  mineOnly: z.boolean().optional(),
+  /** Resolved from the signed-in member; not stored in the URL. */
+  viewerParticipantId: z.uuid().optional(),
 });
 
 export const listTransactionsSchema = z.object({

@@ -3,7 +3,13 @@
 import { useMemo, useRef, useEffect, useOptimistic, useState, useTransition } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useLocale, useTranslations } from 'next-intl';
-import { useQueryStates, parseAsString } from 'nuqs';
+import {
+  useQueryStates,
+  parseAsString,
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsBoolean,
+} from 'nuqs';
 import { toast } from 'sonner';
 import { Amount, toneForKind } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
@@ -14,9 +20,11 @@ import { deleteTransaction, restoreTransaction } from '@/features/transactions/a
 import { useInfiniteTransactions } from '@/features/transactions/hooks';
 import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
-import type { TransactionView } from '@/features/transactions/types';
+import type { TagRow, TransactionView } from '@/features/transactions/types';
+import { parseLedgerFilters } from '@/features/transactions/lib/parse-ledger-filters';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
+import { formatMoney, money, parseMoney } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
 type ListItem =
@@ -51,15 +59,17 @@ export function LedgerClient({
   spaceId,
   initialPage,
   initialFilters,
+  tags,
 }: {
   spaceId: string;
   initialPage: TransactionsPage;
   initialFilters: TransactionFilters;
+  tags: TagRow[];
 }) {
   const t = useTranslations('ledger');
   const tTx = useTranslations('transactions');
   const locale = useLocale();
-  const { space } = useSpaceContext();
+  const { space, participantId } = useSpaceContext();
   const composer = useTransactionComposerOptional();
   const [detail, setDetail] = useState<TransactionView | null>(null);
   const [pending, startTransition] = useTransition();
@@ -69,20 +79,31 @@ export function LedgerClient({
     kind: parseAsString.withDefault(''),
     from: parseAsString.withDefault(''),
     to: parseAsString.withDefault(''),
+    tags: parseAsArrayOf(parseAsString).withDefault([]),
+    min: parseAsInteger,
+    max: parseAsInteger,
+    shared: parseAsBoolean.withDefault(false),
+    mine: parseAsBoolean.withDefault(false),
   });
 
-  const filters: TransactionFilters = useMemo(() => {
-    const kind =
-      urlState.kind === 'expense' || urlState.kind === 'income' || urlState.kind === 'transfer'
-        ? urlState.kind
-        : undefined;
-    return {
-      search: urlState.q || undefined,
-      kind,
-      dateFrom: urlState.from || undefined,
-      dateTo: urlState.to || undefined,
-    };
-  }, [urlState]);
+  const filters: TransactionFilters = useMemo(
+    () =>
+      parseLedgerFilters(
+        {
+          q: urlState.q,
+          kind: urlState.kind,
+          from: urlState.from,
+          to: urlState.to,
+          tags: urlState.tags,
+          amountMin: urlState.min,
+          amountMax: urlState.max,
+          shared: urlState.shared,
+          mine: urlState.mine,
+        },
+        participantId,
+      ),
+    [urlState, participantId],
+  );
 
   const queryArgs = {
     spaceId,
@@ -129,7 +150,17 @@ export function LedgerClient({
   });
 
   function clearFilters(): void {
-    void setUrlState({ q: '', kind: '', from: '', to: '' });
+    void setUrlState({
+      q: '',
+      kind: '',
+      from: '',
+      to: '',
+      tags: [],
+      min: null,
+      max: null,
+      shared: false,
+      mine: false,
+    });
   }
 
   function onDelete(tx: TransactionView): void {
@@ -165,7 +196,31 @@ export function LedgerClient({
     });
   }
 
-  const hasFilters = Boolean(filters.search || filters.kind || filters.dateFrom || filters.dateTo);
+  const hasFilters = Boolean(
+    filters.search ||
+    filters.kind ||
+    filters.dateFrom ||
+    filters.dateTo ||
+    filters.tagIds?.length ||
+    filters.amountMin != null ||
+    filters.amountMax != null ||
+    filters.sharedOnly ||
+    filters.mineOnly,
+  );
+
+  function majorToMinorInput(value: string): number | null {
+    const parsed = parseMoney(value, { locale, currency: space.base_currency });
+    if (!parsed.ok) return parsed.error === 'empty' ? null : null;
+    return Number(parsed.value.minor);
+  }
+
+  function minorToMajorInput(minor: number | null): string {
+    if (minor == null) return '';
+    return formatMoney(money(minor, space.base_currency), {
+      locale,
+      showCurrency: false,
+    });
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -225,6 +280,68 @@ export function LedgerClient({
             aria-label={t('dateTo')}
             className="w-auto"
           />
+          {tags.length > 0 ? (
+            <select
+              className="h-9 max-w-[10rem] rounded-md border border-input bg-background px-2 text-sm"
+              value={urlState.tags[0] ?? ''}
+              onChange={(e) => {
+                const id = e.target.value;
+                void setUrlState({ tags: id ? [id] : [] });
+              }}
+              aria-label={t('filterTags')}
+            >
+              <option value="">{t('allTags')}</option>
+              {tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+          ) : null}
+          <Input
+            type="text"
+            inputMode="decimal"
+            placeholder={t('amountMin')}
+            value={minorToMajorInput(urlState.min)}
+            onChange={(e) => {
+              void setUrlState({ min: majorToMinorInput(e.target.value) });
+            }}
+            aria-label={t('amountMin')}
+            className="w-24"
+          />
+          <Input
+            type="text"
+            inputMode="decimal"
+            placeholder={t('amountMax')}
+            value={minorToMajorInput(urlState.max)}
+            onChange={(e) => {
+              void setUrlState({ max: majorToMinorInput(e.target.value) });
+            }}
+            aria-label={t('amountMax')}
+            className="w-24"
+          />
+          <label className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              checked={urlState.shared}
+              onChange={(e) => {
+                void setUrlState({ shared: e.target.checked });
+              }}
+              className="size-4 rounded border-input"
+            />
+            {t('sharedOnly')}
+          </label>
+          <label className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              checked={urlState.mine}
+              onChange={(e) => {
+                void setUrlState({ mine: e.target.checked });
+              }}
+              className="size-4 rounded border-input"
+            />
+            {t('mineOnly')}
+          </label>
           {hasFilters ? (
             <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
               {t('clearFilters')}

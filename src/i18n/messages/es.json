@@ -329,7 +329,13 @@
     "error": "No se pudo cargar el libro.",
     "retry": "Reintentar",
     "loadingMore": "Cargando más…",
-    "add": "Añadir"
+    "add": "Añadir",
+    "filterTags": "Etiqueta",
+    "allTags": "Todas las etiquetas",
+    "amountMin": "Importe mín.",
+    "amountMax": "Importe máx.",
+    "sharedOnly": "Solo compartidos",
+    "mineOnly": "Solo míos"
   },
   "transactions": {
     "addTitle": "Añadir movimiento",

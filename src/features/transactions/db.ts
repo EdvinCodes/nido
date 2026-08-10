@@ -42,6 +42,7 @@ export interface QueryBuilder<Row> extends PromiseLike<ListResult<Row>> {
   in(column: string, values: readonly (string | number)[]): QueryBuilder<Row>;
   is(column: string, value: null | boolean): QueryBuilder<Row>;
   ilike(column: string, pattern: string): QueryBuilder<Row>;
+  contains(column: string, value: unknown): QueryBuilder<Row>;
   or(filters: string): QueryBuilder<Row>;
   order(column: string, options?: { ascending?: boolean; nullsFirst?: boolean }): QueryBuilder<Row>;
   range(from: number, to: number): QueryBuilder<Row>;

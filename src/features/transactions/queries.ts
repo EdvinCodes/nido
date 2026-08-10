@@ -46,6 +46,19 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
   if (filters.amountMin != null) query = query.gte('amount_minor', filters.amountMin);
   if (filters.amountMax != null) query = query.lte('amount_minor', filters.amountMax);
 
+  if (filters.sharedOnly) {
+    query = query.neq('split_mode', 'personal');
+  }
+
+  if (filters.mineOnly && filters.viewerParticipantId) {
+    query = query.contains('splits', [{ participant_id: filters.viewerParticipantId }]);
+  }
+
+  if (filters.tagIds?.length) {
+    const tagClauses = filters.tagIds.map((id) => `tags.cs.[{"id":"${id}"}]`).join(',');
+    query = query.or(tagClauses);
+  }
+
   if (filters.search) {
     const term = sanitizeSearch(filters.search);
     if (term) {

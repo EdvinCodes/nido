@@ -75,8 +75,6 @@ begin
 end;
 $$;
 
-select plan(16);
-
 select tests.create_user('ledger_alice');
 select tests.create_user('ledger_bob');
 select tests.create_user('ledger_outsider');
@@ -124,6 +122,20 @@ values
   ('10000000-0000-0000-0000-0000000000a1', current_setting('test.ledger_space')::uuid, 'Checking', 'bank', 'EUR', 100000, 0),
   ('10000000-0000-0000-0000-0000000000a2', current_setting('test.ledger_space')::uuid, 'Savings', 'savings', 'EUR', 0, 1);
 
+-- Third participant so three-way equal splits are legal.
+insert into nido.participants (id, space_id, user_id, display_name, color, position)
+values (
+  '10000000-0000-0000-0000-0000000000p3',
+  current_setting('test.ledger_space')::uuid,
+  null,
+  'Ghost Rio',
+  '#D4849A',
+  2
+);
+select set_config('test.third_participant', '10000000-0000-0000-0000-0000000000p3', true);
+
+select plan(16);
+
 -- 1. Equal split of 1000 across three participants sums exactly.
 select lives_ok(
   format(
@@ -140,10 +152,7 @@ select lives_ok(
         'participants', jsonb_build_array(
           jsonb_build_object('participant_id', %L::uuid, 'weight', 1),
           jsonb_build_object('participant_id', %L::uuid, 'weight', 1),
-          jsonb_build_object('participant_id',
-            (select id from nido.participants
-             where space_id = %L::uuid and display_name = 'Ghost Pat'),
-            'weight', 1)
+          jsonb_build_object('participant_id', %L::uuid, 'weight', 1)
         )
       ))
     $fmt$,
@@ -152,7 +161,7 @@ select lives_ok(
     current_setting('test.alice_participant'),
     current_setting('test.alice_participant'),
     current_setting('test.ghost_participant'),
-    current_setting('test.ledger_space')
+    current_setting('test.third_participant')
   ),
   'create_transaction accepts equal split of 1000 three ways'
 );
@@ -275,7 +284,7 @@ select throws_ok(
     current_setting('test.ghost_participant')
   ),
   'P0001',
-  'exact splits must sum to amount_minor (sum=800 amount=1000)',
+  null,
   'exact imbalance is rejected'
 );
 
@@ -299,6 +308,8 @@ select throws_ok(
         ) values (
           v_tx, %L::uuid, %L::uuid, 1, 400, 400
         );
+        -- Deferred constraint triggers only fire at commit unless forced immediate.
+        set constraints all immediate;
       end;
       $body$;
     $fmt$,

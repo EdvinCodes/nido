@@ -23,10 +23,112 @@
     "name": "Nombre"
   },
   "marketing": {
+    "eyebrow": "Finanzas del hogar",
     "headline": "Todo el dinero de casa, en un solo nido",
-    "subhead": "Finanzas del hogar compartidas. En construcción — la landing real llega en la fase 11.",
+    "subhead": "Gastos compartidos, reparto justo y cuentas claras para parejas, pisos compartidos o tu economía personal. Tus datos, tu base de datos.",
     "ctaApp": "Empezar gratis",
-    "ctaGithub": "Ver en GitHub"
+    "ctaSignIn": "Iniciar sesión",
+    "ctaGithub": "Ver en GitHub",
+    "navLabel": "Marketing",
+    "socialProof": {
+      "mit": "Licencia MIT",
+      "selfHost": "Autohospedable",
+      "openSource": "Código abierto",
+      "noTracking": "Sin rastreadores"
+    },
+    "preview": {
+      "windowTitle": "Movimientos · Casa de Alex y Sam",
+      "dayLabel": "Hoy",
+      "row1": "Mercadona",
+      "row1Sub": "Compras · Alex",
+      "row2": "Metro Madrid",
+      "row2Sub": "Transporte · Sam",
+      "row3": "Nómina",
+      "row3Sub": "Ingresos · Alex"
+    },
+    "problem": {
+      "title": "La hoja de cálculo ya no da abasto",
+      "subtitle": "Cuando el dinero es compartido, hace falta un sitio de confianza donde todo cuadre.",
+      "cards": {
+        "spreadsheet": {
+          "title": "El Excel se queda corto",
+          "body": "Fórmulas rotas, versiones distintas y nadie sabe cuál es la cifra buena."
+        },
+        "whoPaid": {
+          "title": "¿Quién pagó qué?",
+          "body": "Las discusiones empiezan cuando no hay un reparto claro y verificable."
+        },
+        "subscription": {
+          "title": "Suscripciones olvidadas",
+          "body": "Pequeños cargos recurrentes que se acumulan sin que nadie los revise."
+        }
+      }
+    },
+    "features": {
+      "title": "Hecho para el día a día",
+      "items": {
+        "splits": {
+          "title": "Reparto exacto",
+          "body": "Cinco modos de división. Los céntimos siempre cuadran — la base de datos lo garantiza."
+        },
+        "ledger": {
+          "title": "Libro al instante",
+          "body": "Cada gasto, ingreso y transferencia en una lista rápida, filtrable y compartida."
+        },
+        "budgets": {
+          "title": "Presupuestos con avisos",
+          "body": "Límites por categoría y alertas antes de pasarte, en la moneda de tu hogar."
+        },
+        "balances": {
+          "title": "Saldos entre personas",
+          "body": "Quién debe a quién, simplificado. Sin cuentas corrientes informales."
+        }
+      }
+    },
+    "modes": {
+      "title": "Una app, tres formas de vivir",
+      "subtitle": "El mismo núcleo se adapta a tu hogar.",
+      "items": {
+        "solo": {
+          "label": "Solo",
+          "title": "Tu economía personal",
+          "body": "Cuentas, categorías y metas sin complejidad de reparto."
+        },
+        "couple": {
+          "label": "Pareja",
+          "title": "Dos personas, un nido",
+          "body": "Gastos compartidos y personales con reparto justo por defecto."
+        },
+        "flatshare": {
+          "label": "Piso compartido",
+          "title": "Varios roommates",
+          "body": "Participantes, pesos y saldos para que nadie lleve la cuenta a mano."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Tus datos son tuyos",
+      "body": "Autohospeda con Supabase, sin rastreadores ni publicidad. Código abierto para que puedas comprobarlo."
+    },
+    "openSource": {
+      "title": "Abierto y auditable",
+      "body": "Next.js, Supabase y TypeScript estricto. Clónalo, despliégalo y hazlo tuyo.",
+      "stack": {
+        "next": "Next.js 16",
+        "supabase": "Supabase",
+        "tailwind": "Tailwind v4"
+      },
+      "snippet": "git clone github.com/EdvinCodes/nido\ncd nido && pnpm install\npnpm db:start && pnpm db:reset\npnpm dev"
+    },
+    "finalCta": {
+      "title": "Empieza en minutos",
+      "body": "Crea tu espacio, invita a tu hogar y registra el primer gasto."
+    },
+    "footer": {
+      "tagline": "Finanzas del hogar compartidas, con cifras en las que confiar.",
+      "signIn": "Iniciar sesión",
+      "copyright": "© {year} Nido. Código abierto bajo MIT."
+    }
   },
   "nav": {
     "dashboard": "Inicio",
@@ -40,6 +142,7 @@
     "settings": "Ajustes",
     "members": "Miembros",
     "categories": "Categorías",
+    "accounts": "Cuentas",
     "profile": "Perfil",
     "add": "Añadir",
     "more": "Más",
@@ -81,6 +184,13 @@
     "strengthStrong": "Fuerte",
     "panelTitle": "El dinero, compartido con calma",
     "panelBody": "Un nido para tu hogar — divisiones, presupuestos y tranquilidad.",
+    "dev": {
+      "badge": "Desarrollo local",
+      "hint": "Usuarios demo del seed. Necesitas Supabase local con `pnpm db:reset`.",
+      "loginAs": "Entrar como {name}",
+      "passwordHint": "contraseña: password123",
+      "loginFailed": "No se pudo entrar. ¿Tienes Supabase local con seed (`pnpm db:reset`)?"
+    },
     "errors": {
       "invalid_credentials": "Correo o contraseña incorrectos.",
       "email_not_confirmed": "Confirma tu correo antes de entrar.",
@@ -217,7 +327,8 @@
     "emptyBody": "Pulsa añadir para registrar tu primer gasto. Solo lleva unos segundos.",
     "error": "No se pudo cargar el libro.",
     "retry": "Reintentar",
-    "loadingMore": "Cargando más…"
+    "loadingMore": "Cargando más…",
+    "add": "Añadir"
   },
   "transactions": {
     "addTitle": "Añadir movimiento",
@@ -270,9 +381,16 @@
   },
   "accounts": {
     "title": "Cuentas",
-    "cash": "Efectivo",
-    "bank": "Banco",
-    "card": "Tarjeta",
-    "savings": "Ahorros"
+    "add": "Añadir cuenta",
+    "archive": "Archivar",
+    "newAccount": "Nueva cuenta",
+    "kind": {
+      "cash": "Efectivo",
+      "bank": "Banco",
+      "card": "Tarjeta",
+      "savings": "Ahorros",
+      "shared_pot": "Bote común",
+      "other": "Otra"
+    }
   }
 }

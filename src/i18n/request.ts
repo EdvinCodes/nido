@@ -1,6 +1,10 @@
 import { cookies, headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
+import en from './messages/en.json';
+import es from './messages/es.json';
 import { defaultLocale, isSupportedLocale, LOCALE_COOKIE, type Locale } from './locales';
+
+const messageCatalog: Record<Locale, typeof es> = { es, en };
 
 async function resolveLocale(): Promise<Locale> {
   const cookieStore = await cookies();
@@ -17,9 +21,6 @@ async function resolveLocale(): Promise<Locale> {
 
 export default getRequestConfig(async () => {
   const locale = await resolveLocale();
-  const messages = (await import(`./messages/${locale}.json`)) as {
-    default: Record<string, unknown>;
-  };
 
-  return { locale, messages: messages.default };
+  return { locale, messages: messageCatalog[locale] };
 });

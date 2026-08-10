@@ -15,6 +15,7 @@ import {
   signInWithMagicLinkAction,
 } from '@/features/auth/actions';
 import { signInSchema, type SignInInput } from '@/features/auth/schemas';
+import { DevSignInPanel } from '@/features/auth/dev-sign-in-panel';
 import { route } from '@/lib/routes';
 
 export function SignInForm() {
@@ -131,6 +132,8 @@ export function SignInForm() {
           {t('google')}
         </Button>
       </div>
+
+      <DevSignInPanel {...(next ? { next } : {})} />
 
       <p className="text-sm text-muted-foreground">
         {t('noAccount')}{' '}

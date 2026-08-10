@@ -23,10 +23,112 @@
     "name": "Name"
   },
   "marketing": {
+    "eyebrow": "Household finance",
     "headline": "All your household money, in one nest",
-    "subhead": "Shared household finance. Under construction — the real landing page arrives in phase 11.",
+    "subhead": "Shared expenses, fair splits, and clear accounts for couples, flatmates, or solo budgeting. Your data, your database.",
     "ctaApp": "Start free",
-    "ctaGithub": "View on GitHub"
+    "ctaSignIn": "Sign in",
+    "ctaGithub": "View on GitHub",
+    "navLabel": "Marketing",
+    "socialProof": {
+      "mit": "MIT licence",
+      "selfHost": "Self-hostable",
+      "openSource": "Open source",
+      "noTracking": "No trackers"
+    },
+    "preview": {
+      "windowTitle": "Ledger · Alex & Sam's home",
+      "dayLabel": "Today",
+      "row1": "Mercadona",
+      "row1Sub": "Groceries · Alex",
+      "row2": "Metro Madrid",
+      "row2Sub": "Transport · Sam",
+      "row3": "Paycheque",
+      "row3Sub": "Income · Alex"
+    },
+    "problem": {
+      "title": "The spreadsheet is not enough",
+      "subtitle": "When money is shared, you need one place everyone trusts.",
+      "cards": {
+        "spreadsheet": {
+          "title": "Spreadsheets break down",
+          "body": "Broken formulas, conflicting copies, and no one knows the real total."
+        },
+        "whoPaid": {
+          "title": "Who paid for what?",
+          "body": "Arguments start when splits are unclear or impossible to verify."
+        },
+        "subscription": {
+          "title": "Forgotten subscriptions",
+          "body": "Small recurring charges that pile up because nobody reviews them."
+        }
+      }
+    },
+    "features": {
+      "title": "Built for everyday life",
+      "items": {
+        "splits": {
+          "title": "Exact splits",
+          "body": "Five split modes. Cents always add up — the database enforces it."
+        },
+        "ledger": {
+          "title": "Instant ledger",
+          "body": "Every expense, income, and transfer in a fast, filterable shared list."
+        },
+        "budgets": {
+          "title": "Budgets with alerts",
+          "body": "Category limits and warnings before you overspend, in your home currency."
+        },
+        "balances": {
+          "title": "Balances between people",
+          "body": "Who owes whom, simplified. No informal running tabs."
+        }
+      }
+    },
+    "modes": {
+      "title": "One app, three ways to live",
+      "subtitle": "The same core adapts to your household.",
+      "items": {
+        "solo": {
+          "label": "Solo",
+          "title": "Personal finance",
+          "body": "Accounts, categories, and goals without split complexity."
+        },
+        "couple": {
+          "label": "Couple",
+          "title": "Two people, one nest",
+          "body": "Shared and personal spending with fair splits by default."
+        },
+        "flatshare": {
+          "label": "Flatshare",
+          "title": "Several roommates",
+          "body": "Participants, weights, and balances so no one keeps score by hand."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Your data stays yours",
+      "body": "Self-host on Supabase, no trackers or ads. Open source so you can verify."
+    },
+    "openSource": {
+      "title": "Open and auditable",
+      "body": "Next.js, Supabase, and strict TypeScript. Clone it, deploy it, make it yours.",
+      "stack": {
+        "next": "Next.js 16",
+        "supabase": "Supabase",
+        "tailwind": "Tailwind v4"
+      },
+      "snippet": "git clone github.com/EdvinCodes/nido\ncd nido && pnpm install\npnpm db:start && pnpm db:reset\npnpm dev"
+    },
+    "finalCta": {
+      "title": "Get started in minutes",
+      "body": "Create your space, invite your household, and log the first expense."
+    },
+    "footer": {
+      "tagline": "Shared household finance with numbers you can trust.",
+      "signIn": "Sign in",
+      "copyright": "© {year} Nido. Open source under MIT."
+    }
   },
   "nav": {
     "dashboard": "Home",
@@ -40,6 +142,7 @@
     "settings": "Settings",
     "members": "Members",
     "categories": "Categories",
+    "accounts": "Accounts",
     "profile": "Profile",
     "add": "Add",
     "more": "More",
@@ -81,6 +184,13 @@
     "strengthStrong": "Strong",
     "panelTitle": "Money, shared calmly",
     "panelBody": "One nest for your household — splits, budgets, and peace of mind.",
+    "dev": {
+      "badge": "Local development",
+      "hint": "Demo users from seed data. Requires local Supabase with `pnpm db:reset`.",
+      "loginAs": "Sign in as {name}",
+      "passwordHint": "password: password123",
+      "loginFailed": "Could not sign in. Is local Supabase running with seed (`pnpm db:reset`)?"
+    },
     "errors": {
       "invalid_credentials": "Wrong email or password.",
       "email_not_confirmed": "Confirm your email before signing in.",
@@ -217,7 +327,8 @@
     "emptyBody": "Tap add to record your first expense. It only takes a few seconds.",
     "error": "Could not load the ledger.",
     "retry": "Retry",
-    "loadingMore": "Loading more…"
+    "loadingMore": "Loading more…",
+    "add": "Add"
   },
   "transactions": {
     "addTitle": "Add transaction",
@@ -270,9 +381,16 @@
   },
   "accounts": {
     "title": "Accounts",
-    "cash": "Cash",
-    "bank": "Bank",
-    "card": "Card",
-    "savings": "Savings"
+    "add": "Add account",
+    "archive": "Archive",
+    "newAccount": "New account",
+    "kind": {
+      "cash": "Cash",
+      "bank": "Bank",
+      "card": "Card",
+      "savings": "Savings",
+      "shared_pot": "Shared pot",
+      "other": "Other"
+    }
   }
 }

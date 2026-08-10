@@ -18,7 +18,10 @@ begin
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
     email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
-    created_at, updated_at
+    created_at, updated_at,
+    confirmation_token, recovery_token, email_change,
+    email_change_token_new, email_change_token_current,
+    phone_change, phone_change_token
   ) values (
     v_id,
     '00000000-0000-0000-0000-000000000000',
@@ -30,7 +33,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     jsonb_build_object('display_name', identifier),
     now(),
-    now()
+    now(),
+    '', '', '', '', '', '', ''
   );
   return v_id;
 end;

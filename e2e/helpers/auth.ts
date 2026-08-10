@@ -23,7 +23,13 @@ export async function signInDemo(
   await page.goto('/sign-in');
 
   const devAlex = page.getByRole('button', { name: /entrar como alex|sign in as alex/i });
-  if (await devAlex.isVisible()) {
+  // Wait for the client panel (or fall back to the password form).
+  const hasDevLogin = await devAlex
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (hasDevLogin) {
     await devAlex.click();
   } else {
     await page.getByLabel(/correo|email/i).fill(email);
@@ -34,14 +40,24 @@ export async function signInDemo(
       .click();
   }
 
-  // App sign-in redirects to `/` first; marketing page then server-redirects to `/s/:id`.
-  await page.waitForURL((url) => SPACE_URL.test(url.pathname) || url.pathname === '/', {
-    timeout: 30_000,
-  });
+  // Soft navigations (App Router) do not always fire a full "load"; commit is enough.
+  // Accept `/` briefly — marketing then server-redirects to `/s/:id`.
+  try {
+    await page.waitForURL((url) => SPACE_URL.test(url.pathname) || url.pathname === '/', {
+      timeout: 30_000,
+      waitUntil: 'commit',
+    });
+  } catch (error) {
+    throw new Error(
+      `Demo sign-in did not leave /sign-in (still at ${page.url()}). ` +
+        `Ensure seed users can log in (auth.identities + empty token columns). ` +
+        `Original: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 
   if (!SPACE_URL.test(new URL(page.url()).pathname)) {
     await page.goto('/');
-    await page.waitForURL(SPACE_URL, { timeout: 30_000 });
+    await page.waitForURL(SPACE_URL, { timeout: 30_000, waitUntil: 'commit' });
   }
 
   return parseSpaceId(page.url());

@@ -86,5 +86,14 @@
     "typescript": "^5",
     "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,mts}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{json,css,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

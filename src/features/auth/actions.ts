@@ -14,7 +14,6 @@ import {
 import { mapAuthError } from './map-auth-error';
 import { safeNext } from './safe-next';
 import { route } from '@/lib/routes';
-import type { Route } from 'next';
 
 export async function signInAction(raw: unknown): Promise<ActionResult<{ next: string }>> {
   const parsed = signInSchema.safeParse(raw);
@@ -102,7 +101,7 @@ export async function signInWithGoogleAction(next?: string): Promise<void> {
     redirect(route('/sign-in?error=oauth'));
   }
 
-  redirect(data.url as Route);
+  redirect(data.url);
 }
 
 export async function forgotPasswordAction(raw: unknown): Promise<ActionResult<{ sent: true }>> {

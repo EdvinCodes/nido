@@ -189,11 +189,11 @@ begin
     into v_ids, v_weights
   from (
     select
-      v_ids[i] as pid,
-      v_weights[i] as w,
+      u.pid,
+      u.w,
       coalesce(p.position, 32767) as pos
-    from generate_subscripts(v_ids, 1) as i
-    left join nido.participants p on p.id = v_ids[i]
+    from unnest(v_ids, v_weights) as u(pid, w)
+    left join nido.participants p on p.id = u.pid
   ) x;
 
   v_owed := nido.allocate(p_amount_minor, v_weights);

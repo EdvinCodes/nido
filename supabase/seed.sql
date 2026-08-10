@@ -70,6 +70,48 @@ insert into auth.users (
     now()
   );
 
+-- Email/password sign-in requires a matching auth.identities row (GoTrue looks it up on login).
+insert into auth.identities (
+  id,
+  user_id,
+  provider_id,
+  provider,
+  identity_data,
+  last_sign_in_at,
+  created_at,
+  updated_at
+) values
+  (
+    '00000000-0000-0000-0000-0000000000a1',
+    '00000000-0000-0000-0000-0000000000a1',
+    '00000000-0000-0000-0000-0000000000a1',
+    'email',
+    jsonb_build_object(
+      'sub', '00000000-0000-0000-0000-0000000000a1',
+      'email', 'alex@demo.nido.local',
+      'email_verified', false,
+      'phone_verified', false
+    ),
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000a2',
+    'email',
+    jsonb_build_object(
+      'sub', '00000000-0000-0000-0000-0000000000a2',
+      'email', 'sam@demo.nido.local',
+      'email_verified', false,
+      'phone_verified', false
+    ),
+    now(),
+    now(),
+    now()
+  );
+
 -- ---------------------------------------------------------------------------------------
 -- 2. Everything else, as one deterministic script. `seed.sql` runs as the migration role,
 --    which bypasses RLS entirely, so the only thing that matters for the RPCs below is

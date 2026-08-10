@@ -37,7 +37,12 @@ test.describe('invite flow', () => {
     const spaceId = await signUpAndCreateSpace(hostPage, hostEmail, 'Shared Nest');
 
     await hostPage.goto(`/s/${spaceId}/settings/members`);
-    await hostPage.getByRole('button', { name: /copiar enlace|invite link|enlace/i }).click();
+    await expect(hostPage.getByRole('heading', { name: /members|miembros/i })).toBeVisible({
+      timeout: 15_000,
+    });
+    await hostPage
+      .getByRole('button', { name: /copy invite link|copiar enlace de invitación/i })
+      .click();
     const linkText = hostPage.locator('.font-mono').first();
     await expect(linkText).toBeVisible({ timeout: 15_000 });
     const inviteUrl = (await linkText.textContent())?.trim() ?? '';

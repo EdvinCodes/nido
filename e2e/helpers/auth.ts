@@ -23,9 +23,7 @@ export async function signInDemo(
   await page.goto('/sign-in');
 
   const devAlex = page.getByRole('button', { name: /entrar como alex|sign in as alex/i });
-  const useDevPanel = !process.env.CI && (await devAlex.isVisible());
-
-  if (useDevPanel) {
+  if (await devAlex.isVisible()) {
     await devAlex.click();
   } else {
     await page.getByLabel(/correo|email/i).fill(email);

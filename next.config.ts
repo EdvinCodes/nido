@@ -6,6 +6,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Playwright and local tooling hit the dev server via 127.0.0.1; Next.js 16 blocks cross-origin
+  // dev asset requests unless the host is explicitly allowed.
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+
   // Standalone output keeps the self-hosted Docker image small. See docs/01-ARCHITECTURE.md §10.
   ...(process.env.BUILD_STANDALONE === 'true' ? { output: 'standalone' as const } : {}),
 

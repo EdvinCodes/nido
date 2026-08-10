@@ -4,6 +4,38 @@
     "description": "Finanzas del hogar, compartidas. De una persona a toda la casa."
   },
   "common": {
-    "appName": "Nido"
+    "appName": "Nido",
+    "loading": "Cargando…",
+    "retry": "Reintentar",
+    "goHome": "Ir al inicio"
+  },
+  "marketing": {
+    "headline": "Todo el dinero de casa, en un solo nido",
+    "subhead": "Finanzas del hogar compartidas. En construcción — la landing real llega en la fase 11.",
+    "ctaApp": "Abrir la app",
+    "ctaGithub": "Ver en GitHub"
+  },
+  "nav": {
+    "dashboard": "Inicio",
+    "ledger": "Movimientos",
+    "budgets": "Presupuestos",
+    "goals": "Metas",
+    "balances": "Saldos",
+    "subscriptions": "Suscripciones",
+    "reports": "Informes",
+    "assistant": "Asistente",
+    "settings": "Ajustes",
+    "add": "Añadir",
+    "more": "Más"
+  },
+  "shell": {
+    "spacePlaceholder": "Espacio demo",
+    "pageTitle": "Panel"
+  },
+  "errors": {
+    "title": "Algo ha fallado",
+    "description": "Ha ocurrido un error inesperado. Puedes reintentar o volver al inicio.",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundDescription": "La ruta que buscas no existe o ha cambiado."
   }
 }

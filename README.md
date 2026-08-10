@@ -6,7 +6,7 @@
 
 Track every euro that enters and leaves your home — alone, as a couple, or with roommates.
 Split expenses any way you want, set budgets that actually warn you, chase savings goals,
-tame subscriptions, and eventually just *ask* your data where the money is going.
+tame subscriptions, and eventually just _ask_ your data where the money is going.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org)
@@ -17,9 +17,9 @@ tame subscriptions, and eventually just *ask* your data where the money is going
 
 ---
 
-> **Status: pre-alpha.** The product is fully specified in [`docs/`](./docs) and is being built
-> phase by phase. Nothing here is production-ready yet. Follow
-> [`docs/phases/README.md`](./docs/phases/README.md) to see what is done and what is next.
+> **Status: foundations complete (phase 00).** The product is being built phase by phase.
+> Follow [`docs/phases/README.md`](./docs/phases/README.md) for progress. Phase 01 (auth &
+> spaces) is next.
 
 ## Why Nido
 
@@ -35,23 +35,23 @@ else — analytics, budgets, debt settlement, and an AI assistant that can actua
 
 ## Core capabilities
 
-| Area | What it does |
-| --- | --- |
-| **Spaces** | Solo, couple, or shared (N members). Roles, invitations, per-space settings and base currency. |
-| **Ledger** | Income and expenses with payer, date, account, category, notes, tags, and attachments. |
-| **Splitting** | Personal, equal, by shares, by percentage, or exact amounts. Cent-perfect, no rounding drift. |
-| **Categories** | Custom trees with colors and icons, plus a sensible default set on space creation. |
-| **Budgets** | Daily / weekly / monthly / yearly limits, global or per category, per member or per space, with rollover. |
-| **Alerts** | Threshold notifications (50/80/100 %) in-app, via web push, and by email. |
-| **Goals** | Savings pots with target dates, progress, and contributions from any member. |
-| **Subscriptions** | Recurring charges and income with forecasting, renewal reminders, and "ghost subscription" detection. |
-| **Balances** | Who owes whom, with a minimum-transfer settlement algorithm and settlement history. |
-| **Receipts** | Photo or PDF attachments with on-device compression and optional AI extraction of amount, merchant, and date. |
-| **Import** | CSV/XLSX bank statement import with column mapping, deduplication, and rule-based auto-categorization. |
-| **Bank sync** | Optional PSD2 open banking connection through a pluggable provider interface. |
-| **Multi-currency** | Amounts stored in their original currency, converted to the space base currency at transaction date. |
-| **Reports** | Monthly close, PDF and Excel exports, period comparison. |
-| **AI assistant** | Tool-calling agent over your own data. Bring your own key: OpenAI, Anthropic, Google, or fully local Ollama. |
+| Area               | What it does                                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| **Spaces**         | Solo, couple, or shared (N members). Roles, invitations, per-space settings and base currency.                |
+| **Ledger**         | Income and expenses with payer, date, account, category, notes, tags, and attachments.                        |
+| **Splitting**      | Personal, equal, by shares, by percentage, or exact amounts. Cent-perfect, no rounding drift.                 |
+| **Categories**     | Custom trees with colors and icons, plus a sensible default set on space creation.                            |
+| **Budgets**        | Daily / weekly / monthly / yearly limits, global or per category, per member or per space, with rollover.     |
+| **Alerts**         | Threshold notifications (50/80/100 %) in-app, via web push, and by email.                                     |
+| **Goals**          | Savings pots with target dates, progress, and contributions from any member.                                  |
+| **Subscriptions**  | Recurring charges and income with forecasting, renewal reminders, and "ghost subscription" detection.         |
+| **Balances**       | Who owes whom, with a minimum-transfer settlement algorithm and settlement history.                           |
+| **Receipts**       | Photo or PDF attachments with on-device compression and optional AI extraction of amount, merchant, and date. |
+| **Import**         | CSV/XLSX bank statement import with column mapping, deduplication, and rule-based auto-categorization.        |
+| **Bank sync**      | Optional PSD2 open banking connection through a pluggable provider interface.                                 |
+| **Multi-currency** | Amounts stored in their original currency, converted to the space base currency at transaction date.          |
+| **Reports**        | Monthly close, PDF and Excel exports, period comparison.                                                      |
+| **AI assistant**   | Tool-calling agent over your own data. Bring your own key: OpenAI, Anthropic, Google, or fully local Ollama.  |
 
 ## Tech stack
 
@@ -66,21 +66,22 @@ Full reasoning and rejected alternatives: [`docs/07-ADR.md`](./docs/07-ADR.md).
 
 ## Documentation
 
-| Document | Purpose |
-| --- | --- |
-| [`docs/00-PROJECT.md`](./docs/00-PROJECT.md) | Vision, scope, principles, personas, glossary, roadmap |
-| [`docs/01-ARCHITECTURE.md`](./docs/01-ARCHITECTURE.md) | System design, folder structure, data flow, security, deployment |
-| [`docs/02-DATA-MODEL.md`](./docs/02-DATA-MODEL.md) | Complete SQL schema, RLS policies, functions, money and splitting rules |
-| [`docs/03-DESIGN-SYSTEM.md`](./docs/03-DESIGN-SYSTEM.md) | Brand, tokens, typography, components, motion, landing page |
-| [`docs/04-FEATURES.md`](./docs/04-FEATURES.md) | Functional specification, screen by screen |
-| [`docs/05-AI-ASSISTANT.md`](./docs/05-AI-ASSISTANT.md) | Assistant architecture, tools, guardrails, privacy |
-| [`docs/06-CONVENTIONS.md`](./docs/06-CONVENTIONS.md) | Code style, git, testing, CI, definition of done |
-| [`docs/07-ADR.md`](./docs/07-ADR.md) | Architecture decision records |
-| [`docs/phases/`](./docs/phases) | Executable build plan, one file per phase |
+| Document                                                 | Purpose                                                                 |
+| -------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [`docs/00-PROJECT.md`](./docs/00-PROJECT.md)             | Vision, scope, principles, personas, glossary, roadmap                  |
+| [`docs/01-ARCHITECTURE.md`](./docs/01-ARCHITECTURE.md)   | System design, folder structure, data flow, security, deployment        |
+| [`docs/02-DATA-MODEL.md`](./docs/02-DATA-MODEL.md)       | Complete SQL schema, RLS policies, functions, money and splitting rules |
+| [`docs/03-DESIGN-SYSTEM.md`](./docs/03-DESIGN-SYSTEM.md) | Brand, tokens, typography, components, motion, landing page             |
+| [`docs/04-FEATURES.md`](./docs/04-FEATURES.md)           | Functional specification, screen by screen                              |
+| [`docs/05-AI-ASSISTANT.md`](./docs/05-AI-ASSISTANT.md)   | Assistant architecture, tools, guardrails, privacy                      |
+| [`docs/06-CONVENTIONS.md`](./docs/06-CONVENTIONS.md)     | Code style, git, testing, CI, definition of done                        |
+| [`docs/07-ADR.md`](./docs/07-ADR.md)                     | Architecture decision records                                           |
+| [`docs/phases/`](./docs/phases)                          | Executable build plan, one file per phase                               |
 
 ## Getting started
 
-> Available from Phase 0 onwards.
+> Available after phase 00. Requires [Docker](https://docs.docker.com/get-docker/) for the
+> local Supabase stack.
 
 ```bash
 git clone https://github.com/EdvinCodes/nido.git

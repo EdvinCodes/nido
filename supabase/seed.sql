@@ -1,0 +1,8 @@
+-- Deterministic demo data, per docs/02-DATA-MODEL.md §16: one 'couple' space, two members,
+-- the default category tree, four accounts, three months of realistic transactions, two
+-- budgets, two goals, four subscriptions, and one unsettled balance.
+--
+-- Empty in Phase 00 on purpose: none of those tables exist yet (out of scope — see
+-- docs/phases/PHASE-00-foundations.md). This file is wired into `supabase/config.toml`
+-- (`[db.seed]`) now so `pnpm db:reset` already exercises the seeding step; it gets real
+-- statements starting in Phase 01, growing alongside each table it seeds.

@@ -4,6 +4,38 @@
     "description": "Household finance, shared. From one person to the whole home."
   },
   "common": {
-    "appName": "Nido"
+    "appName": "Nido",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "goHome": "Go home"
+  },
+  "marketing": {
+    "headline": "All your household money, in one nest",
+    "subhead": "Shared household finance. Under construction — the real landing page arrives in phase 11.",
+    "ctaApp": "Open the app",
+    "ctaGithub": "View on GitHub"
+  },
+  "nav": {
+    "dashboard": "Home",
+    "ledger": "Ledger",
+    "budgets": "Budgets",
+    "goals": "Goals",
+    "balances": "Balances",
+    "subscriptions": "Subscriptions",
+    "reports": "Reports",
+    "assistant": "Assistant",
+    "settings": "Settings",
+    "add": "Add",
+    "more": "More"
+  },
+  "shell": {
+    "spacePlaceholder": "Demo space",
+    "pageTitle": "Dashboard"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. You can retry or go back home.",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has moved."
   }
 }

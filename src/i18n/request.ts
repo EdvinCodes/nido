@@ -1,9 +1,6 @@
 import { cookies, headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
-import { defaultLocale, isSupportedLocale, type Locale } from './locales';
-
-/** Locale cookie set once a visitor picks a language explicitly. */
-export const LOCALE_COOKIE = 'NEXT_LOCALE';
+import { defaultLocale, isSupportedLocale, LOCALE_COOKIE, type Locale } from './locales';
 
 async function resolveLocale(): Promise<Locale> {
   const cookieStore = await cookies();

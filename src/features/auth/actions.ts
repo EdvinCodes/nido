@@ -101,7 +101,8 @@ export async function signInWithGoogleAction(next?: string): Promise<void> {
     redirect(route('/sign-in?error=oauth'));
   }
 
-  redirect(data.url);
+  // OAuth provider URL is absolute; typed routes still require a Route cast.
+  redirect(route(data.url));
 }
 
 export async function forgotPasswordAction(raw: unknown): Promise<ActionResult<{ sent: true }>> {

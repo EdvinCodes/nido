@@ -170,6 +170,7 @@ declare
   v_n_transfers int := 0;
   v_n_incomes int := 0;
   v_n_expenses int := 0;
+  v_resolved_cat uuid;
 begin
   -- 2a. Alex creates the couple space (owner participant + default categories, atomically).
   perform set_config('request.jwt.claim.sub', v_alex_id::text, true);
@@ -215,15 +216,17 @@ begin
   -- 2e. Resolve category ids once, by name + kind (both expense and income trees contain a
   -- 'Gifts' and an 'Other' category, so the kind filter disambiguates them).
   for v_idx in 1..array_length(v_exp_name, 1) loop
-    select c.id into v_exp_cat_id[v_idx]
+    select c.id into v_resolved_cat
     from nido.categories c
     where c.space_id = v_space_id and c.kind = 'expense' and c.name = v_exp_name[v_idx];
+    v_exp_cat_id[v_idx] := v_resolved_cat;
   end loop;
 
   for v_idx in 1..array_length(v_inc_name, 1) loop
-    select c.id into v_inc_cat_id[v_idx]
+    select c.id into v_resolved_cat
     from nido.categories c
     where c.space_id = v_space_id and c.kind = 'income' and c.name = v_inc_name[v_idx];
+    v_inc_cat_id[v_idx] := v_resolved_cat;
   end loop;
 
   -- 2f. ~150 transactions spread across three months (2026-05-01 .. 2026-07-31), covering

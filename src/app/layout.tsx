@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { AppProviders } from '@/components/providers';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
@@ -38,8 +39,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
-            {children}
-            <Toaster />
+            <AppProviders>
+              {children}
+              <Toaster />
+            </AppProviders>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

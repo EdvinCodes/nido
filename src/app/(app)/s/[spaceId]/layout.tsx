@@ -1,8 +1,12 @@
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
-import { getSpaceForMember, getUserSpaces } from '@/features/spaces/queries';
+import { listAccounts } from '@/features/accounts/queries';
+import { getCategories, getSpaceForMember, getUserSpaces } from '@/features/spaces/queries';
 import { SpaceProvider } from '@/features/spaces/space-context';
+import { TransactionComposerProvider } from '@/features/transactions/composer-context';
+import { getActiveParticipants } from '@/features/transactions/queries';
+import { TransactionComposerHost } from '@/features/transactions/transaction-form';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function SpaceLayout({
@@ -22,7 +26,12 @@ export default async function SpaceLayout({
     .update({ last_active_space_id: spaceId })
     .eq('id', membership.userId);
 
-  const spaces = await getUserSpaces();
+  const [spaces, categories, accounts, participants] = await Promise.all([
+    getUserSpaces(),
+    getCategories(spaceId),
+    listAccounts(spaceId),
+    getActiveParticipants(spaceId),
+  ]);
 
   return (
     <SpaceProvider
@@ -34,14 +43,33 @@ export default async function SpaceLayout({
         spaces,
       }}
     >
-      <AppShell
-        spaceId={spaceId}
-        spaces={spaces}
-        role={membership.role}
-        spaceName={membership.space.name}
-      >
-        {children}
-      </AppShell>
+      <TransactionComposerProvider>
+        <AppShell
+          spaceId={spaceId}
+          spaces={spaces}
+          role={membership.role}
+          spaceName={membership.space.name}
+        >
+          {children}
+        </AppShell>
+        <TransactionComposerHost
+          categories={categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            color: c.color,
+            icon: c.icon,
+            kind: c.kind,
+            parent_id: c.parent_id,
+          }))}
+          accounts={accounts}
+          participants={participants.map((p) => ({
+            id: p.id,
+            displayName: p.display_name,
+            color: p.color,
+            position: p.position,
+          }))}
+        />
+      </TransactionComposerProvider>
     </SpaceProvider>
   );
 }

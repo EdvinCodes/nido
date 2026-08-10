@@ -12,7 +12,7 @@ promote an item into a phase file first.
 
 ## Open
 
-_(empty — the build has not started)_
+- [ ] Perf seed of 10k transactions for ledger virtualization FPS checks — deferred from Phase 02 because seeding 10k via `create_transaction` on every `db:reset` is too slow; demo seed keeps ~150 realistic rows. Target: Phase 02 follow-up / tooling.
 
 ## Post-v1 ideas
 

@@ -133,6 +133,17 @@ const eslintConfig = defineConfig([
     },
   },
 
+  // Next typed routes: with `.next/types` present, `Route` is a literal union and the cast
+  // in `route()` is required for `next build`. Without those generated types (fresh CI lint),
+  // ESLint widens `Route` to `string` and flags the cast as unnecessary. Keep the cast for
+  // build correctness and silence the rule only in this one helper.
+  {
+    files: ['src/lib/routes.ts'],
+    rules: {
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+    },
+  },
+
   prettier,
 ]);
 

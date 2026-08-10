@@ -1,5 +1,23 @@
 # Phase 02 — Ledger core
 
+## Status note (session checkpoint)
+
+**In progress.** Landed: DB migrations (accounts/tags/transactions/splits/view/RPCs/idempotency),
+seed, pgTAP `060_ledger.sql`, TS domain (`computeSplits`/`validateSplit`/…), server actions +
+queries, Amount/AmountInput/SplitEditor/composer, `/ledger` virtualized list with URL filters,
+FAB + nav. `pnpm typecheck` / `lint` / `test` / `build` green locally.
+
+**Still open before Done:**
+
+- Run `pnpm db:reset && pnpm db:types` (needs Docker/Supabase) and commit generated types
+- `pnpm test:db` + Playwright ledger flow
+- Realtime highlight, swipe/long-press bulk, ⌘K palette, optimistic insert
+- Remaining filters (tags, amount range, shared/mine, has-attachment)
+- Accounts settings CRUD UI
+- Perf seed of 10k rows (see `docs/BACKLOG.md`)
+
+---
+
 ## Goal
 
 The heart of the product. After this phase two people can record every expense, income, and

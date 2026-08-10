@@ -5,15 +5,17 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
+import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 
 export function MobileTabBar({ activePath, spaceId }: { activePath: string; spaceId: string }) {
   const t = useTranslations('nav');
   const base = `/s/${spaceId}`;
+  const composer = useTransactionComposerOptional();
 
   const tabs = [
     { key: 'dashboard' as const, href: base, icon: LayoutDashboard, primary: false, ready: true },
-    { key: 'ledger' as const, href: `${base}/ledger`, icon: Receipt, primary: false, ready: false },
-    { key: 'add' as const, href: base, icon: Plus, primary: true, ready: false },
+    { key: 'ledger' as const, href: `${base}/ledger`, icon: Receipt, primary: false, ready: true },
+    { key: 'add' as const, href: base, icon: Plus, primary: true, ready: true },
     {
       key: 'budgets' as const,
       href: `${base}/budgets`,
@@ -40,14 +42,17 @@ export function MobileTabBar({ activePath, spaceId }: { activePath: string; spac
 
         if (primary) {
           return (
-            <span
+            <button
               key={key}
-              className="-mt-5 flex size-14 items-center justify-center rounded-full bg-primary/50 text-primary-foreground shadow-float"
-              aria-label={`${t(key)} (${t('comingSoon')})`}
-              title={t('comingSoon')}
+              type="button"
+              className="-mt-5 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-float"
+              aria-label={t(key)}
+              onClick={() => {
+                composer?.openCreate();
+              }}
             >
               <Icon className="size-6" aria-hidden />
-            </span>
+            </button>
           );
         }
 

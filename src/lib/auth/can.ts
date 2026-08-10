@@ -15,6 +15,13 @@ export type SpaceAction =
   | 'categories.create'
   | 'categories.update'
   | 'categories.delete'
+  | 'transactions.create'
+  | 'transactions.update'
+  | 'transactions.delete'
+  | 'accounts.create'
+  | 'accounts.update'
+  | 'accounts.delete'
+  | 'tags.create'
   | 'profile.update';
 
 const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<SpaceAction>> = {
@@ -28,6 +35,13 @@ const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<SpaceAction>> = {
     'categories.create',
     'categories.update',
     'categories.delete',
+    'transactions.create',
+    'transactions.update',
+    'transactions.delete',
+    'accounts.create',
+    'accounts.update',
+    'accounts.delete',
+    'tags.create',
     'profile.update',
   ]),
   admin: new Set([
@@ -38,9 +52,28 @@ const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<SpaceAction>> = {
     'categories.create',
     'categories.update',
     'categories.delete',
+    'transactions.create',
+    'transactions.update',
+    'transactions.delete',
+    'accounts.create',
+    'accounts.update',
+    'accounts.delete',
+    'tags.create',
     'profile.update',
   ]),
-  member: new Set(['space.read', 'categories.create', 'categories.update', 'profile.update']),
+  member: new Set([
+    'space.read',
+    'categories.create',
+    'categories.update',
+    // A member can create/update transactions, and delete their own (RLS enforces ownership).
+    'transactions.create',
+    'transactions.update',
+    'transactions.delete',
+    'accounts.create',
+    'accounts.update',
+    'tags.create',
+    'profile.update',
+  ]),
   viewer: new Set(['space.read', 'profile.update']),
 };
 

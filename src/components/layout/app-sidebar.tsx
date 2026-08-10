@@ -23,7 +23,7 @@ type SpaceList = Awaited<ReturnType<typeof getUserSpaces>>;
 
 const NAV_ITEMS = [
   { key: 'dashboard', href: '', icon: LayoutDashboard, ready: true },
-  { key: 'ledger', href: '/ledger', icon: Receipt, ready: false },
+  { key: 'ledger', href: '/ledger', icon: Receipt, ready: true },
   { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: false },
   { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: false },
   { key: 'balances', href: '/balances', icon: Scale, ready: false },

@@ -49,7 +49,7 @@
     "spacePlaceholder": "Demo space",
     "pageTitle": "Dashboard",
     "emptyTitle": "Your nest is ready",
-    "emptyBody": "The ledger arrives in the next phase. For now, invite your household and set up categories.",
+    "emptyBody": "Open the ledger to record your first expense, or invite your household and set up categories.",
     "createSpace": "Create new space",
     "switchSpace": "Switch space"
   },
@@ -204,5 +204,75 @@
     "description": "An unexpected error occurred. You can retry or go back home.",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist or has moved."
+  },
+  "ledger": {
+    "title": "Ledger",
+    "searchPlaceholder": "Search description, merchant…",
+    "filterKind": "Type",
+    "allKinds": "All types",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearFilters": "Clear filters",
+    "emptyTitle": "No transactions yet",
+    "emptyBody": "Tap add to record your first expense. It only takes a few seconds.",
+    "error": "Could not load the ledger.",
+    "retry": "Retry",
+    "loadingMore": "Loading more…"
+  },
+  "transactions": {
+    "addTitle": "Add transaction",
+    "amount": "Amount",
+    "category": "Category",
+    "categoryPlaceholder": "Choose a category",
+    "account": "Account",
+    "accountPlaceholder": "Choose an account",
+    "noAccount": "No account",
+    "fromAccount": "From",
+    "toAccount": "To",
+    "payer": "Paid by",
+    "description": "Description",
+    "merchant": "Merchant",
+    "notes": "Notes",
+    "date": "Date",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "moreDetails": "More details",
+    "hideDetails": "Hide details",
+    "weight": "Shares",
+    "percent": "Percent",
+    "exactAmount": "Exact amount (cents)",
+    "giveRest": "Give the rest",
+    "created": "Transaction saved",
+    "deleted": "Transaction deleted",
+    "restored": "Transaction restored",
+    "undo": "Undo",
+    "delete": "Delete",
+    "kind": {
+      "expense": "Expense",
+      "income": "Income",
+      "transfer": "Transfer"
+    },
+    "splitMode": {
+      "personal": "Personal",
+      "equal": "Equal",
+      "shares": "Shares",
+      "percent": "Percent",
+      "exact": "Exact"
+    },
+    "split": {
+      "amountInvalid": "Enter an amount greater than zero.",
+      "noParticipants": "Select at least one person.",
+      "personalNeedsOne": "Personal mode needs exactly one person.",
+      "percentNot100": "Percentages must add up to 100.",
+      "exactUnbalanced": "Exact amounts must add up to the total. Remainder:",
+      "zeroWeight": "Total weight must be greater than zero."
+    }
+  },
+  "accounts": {
+    "title": "Accounts",
+    "cash": "Cash",
+    "bank": "Bank",
+    "card": "Card",
+    "savings": "Savings"
   }
 }

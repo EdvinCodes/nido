@@ -49,7 +49,7 @@
     "spacePlaceholder": "Espacio demo",
     "pageTitle": "Panel",
     "emptyTitle": "Tu nido está listo",
-    "emptyBody": "El libro de movimientos llega en la siguiente fase. Mientras tanto, invita a tu hogar y configura las categorías.",
+    "emptyBody": "Abre el libro para registrar tu primer gasto, o invita a tu hogar y configura las categorías.",
     "createSpace": "Crear nuevo espacio",
     "switchSpace": "Cambiar de espacio"
   },
@@ -204,5 +204,75 @@
     "description": "Ha ocurrido un error inesperado. Puedes reintentar o volver al inicio.",
     "notFoundTitle": "Página no encontrada",
     "notFoundDescription": "La ruta que buscas no existe o ha cambiado."
+  },
+  "ledger": {
+    "title": "Movimientos",
+    "searchPlaceholder": "Buscar descripción, comercio…",
+    "filterKind": "Tipo",
+    "allKinds": "Todos los tipos",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "clearFilters": "Limpiar filtros",
+    "emptyTitle": "Aún no hay movimientos",
+    "emptyBody": "Pulsa añadir para registrar tu primer gasto. Solo lleva unos segundos.",
+    "error": "No se pudo cargar el libro.",
+    "retry": "Reintentar",
+    "loadingMore": "Cargando más…"
+  },
+  "transactions": {
+    "addTitle": "Añadir movimiento",
+    "amount": "Importe",
+    "category": "Categoría",
+    "categoryPlaceholder": "Elige una categoría",
+    "account": "Cuenta",
+    "accountPlaceholder": "Elige una cuenta",
+    "noAccount": "Sin cuenta",
+    "fromAccount": "Desde",
+    "toAccount": "Hacia",
+    "payer": "Pagó",
+    "description": "Descripción",
+    "merchant": "Comercio",
+    "notes": "Notas",
+    "date": "Fecha",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "moreDetails": "Más detalles",
+    "hideDetails": "Ocultar detalles",
+    "weight": "Participaciones",
+    "percent": "Porcentaje",
+    "exactAmount": "Importe exacto (céntimos)",
+    "giveRest": "Dar el resto",
+    "created": "Movimiento guardado",
+    "deleted": "Movimiento eliminado",
+    "restored": "Movimiento restaurado",
+    "undo": "Deshacer",
+    "delete": "Eliminar",
+    "kind": {
+      "expense": "Gasto",
+      "income": "Ingreso",
+      "transfer": "Transferencia"
+    },
+    "splitMode": {
+      "personal": "Personal",
+      "equal": "Igual",
+      "shares": "Partes",
+      "percent": "Porcentaje",
+      "exact": "Exacto"
+    },
+    "split": {
+      "amountInvalid": "Introduce un importe mayor que cero.",
+      "noParticipants": "Selecciona al menos una persona.",
+      "personalNeedsOne": "El modo personal necesita exactamente una persona.",
+      "percentNot100": "Los porcentajes deben sumar 100.",
+      "exactUnbalanced": "Los importes exactos deben sumar el total. Resto:",
+      "zeroWeight": "El peso total debe ser mayor que cero."
+    }
+  },
+  "accounts": {
+    "title": "Cuentas",
+    "cash": "Efectivo",
+    "bank": "Banco",
+    "card": "Tarjeta",
+    "savings": "Ahorros"
   }
 }

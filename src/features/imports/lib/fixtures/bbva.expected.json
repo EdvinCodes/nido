@@ -1,0 +1,27 @@
+{
+  "encoding": "utf-8",
+  "delimiter": ";",
+  "headerRowIndex": 3,
+  "dateFormat": "DMY",
+  "rows": [
+    {
+      "bookedOn": "2026-08-01",
+      "description": "NOMINA EMPRESA SA",
+      "amountMinor": 245000,
+      "kind": "income"
+    },
+    {
+      "bookedOn": "2026-08-02",
+      "description": "COMPRA TARJ. MERCADONA VALENCIA",
+      "merchant": "Mercadona Valencia",
+      "amountMinor": 4567,
+      "kind": "expense"
+    },
+    {
+      "bookedOn": "2026-08-03",
+      "description": "TRANSFERENCIA RECIBIDA",
+      "amountMinor": 10000,
+      "kind": "expense"
+    }
+  ]
+}

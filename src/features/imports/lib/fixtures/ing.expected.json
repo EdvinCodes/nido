@@ -1,0 +1,21 @@
+{
+  "encoding": "utf-8",
+  "delimiter": ",",
+  "headerRowIndex": 0,
+  "dateFormat": "YMD",
+  "rows": [
+    {
+      "bookedOn": "2026-08-07",
+      "description": "Amazon EU*MK9P2 Barcelona",
+      "merchant": "Amazon Eu Barcelona",
+      "amountMinor": 1999,
+      "kind": "expense"
+    },
+    {
+      "bookedOn": "2026-08-08",
+      "description": "Salary payment",
+      "amountMinor": 250000,
+      "kind": "income"
+    }
+  ]
+}

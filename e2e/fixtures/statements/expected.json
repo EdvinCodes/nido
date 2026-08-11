@@ -1,0 +1,9 @@
+{
+  "rows": [
+    {
+      "description": "E2E TEST MERCADONA",
+      "amountMinor": 1250,
+      "kind": "expense"
+    }
+  ]
+}

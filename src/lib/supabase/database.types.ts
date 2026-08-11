@@ -224,6 +224,130 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          account_id: string | null
+          balance_as_of: string | null
+          balance_minor: number | null
+          connection_id: string
+          currency: string
+          external_id: string
+          iban_last4: string | null
+          id: string
+          name: string | null
+          space_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          balance_as_of?: string | null
+          balance_minor?: number | null
+          connection_id: string
+          currency: string
+          external_id: string
+          iban_last4?: string | null
+          id?: string
+          name?: string | null
+          space_id: string
+        }
+        Update: {
+          account_id?: string | null
+          balance_as_of?: string | null
+          balance_minor?: number | null
+          connection_id?: string
+          currency?: string
+          external_id?: string
+          iban_last4?: string | null
+          id?: string
+          name?: string | null
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "bank_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_connections: {
+        Row: {
+          consent_expires_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          institution_id: string
+          institution_name: string
+          last_error: string | null
+          last_synced_at: string | null
+          logo_url: string | null
+          provider: string
+          session_ref: string
+          space_id: string
+          status: string
+        }
+        Insert: {
+          consent_expires_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          institution_id: string
+          institution_name: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          logo_url?: string | null
+          provider: string
+          session_ref: string
+          space_id: string
+          status?: string
+        }
+        Update: {
+          consent_expires_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          institution_id?: string
+          institution_name?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          logo_url?: string | null
+          provider?: string
+          session_ref?: string
+          space_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_connections_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_connections_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_periods: {
         Row: {
           budget_id: string
@@ -421,6 +545,63 @@ export type Database = {
           },
           {
             foreignKeyName: "categories_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categorization_rules: {
+        Row: {
+          auto_learned: boolean
+          category_id: string
+          created_at: string
+          field: string
+          hit_count: number
+          id: string
+          match_type: string
+          pattern: string
+          priority: number
+          set_merchant: string | null
+          space_id: string
+        }
+        Insert: {
+          auto_learned?: boolean
+          category_id: string
+          created_at?: string
+          field?: string
+          hit_count?: number
+          id?: string
+          match_type: string
+          pattern: string
+          priority?: number
+          set_merchant?: string | null
+          space_id: string
+        }
+        Update: {
+          auto_learned?: boolean
+          category_id?: string
+          created_at?: string
+          field?: string
+          hit_count?: number
+          id?: string
+          match_type?: string
+          pattern?: string
+          priority?: number
+          set_merchant?: string | null
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categorization_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "categorization_rules_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
             referencedRelation: "spaces"
@@ -648,6 +829,203 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_batches: {
+        Row: {
+          account_id: string | null
+          committed_at: string | null
+          created_at: string
+          created_by: string
+          file_name: string | null
+          id: string
+          imported_count: number
+          mapping: Json
+          row_count: number
+          skipped_count: number
+          source: string
+          space_id: string
+          status: Database["nido"]["Enums"]["import_status"]
+        }
+        Insert: {
+          account_id?: string | null
+          committed_at?: string | null
+          created_at?: string
+          created_by: string
+          file_name?: string | null
+          id?: string
+          imported_count?: number
+          mapping?: Json
+          row_count?: number
+          skipped_count?: number
+          source: string
+          space_id: string
+          status?: Database["nido"]["Enums"]["import_status"]
+        }
+        Update: {
+          account_id?: string | null
+          committed_at?: string | null
+          created_at?: string
+          created_by?: string
+          file_name?: string | null
+          id?: string
+          imported_count?: number
+          mapping?: Json
+          row_count?: number
+          skipped_count?: number
+          source?: string
+          space_id?: string
+          status?: Database["nido"]["Enums"]["import_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_batches_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_batches_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_batches_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_mapping_templates: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          mapping: Json
+          name: string
+          space_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          mapping?: Json
+          name: string
+          space_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          mapping?: Json
+          name?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_mapping_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_mapping_templates_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_rows: {
+        Row: {
+          batch_id: string
+          created_at: string
+          decision: string
+          duplicate_of: string | null
+          error: string | null
+          fingerprint: string
+          id: string
+          parsed: Json | null
+          raw: Json
+          space_id: string
+          transaction_id: string | null
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          decision?: string
+          duplicate_of?: string | null
+          error?: string | null
+          fingerprint: string
+          id?: string
+          parsed?: Json | null
+          raw: Json
+          space_id: string
+          transaction_id?: string | null
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          decision?: string
+          duplicate_of?: string | null
+          error?: string | null
+          fingerprint?: string
+          id?: string
+          parsed?: Json | null
+          raw?: Json
+          space_id?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_rows_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_rows_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
             referencedColumns: ["id"]
           },
         ]
@@ -1534,8 +1912,10 @@ export type Database = {
           deleted_at: string | null
           description: string
           external_id: string | null
+          fingerprint: string | null
           goal_id: string | null
           id: string
+          import_row_id: string | null
           is_pending: boolean
           kind: Database["nido"]["Enums"]["tx_kind"]
           merchant: string | null
@@ -1561,8 +1941,10 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           external_id?: string | null
+          fingerprint?: string | null
           goal_id?: string | null
           id?: string
+          import_row_id?: string | null
           is_pending?: boolean
           kind: Database["nido"]["Enums"]["tx_kind"]
           merchant?: string | null
@@ -1588,8 +1970,10 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           external_id?: string | null
+          fingerprint?: string | null
           goal_id?: string | null
           id?: string
+          import_row_id?: string | null
           is_pending?: boolean
           kind?: Database["nido"]["Enums"]["tx_kind"]
           merchant?: string | null
@@ -1636,6 +2020,13 @@ export type Database = {
             columns: ["goal_id"]
             isOneToOne: false
             referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_import_row_fkey"
+            columns: ["import_row_id"]
+            isOneToOne: false
+            referencedRelation: "import_rows"
             referencedColumns: ["id"]
           },
           {
@@ -1806,6 +2197,7 @@ export type Database = {
         Args: { p_day: number; p_month: number; p_year: number }
         Returns: string
       }
+      _fnv1a64: { Args: { p_input: string }; Returns: string }
       _insert_splits: {
         Args: {
           p_amount_minor: number
@@ -1819,6 +2211,7 @@ export type Database = {
         Returns: undefined
       }
       _last_day_of_month: { Args: { p_date: string }; Returns: string }
+      _normalize_fingerprint_text: { Args: { p_text: string }; Returns: string }
       _notify_recurring_due: {
         Args: {
           p_due_on: string
@@ -1864,6 +2257,14 @@ export type Database = {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]
       }
+      apply_categorization_rules: {
+        Args: { p_merchant: string; p_space_id: string; p_text: string }
+        Returns: {
+          category_id: string
+          set_merchant: string
+        }[]
+      }
+      apply_rule_to_ledger: { Args: { p_rule_id: string }; Returns: number }
       attachment_storage_paths: { Args: { p_id: string }; Returns: Json }
       balance_breakdown: {
         Args: {
@@ -1878,6 +2279,7 @@ export type Database = {
         Args: { p_budget: Database["nido"]["Tables"]["budgets"]["Row"] }
         Returns: string[]
       }
+      commit_import: { Args: { p_batch_id: string }; Returns: Json }
       compute_budget_spent: {
         Args: { p_budget_id: string; p_from: string; p_to: string }
         Returns: number
@@ -1928,6 +2330,17 @@ export type Database = {
         Args: { p_period_id: string }
         Returns: number
       }
+      find_duplicate: {
+        Args: {
+          p_amount: number
+          p_booked_on: string
+          p_external_id?: string
+          p_fingerprint: string
+          p_normalized_text?: string
+          p_space_id: string
+        }
+        Returns: string
+      }
       goal_projection: { Args: { p_goal_id: string }; Returns: Json }
       has_role: {
         Args: {
@@ -1941,6 +2354,7 @@ export type Database = {
         Args: { p_date: string; p_month_starts_on: number }
         Returns: string
       }
+      increment_rule_hit: { Args: { p_rule_id: string }; Returns: undefined }
       is_member: {
         Args: {
           p_roles?: Database["nido"]["Enums"]["member_role"][]
@@ -2046,6 +2460,19 @@ export type Database = {
         Returns: Json
       }
       suggest_budgets: { Args: { p_space_id: string }; Returns: Json }
+      transaction_fingerprint: {
+        Args: {
+          p_account_id: string
+          p_amount_minor: number
+          p_booked_on: string
+          p_currency: unknown
+          p_description: string
+          p_merchant: string
+          p_space_id: string
+        }
+        Returns: string
+      }
+      undo_import: { Args: { p_batch_id: string }; Returns: Json }
       update_transaction: { Args: { p: Json; p_id: string }; Returns: Json }
     }
     Enums: {

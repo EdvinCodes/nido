@@ -22,6 +22,7 @@ import {
   duplicateTransaction,
   restoreTransaction,
 } from '@/features/transactions/actions';
+import { exportLedgerAction } from '@/features/imports/actions';
 import { listTransactionAttachments } from '@/features/attachments/actions';
 import { AttachmentGallery } from '@/features/attachments/attachment-gallery';
 import type { AttachmentRow } from '@/features/attachments/queries';
@@ -78,6 +79,7 @@ export function LedgerClient({
 }) {
   const t = useTranslations('ledger');
   const tTx = useTranslations('transactions');
+  const tImport = useTranslations('import');
   const tBalances = useTranslations('balances');
   const locale = useLocale();
   const { space, participantId } = useSpaceContext();
@@ -321,15 +323,62 @@ export function LedgerClient({
       <div className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 pt-4 pb-3 backdrop-blur-md lg:px-8">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
-          <Button
-            type="button"
-            className="hidden lg:inline-flex"
-            onClick={() => {
-              composer?.openCreate();
-            }}
-          >
-            {t('add')}
-          </Button>
+          <div className="hidden items-center gap-2 lg:flex">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void exportLedgerAction({ spaceId, format: 'csv' }).then((res) => {
+                  if (!res.ok) return;
+                  const blob = new Blob(
+                    [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
+                    {
+                      type: res.data.mimeType,
+                    },
+                  );
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = res.data.fileName;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                });
+              }}
+            >
+              {tImport('exportCsv')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void exportLedgerAction({ spaceId, format: 'xlsx' }).then((res) => {
+                  if (!res.ok) return;
+                  const blob = new Blob(
+                    [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
+                    {
+                      type: res.data.mimeType,
+                    },
+                  );
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = res.data.fileName;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                });
+              }}
+            >
+              {tImport('exportXlsx')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                composer?.openCreate();
+              }}
+            >
+              {t('add')}
+            </Button>
+          </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Input

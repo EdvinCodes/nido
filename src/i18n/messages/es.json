@@ -135,6 +135,7 @@
   "nav": {
     "dashboard": "Inicio",
     "ledger": "Movimientos",
+    "import": "Importar",
     "receipts": "Tickets",
     "storage": "Almacenamiento",
     "budgets": "Presupuestos",
@@ -758,6 +759,90 @@
       "import_finished": "Importación lista",
       "bank_sync_failed": "Fallo de sync bancaria",
       "insight": "Insight"
+    }
+  },
+
+  "import": {
+    "title": "Importar movimientos",
+    "description": "Sube un extracto CSV o XLSX. Mapea columnas una vez, revisa y confirma.",
+    "exportCsv": "Exportar CSV",
+    "exportXlsx": "Exportar XLSX",
+    "exportSpace": "Exportar espacio JSON",
+    "importJson": "Importar JSON",
+    "jsonImported": "Importados {count} movimientos desde JSON",
+    "learnRulePrompt": "¿Categorizar siempre {merchant} como {category}?",
+    "learnRuleAction": "Crear regla",
+    "ruleCreated": "Regla guardada",
+    "undoSuccess": "Deshechos {count} movimientos",
+    "steps": {
+      "upload": "Subir",
+      "map": "Mapear",
+      "preview": "Vista previa",
+      "commit": "Hecho"
+    },
+    "upload": {
+      "drop": "Arrastra un CSV o XLSX, o haz clic para elegir",
+      "meta": "Detectado {encoding}, delimitador “{delimiter}”, {count} filas"
+    },
+    "map": {
+      "account": "Cuenta destino",
+      "accountPlaceholder": "Elige cuenta",
+      "savedTemplate": "Mapeo guardado",
+      "savedTemplatePlaceholder": "Cargar mapeo guardado",
+      "none": "— Sin mapear —",
+      "livePreview": "Vista previa (primeras filas)",
+      "continue": "Continuar a vista previa"
+    },
+    "fields": {
+      "date": "Fecha",
+      "description": "Descripción",
+      "merchant": "Comercio",
+      "amount": "Importe",
+      "debit": "Debe",
+      "credit": "Haber",
+      "externalId": "Referencia / ID"
+    },
+    "preview": {
+      "toImport": "{count} a importar",
+      "toSkip": "{count} a omitir",
+      "duplicates": "{count} duplicados",
+      "duplicateBadge": "Duplicado",
+      "category": "Categoría",
+      "skipDuplicates": "Omitir duplicados",
+      "commit": "Confirmar importación"
+    },
+    "commit": {
+      "title": "Importación completa",
+      "summary": "Importados {imported}, omitidos {skipped}",
+      "undo": "Deshacer importación",
+      "another": "Importar otro archivo"
+    },
+    "rules": {
+      "title": "Reglas de categorización",
+      "description": "Las reglas se aplican por prioridad durante la vista previa.",
+      "addRule": "Añadir regla",
+      "pattern": "Patrón",
+      "category": "Categoría",
+      "created": "Regla creada",
+      "ruleLine": "{match} “{pattern}” → {category}",
+      "hits": "{count} aciertos",
+      "test": "Probar",
+      "apply": "Aplicar al libro",
+      "applied": "Actualizados {count} movimientos",
+      "delete": "Eliminar",
+      "testResult": "Coincidiría con {count} movimientos existentes"
+    },
+    "banking": {
+      "title": "Conexiones bancarias",
+      "disabledDescription": "La sync automática es opcional. La importación CSV funciona con cualquier banco.",
+      "enabledDescription": "Conecta cuentas para sincronizar cada seis horas.",
+      "connect": "Conectar banco",
+      "howToEnable": "Activar sync bancaria",
+      "enableStep1": "Configura BANK_PROVIDER=enablebanking en el entorno",
+      "enableStep2": "Añade BANK_APP_ID y BANK_PRIVATE_KEY de Enable Banking",
+      "enableStep3": "Redespliega y vuelve aquí para conectar cuentas",
+      "csvFallback": "Mientras tanto, usa Importar para subir extractos manualmente.",
+      "goImport": "Ir a Importar"
     }
   }
 }

@@ -135,6 +135,7 @@
   "nav": {
     "dashboard": "Home",
     "ledger": "Ledger",
+    "import": "Import",
     "receipts": "Receipts",
     "storage": "Storage",
     "budgets": "Budgets",
@@ -758,6 +759,90 @@
       "import_finished": "Import finished",
       "bank_sync_failed": "Bank sync failed",
       "insight": "Insight"
+    }
+  },
+
+  "import": {
+    "title": "Import transactions",
+    "description": "Upload a bank statement CSV or XLSX. Map columns once, then review and commit.",
+    "exportCsv": "Export CSV",
+    "exportXlsx": "Export XLSX",
+    "exportSpace": "Export space JSON",
+    "importJson": "Import JSON",
+    "jsonImported": "Imported {count} transactions from JSON",
+    "learnRulePrompt": "Always categorize {merchant} as {category}?",
+    "learnRuleAction": "Create rule",
+    "ruleCreated": "Rule saved",
+    "undoSuccess": "Undid {count} transactions",
+    "steps": {
+      "upload": "Upload",
+      "map": "Map",
+      "preview": "Preview",
+      "commit": "Done"
+    },
+    "upload": {
+      "drop": "Drop a CSV or XLSX file, or click to browse",
+      "meta": "Detected {encoding}, delimiter “{delimiter}”, {count} rows"
+    },
+    "map": {
+      "account": "Target account",
+      "accountPlaceholder": "Choose account",
+      "savedTemplate": "Saved mapping",
+      "savedTemplatePlaceholder": "Load a saved mapping",
+      "none": "— Not mapped —",
+      "livePreview": "Live preview (first rows)",
+      "continue": "Continue to preview"
+    },
+    "fields": {
+      "date": "Date",
+      "description": "Description",
+      "merchant": "Merchant",
+      "amount": "Amount",
+      "debit": "Debit",
+      "credit": "Credit",
+      "externalId": "Reference / ID"
+    },
+    "preview": {
+      "toImport": "{count} to import",
+      "toSkip": "{count} to skip",
+      "duplicates": "{count} duplicates",
+      "duplicateBadge": "Duplicate",
+      "category": "Category",
+      "skipDuplicates": "Skip all duplicates",
+      "commit": "Commit import"
+    },
+    "commit": {
+      "title": "Import complete",
+      "summary": "Imported {imported}, skipped {skipped}",
+      "undo": "Undo import",
+      "another": "Import another file"
+    },
+    "rules": {
+      "title": "Categorization rules",
+      "description": "Rules run in priority order during import preview.",
+      "addRule": "Add rule",
+      "pattern": "Pattern",
+      "category": "Category",
+      "created": "Rule created",
+      "ruleLine": "{match} “{pattern}” → {category}",
+      "hits": "{count} hits",
+      "test": "Test",
+      "apply": "Apply to ledger",
+      "applied": "Updated {count} transactions",
+      "delete": "Delete",
+      "testResult": "Would match {count} existing transactions"
+    },
+    "banking": {
+      "title": "Bank connections",
+      "disabledDescription": "Automatic bank sync is optional. CSV import works with every bank.",
+      "enabledDescription": "Connect accounts to sync transactions every six hours.",
+      "connect": "Connect a bank",
+      "howToEnable": "Enable bank sync",
+      "enableStep1": "Set BANK_PROVIDER=enablebanking in your environment",
+      "enableStep2": "Add BANK_APP_ID and BANK_PRIVATE_KEY from Enable Banking",
+      "enableStep3": "Redeploy and return here to connect accounts",
+      "csvFallback": "Until then, use Import to upload statements manually.",
+      "goImport": "Go to Import"
     }
   }
 }

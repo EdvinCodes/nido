@@ -1,0 +1,21 @@
+{
+  "encoding": "utf-8",
+  "delimiter": ",",
+  "headerRowIndex": 0,
+  "dateFormat": "YMD",
+  "rows": [
+    {
+      "bookedOn": "2026-08-05",
+      "description": "REPSOL ESTACION SERVICIO",
+      "merchant": "Repsol Estacion Servicio",
+      "amountMinor": 5230,
+      "kind": "expense"
+    },
+    {
+      "bookedOn": "2026-08-06",
+      "description": "INGRESO TRANSFERENCIA",
+      "amountMinor": 50000,
+      "kind": "income"
+    }
+  ]
+}

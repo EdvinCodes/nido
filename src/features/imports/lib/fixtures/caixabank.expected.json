@@ -1,0 +1,22 @@
+{
+  "encoding": "utf-8",
+  "delimiter": ";",
+  "headerRowIndex": 0,
+  "dateFormat": "DMY",
+  "rows": [
+    {
+      "bookedOn": "2026-08-05",
+      "description": "CAIXABANK - COMISSió MANTENIMENT",
+      "merchant": "Caixabank Comissió Manteniment",
+      "amountMinor": 3600,
+      "kind": "expense"
+    },
+    {
+      "bookedOn": "2026-08-06",
+      "description": "SUPERMERCAT CONSUM",
+      "merchant": "Supermercat Consum",
+      "amountMinor": 2845,
+      "kind": "expense"
+    }
+  ]
+}

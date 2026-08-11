@@ -49,7 +49,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="flex min-h-full flex-1 flex-col">
+      <div className="flex min-h-full min-w-0 flex-1 flex-col overflow-x-hidden">
         <MarketingHeader />
         <main className="flex flex-1 flex-col">{children}</main>
         <MarketingFooter />

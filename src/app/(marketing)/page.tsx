@@ -3,13 +3,18 @@ import { LandingPage } from '@/components/marketing/landing-page';
 import { getProfile, getUserSpaces } from '@/features/spaces/queries';
 import { createClient } from '@/lib/supabase/server';
 
-export default async function MarketingPage() {
+export default async function MarketingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ preview?: string }>;
+}) {
+  const { preview } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
+  if (user && preview !== 'landing') {
     const profile = await getProfile();
     if (profile?.last_active_space_id) {
       redirect(`/s/${profile.last_active_space_id}`);

@@ -106,7 +106,7 @@ export function DashboardView({
 
   if (isEmptySpace) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden">
         <header className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
           <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
         </header>
@@ -154,7 +154,7 @@ export function DashboardView({
         router.refresh();
       }}
     >
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden">
         <header className="sticky top-0 z-20 space-y-3 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>

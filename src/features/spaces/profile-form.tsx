@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 import { useTheme } from 'next-themes';
+import { SignOutButton } from '@/components/auth/sign-out-button';
+import { TimezoneSelect } from '@/components/forms/timezone-select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -114,11 +116,11 @@ export function ProfileForm({ profile, userId: _userId }: { profile: Profile; us
 
       <div className="space-y-2">
         <Label htmlFor="timezone">{t('timezone')}</Label>
-        <Input
+        <TimezoneSelect
           id="timezone"
           value={timezone}
-          onChange={(e) => {
-            setTimezone(e.target.value);
+          onValueChange={(value) => {
+            setTimezone(value);
           }}
         />
       </div>
@@ -169,6 +171,12 @@ export function ProfileForm({ profile, userId: _userId }: { profile: Profile; us
       <Button type="submit" disabled={pending}>
         {tCommon('save')}
       </Button>
+
+      <div className="border-t border-border pt-6">
+        <p className="text-sm font-medium">{t('session')}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t('sessionHint')}</p>
+        <SignOutButton variant="outline" className="mt-3" />
+      </div>
     </form>
   );
 }

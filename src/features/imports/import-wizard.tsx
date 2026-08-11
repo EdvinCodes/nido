@@ -225,7 +225,7 @@ export function ImportWizard({
   });
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 p-4 lg:p-8">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6 overflow-x-hidden p-4 lg:p-8">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">{t('title')}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
@@ -311,7 +311,7 @@ export function ImportWizard({
       )}
 
       {step === 'map' && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-2">
           <div className="space-y-4">
             <div>
               <Label>{t('map.account')}</Label>

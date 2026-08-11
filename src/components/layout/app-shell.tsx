@@ -65,7 +65,7 @@ export function AppShell({
     );
 
   return (
-    <div className="flex min-h-full flex-1">
+    <div className="flex min-h-full min-w-0 flex-1">
       <AppSidebar
         activePath={pathname}
         spaceId={spaceId}
@@ -75,7 +75,7 @@ export function AppShell({
         spaceKind={spaceKind}
         headerAction={isDesktop ? bell : null}
       />
-      <div className="flex min-h-full flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 lg:hidden">
           <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
           {isDesktop === false ? bell : null}

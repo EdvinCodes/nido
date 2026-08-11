@@ -200,6 +200,9 @@
     "accounts": "Cuentas",
     "profile": "Perfil",
     "notifications": "Notificaciones",
+    "spaceSettings": "Espacio",
+    "rules": "Reglas",
+    "banking": "Banca",
     "add": "Añadir",
     "more": "Más",
     "comingSoon": "Pronto"
@@ -377,6 +380,7 @@
     "expenseCategories": "Gastos",
     "incomeCategories": "Ingresos",
     "finish": "Crear espacio",
+    "cancelToDashboard": "Volver al inicio",
     "categories": {
       "housing": "Vivienda",
       "groceries": "Supermercado",
@@ -423,6 +427,12 @@
       "admin": "Admin",
       "member": "Miembro",
       "viewer": "Observador"
+    },
+    "statuses": {
+      "active": "Activo",
+      "invited": "Invitado",
+      "left": "Salió",
+      "removed": "Eliminado"
     }
   },
   "categories": {
@@ -451,7 +461,9 @@
     "themeSystem": "Sistema",
     "colourblind": "Paleta apta para daltonismo",
     "colourblindHint": "Usa teal y violeta para ingresos y gastos en lugar del par por defecto.",
-    "saved": "Perfil guardado"
+    "saved": "Perfil guardado",
+    "session": "Sesión",
+    "sessionHint": "Cierra sesión en este dispositivo. Tus datos siguen en tu base de datos."
   },
   "invite": {
     "accepting": "Uniéndote al espacio…",

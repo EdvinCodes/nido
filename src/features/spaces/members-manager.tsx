@@ -172,7 +172,9 @@ export function MembersManager({
                     t(`roles.${m.role}`)
                   )}
                 </td>
-                <td className="px-3 py-2">{m.status}</td>
+                <td className="px-3 py-2">
+                  {t(`statuses.${m.status as 'active' | 'invited' | 'left' | 'removed'}`)}
+                </td>
                 <td className="px-3 py-2">{new Date(m.joined_at).toISOString().slice(0, 10)}</td>
                 <td className="px-3 py-2 text-right">
                   {canManage ? (

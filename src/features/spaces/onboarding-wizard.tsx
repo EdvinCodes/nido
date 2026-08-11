@@ -1,8 +1,12 @@
 'use client';
 
+import type { Route } from 'next';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState, useTransition } from 'react';
+import { TimezoneSelect } from '@/components/forms/timezone-select';
+import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,7 +23,7 @@ function parseList(value: string | null): string[] {
     .filter(Boolean);
 }
 
-export function OnboardingWizard() {
+export function OnboardingWizard({ cancelHref }: { cancelHref?: Route | null }) {
   const t = useTranslations('onboarding');
   const tCommon = useTranslations('common');
   const router = useRouter();
@@ -51,6 +55,17 @@ export function OnboardingWizard() {
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-8 px-6 py-12">
+      <div className="flex items-center justify-between gap-3">
+        {cancelHref ? (
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={cancelHref}>{t('cancelToDashboard')}</Link>
+          </Button>
+        ) : (
+          <span aria-hidden className="size-9" />
+        )}
+        <SignOutButton variant="ghost" size="sm" showIcon={false} />
+      </div>
+
       <div className="space-y-2">
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {t('stepOf', { step, total: 3 })}
@@ -138,11 +153,11 @@ export function OnboardingWizard() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="timezone">{t('timezone')}</Label>
-            <Input
+            <TimezoneSelect
               id="timezone"
               value={timezone}
-              onChange={(e) => {
-                pushParams({ timezone: e.target.value, step: '2' });
+              onValueChange={(value) => {
+                pushParams({ timezone: value, step: '2' });
               }}
             />
           </div>

@@ -48,7 +48,7 @@ export function BudgetsListClient({
   const [, startTransition] = useTransition();
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden">
       <header className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
         <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
         {canEdit ? (

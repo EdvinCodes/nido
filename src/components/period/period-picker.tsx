@@ -62,8 +62,8 @@ export function PeriodPicker({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border bg-surface/60 p-1">
+    <div className="flex max-w-full min-w-0 flex-wrap items-center gap-2">
+      <div className="flex max-w-full flex-wrap items-center gap-1 overflow-x-auto rounded-lg border border-border bg-surface/60 p-1">
         {PERIOD_PRESETS.filter((preset) => preset !== 'custom').map((preset) => (
           <button
             key={preset}

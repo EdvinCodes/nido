@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { SpaceSwitcher } from '@/components/layout/space-switcher';
+import { SignOutButton } from '@/components/auth/sign-out-button';
 import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
 import type { MemberRole } from '@/lib/auth';
@@ -35,7 +36,7 @@ const NAV_ITEMS = [
   { key: 'subscriptions', href: '/subscriptions', icon: Repeat, ready: true },
   { key: 'reports', href: '/reports', icon: BarChart3, ready: true },
   { key: 'assistant', href: '/assistant', icon: Bot, ready: false },
-  { key: 'settings', href: '/settings/members', icon: Settings, ready: true },
+  { key: 'settings', href: '/settings/profile', icon: Settings, ready: true },
 ] as const;
 
 export function AppSidebar({
@@ -62,14 +63,14 @@ export function AppSidebar({
   });
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
-      <div className="flex items-start justify-between gap-2 border-b border-sidebar-border px-4 py-4">
+    <aside className="sticky top-0 flex hidden h-dvh w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
+      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-sidebar-border px-4 py-4">
         <div className="min-w-0 flex-1">
           <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
         </div>
         {headerAction}
       </div>
-      <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Primary">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Primary">
         {items.map(({ key, href, icon: Icon, ready }) => {
           const fullHref = `/s/${spaceId}${href}`;
           const active =
@@ -104,6 +105,13 @@ export function AppSidebar({
           );
         })}
       </nav>
+      <div className="mt-auto border-t border-sidebar-border p-3">
+        <SignOutButton
+          variant="ghost"
+          size="sm"
+          className="w-full text-sidebar-foreground hover:bg-sidebar-accent/60"
+        />
+      </div>
     </aside>
   );
 }

@@ -47,6 +47,7 @@ export function DeviceFrame({
             alt={alt}
             fill
             priority={priority}
+            unoptimized
             sizes="(max-width: 768px) 100vw, 896px"
             className="object-cover object-top"
           />

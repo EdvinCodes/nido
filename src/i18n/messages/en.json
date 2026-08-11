@@ -200,6 +200,9 @@
     "accounts": "Accounts",
     "profile": "Profile",
     "notifications": "Notifications",
+    "spaceSettings": "Space",
+    "rules": "Rules",
+    "banking": "Banking",
     "add": "Add",
     "more": "More",
     "comingSoon": "Soon"
@@ -377,6 +380,7 @@
     "expenseCategories": "Expenses",
     "incomeCategories": "Income",
     "finish": "Create space",
+    "cancelToDashboard": "Back to dashboard",
     "categories": {
       "housing": "Housing",
       "groceries": "Groceries",
@@ -423,6 +427,12 @@
       "admin": "Admin",
       "member": "Member",
       "viewer": "Viewer"
+    },
+    "statuses": {
+      "active": "Active",
+      "invited": "Invited",
+      "left": "Left",
+      "removed": "Removed"
     }
   },
   "categories": {
@@ -451,7 +461,9 @@
     "themeSystem": "System",
     "colourblind": "Colourblind-safe palette",
     "colourblindHint": "Uses teal and violet for income and expense instead of the default pair.",
-    "saved": "Profile saved"
+    "saved": "Profile saved",
+    "session": "Session",
+    "sessionHint": "Sign out on this device. Your data stays in your database."
   },
   "invite": {
     "accepting": "Joining the space…",

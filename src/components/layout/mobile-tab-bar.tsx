@@ -42,7 +42,7 @@ export function MobileTabBar({
     },
     {
       key: 'more' as const,
-      href: `${base}/settings/members`,
+      href: `${base}/settings/profile`,
       icon: MoreHorizontal,
       primary: false,
       ready: true,

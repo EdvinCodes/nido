@@ -425,7 +425,9 @@
     "hasAttachment": "Has attachment",
     "selectedCount": "{count} selected",
     "clearSelection": "Clear",
-    "bulkDeleted": "Deleted {count} transactions"
+    "bulkDeleted": "Deleted {count} transactions",
+    "pendingSync": "Pending sync",
+    "pendingCount": "{count} pending to sync"
   },
   "transactions": {
     "addTitle": "Add transaction",
@@ -451,6 +453,7 @@
     "exactAmount": "Exact amount (cents)",
     "giveRest": "Give the rest",
     "created": "Transaction saved",
+    "savedOffline": "Saved offline — will sync when you reconnect",
     "manualRate": "Override exchange rate",
     "manualRatePlaceholder": "Rate to base currency",
     "deleted": "Transaction deleted",
@@ -740,7 +743,7 @@
     "empty": "Nothing new.",
     "settingsLink": "Notification settings",
     "settingsTitle": "Notifications",
-    "settingsBody": "Choose which alerts appear in the app. Email and push arrive in a later phase.",
+    "settingsBody": "Choose how you receive alerts for each event. Changes apply to this space.",
     "columns": {
       "kind": "Kind",
       "inApp": "In-app",
@@ -749,6 +752,29 @@
     },
     "soon": "Soon",
     "disabledUntilP10": "Available in a later phase",
+    "emailUnavailable": "Email requires RESEND_API_KEY",
+    "pushUnavailable": "Push requires VAPID keys",
+    "quietHoursTitle": "Quiet hours",
+    "quietHoursBody": "Push notifications are held during quiet hours and delivered when the window ends.",
+    "quietHoursEnabled": "Enable quiet hours",
+    "quietHoursStart": "From",
+    "quietHoursEnd": "Until",
+    "testTitle": "Test notifications",
+    "testInApp": "Test in-app toast",
+    "testInAppSent": "In-app test shown",
+    "testPush": "Send test push",
+    "testPushSent": "Test push sent",
+    "testEmail": "Send test email",
+    "testEmailSent": "Test email sent",
+    "pushTitle": "Browser push",
+    "pushBody": "Get budget alerts and household updates on this device.",
+    "pushEnable": "Enable push",
+    "pushDisable": "Disable push",
+    "pushIosTitle": "Install Nido first",
+    "pushIosBody": "On iPhone, web push only works when Nido is installed to your home screen from Safari.",
+    "pushPrePromptTitle": "Stay in the loop",
+    "pushPrePromptBody": "Enable push to get budget alerts without opening the app.",
+    "pushPrePromptLater": "Not now",
     "kinds": {
       "budget_threshold": "Budget threshold",
       "budget_exceeded": "Budget exceeded",
@@ -760,8 +786,23 @@
       "member_joined": "Member joined",
       "import_finished": "Import finished",
       "bank_sync_failed": "Bank sync failed",
-      "insight": "Insight"
+      "insight": "Insight",
+      "period_close": "Period close"
     }
+  },
+
+  "pwa": {
+    "offlineTitle": "You are offline",
+    "offlineBody": "Nido could not reach the network. Cached pages may still work; new data will sync when you reconnect.",
+    "offlineBanner": "Offline — you can add expenses; they will sync when you reconnect. Editing and analytics need a connection.",
+    "updateTitle": "Update available",
+    "updateBody": "A new version of Nido is ready.",
+    "updateAction": "Reload",
+    "installTitle": "Install Nido",
+    "installBody": "Add Nido to your home screen for faster access and offline capture.",
+    "installIosBody": "Tap Share, then Add to Home Screen to install Nido on iOS.",
+    "installAction": "Install",
+    "installDismiss": "Dismiss"
   },
 
   "import": {

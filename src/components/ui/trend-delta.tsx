@@ -1,4 +1,7 @@
+'use client';
+
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 type TrendDeltaProps = {
@@ -11,6 +14,8 @@ type TrendDeltaProps = {
 };
 
 export function TrendDelta({ ratio, goodWhenUp = true, label, className }: TrendDeltaProps) {
+  const locale = useLocale();
+
   if (ratio == null || !Number.isFinite(ratio)) {
     return (
       <span
@@ -25,7 +30,7 @@ export function TrendDelta({ ratio, goodWhenUp = true, label, className }: Trend
   const up = ratio > 0;
   const flat = Math.abs(ratio) < 0.0005;
   const good = flat ? null : up === goodWhenUp;
-  const pct = new Intl.NumberFormat(undefined, {
+  const pct = new Intl.NumberFormat(locale, {
     style: 'percent',
     maximumFractionDigits: 0,
     signDisplay: 'exceptZero',

@@ -13,7 +13,7 @@ export type NotificationRow = {
   payload: Record<string, unknown>;
 };
 
-const MATRIX_KINDS: NotificationKind[] = [
+export const MATRIX_KINDS: NotificationKind[] = [
   'budget_threshold',
   'budget_exceeded',
   'recurring_due',
@@ -25,6 +25,7 @@ const MATRIX_KINDS: NotificationKind[] = [
   'import_finished',
   'bank_sync_failed',
   'insight',
+  'period_close',
 ];
 
 export async function listNotifications(spaceId: string, limit = 40): Promise<NotificationRow[]> {
@@ -87,6 +88,13 @@ export type PreferenceRow = {
   email: boolean;
 };
 
+export type QuietHoursRow = {
+  enabled: boolean;
+  startMinute: number;
+  endMinute: number;
+  timezone: string;
+};
+
 export async function listNotificationPreferences(spaceId: string): Promise<PreferenceRow[]> {
   const supabase = await createClient();
   const {
@@ -106,8 +114,30 @@ export async function listNotificationPreferences(spaceId: string): Promise<Pref
     return {
       kind,
       inApp: row?.in_app ?? true,
-      push: false,
-      email: false,
+      push: row?.push ?? false,
+      email: row?.email ?? false,
     };
   });
+}
+
+export async function getQuietHours(): Promise<QuietHoursRow | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from('notification_quiet_hours')
+    .select('enabled, start_minute, end_minute, timezone')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!data) return null;
+  return {
+    enabled: data.enabled,
+    startMinute: data.start_minute,
+    endMinute: data.end_minute,
+    timezone: data.timezone,
+  };
 }

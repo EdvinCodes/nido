@@ -17,7 +17,7 @@ not `Done`, read its file, do it, verify it, commit it, update the table below, 
 | 07  | [Attachments & receipt extraction](./PHASE-07-attachments.md) | `Done`        | 02         | 2026-08-11 |
 | 08  | [Import & bank sync](./PHASE-08-import-banking.md)            | `Done`        | 02         | 2026-08-11 |
 | 09  | [Multi-currency & reports](./PHASE-09-currency-reports.md)    | `Done`        | 03         | 2026-08-11 |
-| 10  | [PWA & notifications](./PHASE-10-pwa-notifications.md)        | `Not started` | 04         |            |
+| 10  | [PWA & notifications](./PHASE-10-pwa-notifications.md)        | `Done`        | 04         | 2026-08-11 |
 | 11  | [Landing & polish](./PHASE-11-landing-polish.md)              | `Not started` | 03         |            |
 | 12  | [AI assistant](./PHASE-12-ai-assistant.md)                    | `Not started` | 02–09      |            |
 

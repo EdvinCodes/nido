@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { AppProviders } from '@/components/providers';
+import { PwaShell } from '@/components/pwa/pwa-shell';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
@@ -30,8 +31,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('title'),
     description: t('description'),
+    applicationName: 'Nido',
+    manifest: '/manifest.webmanifest',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'black-translucent',
+      title: 'Nido',
+    },
+    icons: {
+      apple: '/icons/apple-touch-icon.png',
+    },
   };
 }
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fcfcfb' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1a18' },
+  ],
+  viewportFit: 'cover',
+};
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
@@ -43,14 +62,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex min-h-full flex-col bg-background pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider>
-            <AppProviders>
-              {children}
-              <Toaster />
-            </AppProviders>
-          </ThemeProvider>
+          <PwaShell>
+            <ThemeProvider>
+              <AppProviders>
+                {children}
+                <Toaster />
+              </AppProviders>
+            </ThemeProvider>
+          </PwaShell>
         </NextIntlClientProvider>
       </body>
     </html>

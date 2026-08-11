@@ -160,6 +160,11 @@ export function LedgerRow({
             <span className="block truncate text-xs text-muted-foreground">
               {tx.category_name ?? tTx(`kind.${tx.kind}`)}
               {tx.payer_name ? ` · ${tx.payer_name}` : ''}
+              {tx.sync_status === 'pending' ? (
+                <span className="ml-1 text-warning" data-testid="pending-sync-row">
+                  · {tLedger('pendingSync')}
+                </span>
+              ) : null}
             </span>
           </span>
           <span className="flex shrink-0 items-center gap-1.5">

@@ -39,7 +39,7 @@ test.describe('invite flow', () => {
     await hostPage.goto(`/s/${spaceId}/settings/members`);
     await expect(hostPage).toHaveURL(new RegExp(`/s/${spaceId}/settings/members`));
     await expect(
-      hostPage.getByRole('heading', { level: 1, name: /members|miembros/i }),
+      hostPage.getByRole('main').getByRole('heading', { level: 1, name: /members|miembros/i }),
     ).toBeVisible({ timeout: 30_000 });
     await hostPage
       .getByRole('button', { name: /copy invite link|copiar enlace de invitación/i })
@@ -59,7 +59,9 @@ test.describe('invite flow', () => {
 
     await guestPage.goto(invitePath);
     await guestPage.waitForURL(new RegExp(`/s/${spaceId}`), { timeout: 30_000 });
-    await expect(guestPage.getByRole('heading', { name: /panel|dashboard/i })).toBeVisible();
+    await expect(
+      guestPage.getByRole('main').getByRole('heading', { name: /panel|dashboard/i }),
+    ).toBeVisible();
 
     await host.close();
     await guest.close();

@@ -6,6 +6,7 @@ import { useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
+import { ScrollHide, useScrollDirection } from '@/lib/use-scroll-direction';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 
 const LONG_PRESS_MS = 480;
@@ -25,6 +26,8 @@ export function MobileTabBar({
   const composer = useTransactionComposerOptional();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+  const scrollDirection = useScrollDirection();
+  const hideFab = scrollDirection === 'down';
 
   const tabs = [
     { key: 'dashboard' as const, href: base, icon: LayoutDashboard, primary: false, ready: true },
@@ -63,31 +66,32 @@ export function MobileTabBar({
 
         if (primary) {
           return (
-            <button
-              key={key}
-              type="button"
-              className="-mt-5 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-float"
-              aria-label={isAiConfigured ? tAttachments('fabLabelWithScan') : t(key)}
-              onPointerDown={() => {
-                didLongPress.current = false;
-                clearLongPress();
-                if (isAiConfigured) {
-                  longPressTimer.current = setTimeout(() => {
-                    didLongPress.current = true;
-                    composer?.openScanReceipt();
-                  }, LONG_PRESS_MS);
-                }
-              }}
-              onPointerUp={() => {
-                clearLongPress();
-                if (didLongPress.current) return;
-                composer?.openCreate();
-              }}
-              onPointerLeave={clearLongPress}
-              onPointerCancel={clearLongPress}
-            >
-              <Icon className="size-6" aria-hidden />
-            </button>
+            <ScrollHide key={key} hidden={hideFab}>
+              <button
+                type="button"
+                className="-mt-5 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-float"
+                aria-label={isAiConfigured ? tAttachments('fabLabelWithScan') : t(key)}
+                onPointerDown={() => {
+                  didLongPress.current = false;
+                  clearLongPress();
+                  if (isAiConfigured) {
+                    longPressTimer.current = setTimeout(() => {
+                      didLongPress.current = true;
+                      composer?.openScanReceipt();
+                    }, LONG_PRESS_MS);
+                  }
+                }}
+                onPointerUp={() => {
+                  clearLongPress();
+                  if (didLongPress.current) return;
+                  composer?.openCreate();
+                }}
+                onPointerLeave={clearLongPress}
+                onPointerCancel={clearLongPress}
+              >
+                <Icon className="size-6" aria-hidden />
+              </button>
+            </ScrollHide>
           );
         }
 

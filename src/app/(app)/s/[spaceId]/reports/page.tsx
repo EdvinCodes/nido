@@ -14,11 +14,13 @@ export default async function ReportsPage({ params }: { params: Promise<{ spaceI
   ]);
 
   return (
-    <ReportsClient
-      spaceId={spaceId}
-      baseCurrency={membership.space.base_currency}
-      snapshots={snapshots}
-      savingsSeries={savingsSeries}
-    />
+    <main className="flex min-h-0 flex-1 flex-col">
+      <ReportsClient
+        spaceId={spaceId}
+        baseCurrency={membership.space.base_currency}
+        snapshots={snapshots}
+        savingsSeries={savingsSeries}
+      />
+    </main>
   );
 }

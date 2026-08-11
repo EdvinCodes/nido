@@ -1111,14 +1111,51 @@ export type Database = {
           },
         ]
       }
+      notification_quiet_hours: {
+        Row: {
+          enabled: boolean
+          end_minute: number
+          start_minute: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          enabled?: boolean
+          end_minute?: number
+          start_minute?: number
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          enabled?: boolean
+          end_minute?: number
+          start_minute?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_quiet_hours_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
           created_at: string
+          email_sent_at: string | null
           id: string
           kind: Database["nido"]["Enums"]["notification_kind"]
           link: string | null
           payload: Json
+          push_sent_at: string | null
           read_at: string | null
           space_id: string
           title: string
@@ -1127,10 +1164,12 @@ export type Database = {
         Insert: {
           body?: string | null
           created_at?: string
+          email_sent_at?: string | null
           id?: string
           kind: Database["nido"]["Enums"]["notification_kind"]
           link?: string | null
           payload?: Json
+          push_sent_at?: string | null
           read_at?: string | null
           space_id: string
           title: string
@@ -1139,10 +1178,12 @@ export type Database = {
         Update: {
           body?: string | null
           created_at?: string
+          email_sent_at?: string | null
           id?: string
           kind?: Database["nido"]["Enums"]["notification_kind"]
           link?: string | null
           payload?: Json
+          push_sent_at?: string | null
           read_at?: string | null
           space_id?: string
           title?: string
@@ -1306,6 +1347,83 @@ export type Database = {
             columns: ["last_active_space_id"]
             isOneToOne: false
             referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_delivery_queue: {
+        Row: {
+          created_at: string
+          deliver_after: string
+          id: string
+          notification_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deliver_after: string
+          id?: string
+          notification_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deliver_after?: string
+          id?: string
+          notification_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_delivery_queue_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_delivery_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2445,6 +2563,10 @@ export type Database = {
         Returns: string
       }
       increment_rule_hit: { Args: { p_rule_id: string }; Returns: undefined }
+      is_in_quiet_hours: {
+        Args: { p_at?: string; p_user_id: string }
+        Returns: boolean
+      }
       is_member: {
         Args: {
           p_roles?: Database["nido"]["Enums"]["member_role"][]
@@ -2488,6 +2610,10 @@ export type Database = {
       }
       propose_settlement: { Args: { p: Json }; Returns: Json }
       purge_stale_attachments: { Args: never; Returns: number }
+      quiet_hours_end_at: {
+        Args: { p_at?: string; p_user_id: string }
+        Returns: string
+      }
       recompute_budget_period: {
         Args: { p_period_id: string }
         Returns: number

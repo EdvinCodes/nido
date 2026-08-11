@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { PullToRefresh } from '@/components/mobile/pull-to-refresh';
 import { Amount } from '@/components/money/amount';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
@@ -148,426 +149,440 @@ export function DashboardView({
   const showParticipants = spaceKind !== 'solo';
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <header className="sticky top-0 z-20 space-y-3 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
-          <Button
-            type="button"
-            className="hidden lg:inline-flex"
-            onClick={() => {
-              composer?.openCreate();
-            }}
-          >
-            {t('add')}
-          </Button>
-        </div>
-        <PeriodPicker
-          spaceId={spaceId}
-          timeZone={timeZone}
-          monthStartsOn={monthStartsOn}
-          weekStartsOn={weekStartsOn}
-        />
-      </header>
+    <PullToRefresh
+      onRefresh={() => {
+        router.refresh();
+      }}
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 space-y-3 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
+            <Button
+              type="button"
+              className="hidden lg:inline-flex"
+              onClick={() => {
+                composer?.openCreate();
+              }}
+            >
+              {t('add')}
+            </Button>
+          </div>
+          <PeriodPicker
+            spaceId={spaceId}
+            timeZone={timeZone}
+            monthStartsOn={monthStartsOn}
+            weekStartsOn={weekStartsOn}
+          />
+        </header>
 
-      <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
-        <div className="flex min-w-0 flex-col gap-6">
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <SummaryCard
-              href={ledgerHref({
-                spaceId,
-                from: summary.from,
-                to: summary.to,
-                kind: 'income',
-              })}
-              label={t('cards.income')}
-              amount={totals.income_minor}
-              currency={currency}
-              ratio={deltaRatio(totals.income_minor, prev.income_minor)}
-              goodWhenUp
-              deltaLabel={t('vsPrevious')}
-              spark={incomeSpark}
-              sparkTone="income"
-              sparkTitle={t('cards.income')}
-            />
-            <SummaryCard
-              href={ledgerHref({
-                spaceId,
-                from: summary.from,
-                to: summary.to,
-                kind: 'expense',
-              })}
-              label={t('cards.expense')}
-              amount={totals.expense_minor}
-              currency={currency}
-              ratio={deltaRatio(totals.expense_minor, prev.expense_minor)}
-              goodWhenUp={false}
-              deltaLabel={t('vsPrevious')}
-              spark={expenseSpark}
-              sparkTone="expense"
-              sparkTitle={t('cards.expense')}
-            />
-            <SummaryCard
-              href={ledgerHref({ spaceId, from: summary.from, to: summary.to })}
-              label={t('cards.net')}
-              amount={totals.net_minor}
-              currency={currency}
-              ratio={deltaRatio(totals.net_minor, prev.net_minor)}
-              goodWhenUp
-              deltaLabel={t('vsPrevious')}
-              spark={netSpark}
-              sparkTone="neutral"
-              sparkTitle={t('cards.net')}
-              tone="auto"
-            />
-            <SummaryCard
-              href={route(`/s/${spaceId}/settings/accounts`)}
-              label={t('cards.balance')}
-              amount={balanceTotal}
-              currency={currency}
-              ratio={null}
-              goodWhenUp
-              deltaLabel={t('acrossAccounts')}
-              spark={netSpark}
-              sparkTone="neutral"
-              sparkTitle={t('cards.balance')}
-              tone="auto"
-            />
-          </section>
+        <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
+          <div className="flex min-w-0 flex-col gap-6">
+            <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <SummaryCard
+                href={ledgerHref({
+                  spaceId,
+                  from: summary.from,
+                  to: summary.to,
+                  kind: 'income',
+                })}
+                label={t('cards.income')}
+                amount={totals.income_minor}
+                currency={currency}
+                ratio={deltaRatio(totals.income_minor, prev.income_minor)}
+                goodWhenUp
+                deltaLabel={t('vsPrevious')}
+                spark={incomeSpark}
+                sparkTone="income"
+                sparkTitle={t('cards.income')}
+              />
+              <SummaryCard
+                href={ledgerHref({
+                  spaceId,
+                  from: summary.from,
+                  to: summary.to,
+                  kind: 'expense',
+                })}
+                label={t('cards.expense')}
+                amount={totals.expense_minor}
+                currency={currency}
+                ratio={deltaRatio(totals.expense_minor, prev.expense_minor)}
+                goodWhenUp={false}
+                deltaLabel={t('vsPrevious')}
+                spark={expenseSpark}
+                sparkTone="expense"
+                sparkTitle={t('cards.expense')}
+              />
+              <SummaryCard
+                href={ledgerHref({ spaceId, from: summary.from, to: summary.to })}
+                label={t('cards.net')}
+                amount={totals.net_minor}
+                currency={currency}
+                ratio={deltaRatio(totals.net_minor, prev.net_minor)}
+                goodWhenUp
+                deltaLabel={t('vsPrevious')}
+                spark={netSpark}
+                sparkTone="neutral"
+                sparkTitle={t('cards.net')}
+                tone="auto"
+              />
+              <SummaryCard
+                href={route(`/s/${spaceId}/settings/accounts`)}
+                label={t('cards.balance')}
+                amount={balanceTotal}
+                currency={currency}
+                ratio={null}
+                goodWhenUp
+                deltaLabel={t('acrossAccounts')}
+                spark={netSpark}
+                sparkTone="neutral"
+                sparkTitle={t('cards.balance')}
+                tone="auto"
+              />
+            </section>
 
-          <section className="rounded-xl border border-border bg-surface/40 p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-medium tracking-tight">{t('evolution.title')}</h2>
-              <div className="flex gap-1 rounded-md border border-border p-0.5">
-                <button
-                  type="button"
-                  className={`h-7 rounded px-2 text-xs ${evolutionMode === 'area' ? 'bg-primary/15' : 'text-muted-foreground'}`}
-                  onClick={() => {
-                    setEvolutionMode('area');
-                  }}
-                >
-                  {t('evolution.area')}
-                </button>
-                <button
-                  type="button"
-                  className={`h-7 rounded px-2 text-xs ${evolutionMode === 'bars' ? 'bg-primary/15' : 'text-muted-foreground'}`}
-                  onClick={() => {
-                    setEvolutionMode('bars');
-                  }}
-                >
-                  {t('evolution.bars')}
-                </button>
+            <section className="rounded-xl border border-border bg-surface/40 p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-medium tracking-tight">{t('evolution.title')}</h2>
+                <div className="flex gap-1 rounded-md border border-border p-0.5">
+                  <button
+                    type="button"
+                    className={`h-7 rounded px-2 text-xs ${evolutionMode === 'area' ? 'bg-primary/15' : 'text-muted-foreground'}`}
+                    onClick={() => {
+                      setEvolutionMode('area');
+                    }}
+                  >
+                    {t('evolution.area')}
+                  </button>
+                  <button
+                    type="button"
+                    className={`h-7 rounded px-2 text-xs ${evolutionMode === 'bars' ? 'bg-primary/15' : 'text-muted-foreground'}`}
+                    onClick={() => {
+                      setEvolutionMode('bars');
+                    }}
+                  >
+                    {t('evolution.bars')}
+                  </button>
+                </div>
               </div>
-            </div>
-            {evolutionMode === 'area' ? (
-              <AreaTrend
-                title={t('evolution.title')}
-                valueFormatter={formatMinor}
-                data={summary.daily.map((d, index) => ({
-                  label: d.date.slice(5),
-                  value: d.cumulative_net_minor,
-                  previous: series[index]?.net_minor,
-                }))}
-              />
-            ) : (
-              <GroupedBars
-                title={t('evolution.title')}
-                valueFormatter={formatMinor}
-                data={summary.daily.map((d) => ({
-                  label: d.date.slice(5),
-                  income: d.income_minor,
-                  expense: d.expense_minor,
-                }))}
-              />
-            )}
-          </section>
+              {evolutionMode === 'area' ? (
+                <AreaTrend
+                  title={t('evolution.title')}
+                  valueFormatter={formatMinor}
+                  data={summary.daily.map((d, index) => ({
+                    label: d.date.slice(5),
+                    value: d.cumulative_net_minor,
+                    previous: series[index]?.net_minor,
+                  }))}
+                />
+              ) : (
+                <GroupedBars
+                  title={t('evolution.title')}
+                  valueFormatter={formatMinor}
+                  data={summary.daily.map((d) => ({
+                    label: d.date.slice(5),
+                    income: d.income_minor,
+                    expense: d.expense_minor,
+                  }))}
+                />
+              )}
+            </section>
 
-          <section className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-surface/40 p-4">
-              <h2 className="mb-3 text-sm font-medium tracking-tight">{t('categories.title')}</h2>
-              <CategoryDonut
-                title={t('categories.title')}
-                centerLabel={t('categories.total')}
-                valueFormatter={formatMinor}
-                data={topCategories.map((c) => ({
-                  id: c.id,
-                  name: c.name,
-                  color: c.color,
-                  value: c.total_minor,
-                }))}
-                onSliceClick={(slice) => {
-                  router.push(
-                    ledgerHref({
-                      spaceId,
-                      from: summary.from,
-                      to: summary.to,
-                      kind: 'expense',
-                      categoryId: slice.id,
-                    }),
-                  );
-                }}
-              />
-            </div>
-            <div className="rounded-xl border border-border bg-surface/40 p-4">
-              <h2 className="mb-3 text-sm font-medium tracking-tight">{t('categories.ranked')}</h2>
-              <ul className="space-y-2">
-                {topCategories.map((category) => (
-                  <li key={`${category.id ?? 'none'}-${category.name}`}>
-                    <Link
-                      href={ledgerHref({
+            <section className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl border border-border bg-surface/40 p-4">
+                <h2 className="mb-3 text-sm font-medium tracking-tight">{t('categories.title')}</h2>
+                <CategoryDonut
+                  title={t('categories.title')}
+                  centerLabel={t('categories.total')}
+                  valueFormatter={formatMinor}
+                  data={topCategories.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    color: c.color,
+                    value: c.total_minor,
+                  }))}
+                  onSliceClick={(slice) => {
+                    router.push(
+                      ledgerHref({
                         spaceId,
                         from: summary.from,
                         to: summary.to,
                         kind: 'expense',
-                        categoryId: category.id,
-                      })}
-                      className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-surface-raised"
-                    >
-                      <span
-                        className="size-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: category.color }}
-                        aria-hidden
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">{category.name}</span>
-                        <span className="block text-xs text-muted-foreground">
-                          {Math.round(category.share * 100)}% ·{' '}
-                          <TrendDelta
-                            ratio={deltaRatio(
-                              category.total_minor,
-                              category.total_minor - category.change_minor,
-                            )}
-                            goodWhenUp={false}
-                            label={t('vsPrevious')}
-                          />
-                        </span>
-                        {category.id && categoryBudgetProgress[category.id] ? (
-                          <ProgressBar
-                            className="mt-1"
-                            value={categoryBudgetProgress[category.id]?.ratio ?? 0}
-                            label={category.name}
-                          />
-                        ) : (
-                          <span
-                            className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
-                            aria-hidden
-                          >
-                            <span
-                              className="block h-full rounded-full bg-primary"
-                              style={{ width: `${Math.min(100, category.share * 100)}%` }}
-                            />
-                          </span>
-                        )}
-                      </span>
-                      <Amount
-                        minor={category.total_minor}
-                        currency={currency}
-                        className="text-sm"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <section className="grid gap-4 lg:grid-cols-2">
-            {showParticipants ? (
-              <div className="rounded-xl border border-border bg-surface/40 p-4">
-                <h2 className="mb-3 text-sm font-medium tracking-tight">
-                  {t('participants.title')}
-                </h2>
-                <StackedBars
-                  title={t('participants.title')}
-                  valueFormatter={formatMinor}
-                  series={summary.participants.map((p) => ({
-                    key: p.id,
-                    label: p.display_name,
-                    color: p.color,
-                  }))}
-                  data={[
-                    {
-                      label: t('participants.paid'),
-                      ...Object.fromEntries(summary.participants.map((p) => [p.id, p.paid_minor])),
-                    },
-                    {
-                      label: t('participants.owed'),
-                      ...Object.fromEntries(summary.participants.map((p) => [p.id, p.owed_minor])),
-                    },
-                  ]}
+                        categoryId: slice.id,
+                      }),
+                    );
+                  }}
                 />
               </div>
-            ) : null}
-            <div className="rounded-xl border border-border bg-surface/40 p-4">
-              <h2 className="mb-3 text-sm font-medium tracking-tight">{t('merchants.title')}</h2>
-              <HorizontalBars
-                title={t('merchants.title')}
-                valueFormatter={formatMinor}
-                data={summary.merchants.map((m) => ({
-                  label: m.name,
-                  value: m.total_minor,
-                }))}
-                onBarClick={(point) => {
-                  router.push(
-                    ledgerHref({
-                      spaceId,
-                      from: summary.from,
-                      to: summary.to,
-                      kind: 'expense',
-                      q: point.label === '—' ? undefined : point.label,
-                    }),
-                  );
-                }}
-              />
-            </div>
-          </section>
-        </div>
-
-        <aside className="flex flex-col gap-4">
-          <section className="rounded-xl border border-border bg-surface/40 p-4">
-            <h2 className="mb-3 text-sm font-medium tracking-tight">{t('rail.accounts')}</h2>
-            <ul className="space-y-2">
-              {summary.accounts.map((account) => (
-                <li key={account.id} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <span
-                      className="size-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: account.color }}
-                      aria-hidden
-                    />
-                    <span className="truncate">{account.name}</span>
-                  </span>
-                  <Amount
-                    minor={account.balance_minor}
-                    currency={account.currency}
-                    tone="auto"
-                    className="text-sm"
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section className="rounded-xl border border-border bg-surface/40 p-4">
-            <h2 className="text-sm font-medium tracking-tight">{t('rail.alerts')}</h2>
-            {attentionBudgets.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">{t('rail.alertsEmpty')}</p>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {attentionBudgets.map((budget) => (
-                  <li key={budget.id}>
-                    <Link
-                      href={route(`/s/${spaceId}/budgets/${budget.id}`)}
-                      className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
-                    >
-                      <div className="flex items-center justify-between gap-2 text-sm">
-                        <span className="truncate font-medium">{budget.name}</span>
+              <div className="rounded-xl border border-border bg-surface/40 p-4">
+                <h2 className="mb-3 text-sm font-medium tracking-tight">
+                  {t('categories.ranked')}
+                </h2>
+                <ul className="space-y-2">
+                  {topCategories.map((category) => (
+                    <li key={`${category.id ?? 'none'}-${category.name}`}>
+                      <Link
+                        href={ledgerHref({
+                          spaceId,
+                          from: summary.from,
+                          to: summary.to,
+                          kind: 'expense',
+                          categoryId: category.id,
+                        })}
+                        className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-surface-raised"
+                      >
                         <span
-                          className={
-                            budget.urgency === 'over' ? 'text-danger' : 'text-muted-foreground'
-                          }
-                        >
-                          {Math.round(budget.ratio * 100)}%
+                          className="size-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: category.color }}
+                          aria-hidden
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium">
+                            {category.name}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {Math.round(category.share * 100)}% ·{' '}
+                            <TrendDelta
+                              ratio={deltaRatio(
+                                category.total_minor,
+                                category.total_minor - category.change_minor,
+                              )}
+                              goodWhenUp={false}
+                              label={t('vsPrevious')}
+                            />
+                          </span>
+                          {category.id && categoryBudgetProgress[category.id] ? (
+                            <ProgressBar
+                              className="mt-1"
+                              value={categoryBudgetProgress[category.id]?.ratio ?? 0}
+                              label={category.name}
+                            />
+                          ) : (
+                            <span
+                              className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
+                              aria-hidden
+                            >
+                              <span
+                                className="block h-full rounded-full bg-primary"
+                                style={{ width: `${Math.min(100, category.share * 100)}%` }}
+                              />
+                            </span>
+                          )}
                         </span>
-                      </div>
-                      <ProgressBar className="mt-1.5" value={budget.ratio} label={budget.name} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-          <section className="rounded-xl border border-border bg-surface/40 p-4">
-            <h2 className="text-sm font-medium tracking-tight">{t('rail.upcoming')}</h2>
-            {upcomingCharges.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">{t('rail.upcomingEmpty')}</p>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {upcomingCharges.map((charge) => (
-                  <li key={`${charge.ruleId}-${charge.on}`}>
-                    <Link
-                      href={route(`/s/${spaceId}/subscriptions/${charge.ruleId}`)}
-                      className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
-                    >
-                      <span className="min-w-0 truncate">
-                        <span className="font-medium">{charge.name}</span>
-                        <span className="mt-0.5 block text-xs text-muted-foreground">
-                          {charge.on}
-                        </span>
-                      </span>
-                      <Amount
-                        minor={charge.amountMinor}
-                        currency={charge.currency}
-                        className="text-sm"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-          <section className="rounded-xl border border-border bg-surface/40 p-4">
-            <h2 className="text-sm font-medium tracking-tight">{t('rail.goals')}</h2>
-            {goalProgress.length === 0 ? (
-              <p className="mt-2 text-xs text-muted-foreground">{t('rail.goalsEmpty')}</p>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {goalProgress.map((goal) => (
-                  <li key={goal.id}>
-                    <Link
-                      href={route(`/s/${spaceId}/goals/${goal.id}`)}
-                      className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
-                    >
-                      <div className="flex items-center justify-between gap-2 text-sm">
-                        <span className="truncate font-medium">{goal.name}</span>
-                        <span className="text-muted-foreground">
-                          {Math.round(goal.ratio * 100)}%
-                        </span>
-                      </div>
-                      <ProgressBar className="mt-1.5" value={goal.ratio} label={goal.name} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-          {spaceKind !== 'solo' ? (
-            <section
-              className="rounded-xl border border-border bg-surface/40 p-4"
-              data-testid="rail-balances"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-sm font-medium tracking-tight">{t('rail.balances')}</h2>
-                <Link
-                  href={route(`/s/${spaceId}/balances`)}
-                  className="text-xs font-medium text-foreground underline-offset-2 hover:underline"
-                >
-                  {t('rail.settleLink')}
-                </Link>
+                        <Amount
+                          minor={category.total_minor}
+                          currency={currency}
+                          className="text-sm"
+                        />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {outstandingBalances.length === 0 ? (
-                <p className="mt-2 text-xs text-muted-foreground">{t('rail.balancesEmpty')}</p>
+            </section>
+
+            <section className="grid gap-4 lg:grid-cols-2">
+              {showParticipants ? (
+                <div className="rounded-xl border border-border bg-surface/40 p-4">
+                  <h2 className="mb-3 text-sm font-medium tracking-tight">
+                    {t('participants.title')}
+                  </h2>
+                  <StackedBars
+                    title={t('participants.title')}
+                    valueFormatter={formatMinor}
+                    series={summary.participants.map((p) => ({
+                      key: p.id,
+                      label: p.display_name,
+                      color: p.color,
+                    }))}
+                    data={[
+                      {
+                        label: t('participants.paid'),
+                        ...Object.fromEntries(
+                          summary.participants.map((p) => [p.id, p.paid_minor]),
+                        ),
+                      },
+                      {
+                        label: t('participants.owed'),
+                        ...Object.fromEntries(
+                          summary.participants.map((p) => [p.id, p.owed_minor]),
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+              ) : null}
+              <div className="rounded-xl border border-border bg-surface/40 p-4">
+                <h2 className="mb-3 text-sm font-medium tracking-tight">{t('merchants.title')}</h2>
+                <HorizontalBars
+                  title={t('merchants.title')}
+                  valueFormatter={formatMinor}
+                  data={summary.merchants.map((m) => ({
+                    label: m.name,
+                    value: m.total_minor,
+                  }))}
+                  onBarClick={(point) => {
+                    router.push(
+                      ledgerHref({
+                        spaceId,
+                        from: summary.from,
+                        to: summary.to,
+                        kind: 'expense',
+                        q: point.label === '—' ? undefined : point.label,
+                      }),
+                    );
+                  }}
+                />
+              </div>
+            </section>
+          </div>
+
+          <aside className="flex flex-col gap-4">
+            <section className="rounded-xl border border-border bg-surface/40 p-4">
+              <h2 className="mb-3 text-sm font-medium tracking-tight">{t('rail.accounts')}</h2>
+              <ul className="space-y-2">
+                {summary.accounts.map((account) => (
+                  <li key={account.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span
+                        className="size-2.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: account.color }}
+                        aria-hidden
+                      />
+                      <span className="truncate">{account.name}</span>
+                    </span>
+                    <Amount
+                      minor={account.balance_minor}
+                      currency={account.currency}
+                      tone="auto"
+                      className="text-sm"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section className="rounded-xl border border-border bg-surface/40 p-4">
+              <h2 className="text-sm font-medium tracking-tight">{t('rail.alerts')}</h2>
+              {attentionBudgets.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">{t('rail.alertsEmpty')}</p>
               ) : (
                 <ul className="mt-3 space-y-2">
-                  {outstandingBalances.map((row) => (
-                    <li key={`${row.fromName}-${row.toName}-${row.amountMinor}`}>
+                  {attentionBudgets.map((budget) => (
+                    <li key={budget.id}>
                       <Link
-                        href={route(`/s/${spaceId}/balances`)}
-                        className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
+                        href={route(`/s/${spaceId}/budgets/${budget.id}`)}
+                        className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
                       >
-                        <span className="min-w-0 truncate">
-                          {row.fromName} → {row.toName}
-                        </span>
-                        <Amount minor={row.amountMinor} currency={currency} className="text-sm" />
+                        <div className="flex items-center justify-between gap-2 text-sm">
+                          <span className="truncate font-medium">{budget.name}</span>
+                          <span
+                            className={
+                              budget.urgency === 'over' ? 'text-danger' : 'text-muted-foreground'
+                            }
+                          >
+                            {Math.round(budget.ratio * 100)}%
+                          </span>
+                        </div>
+                        <ProgressBar className="mt-1.5" value={budget.ratio} label={budget.name} />
                       </Link>
                     </li>
                   ))}
                 </ul>
               )}
             </section>
-          ) : null}
-        </aside>
+            <section className="rounded-xl border border-border bg-surface/40 p-4">
+              <h2 className="text-sm font-medium tracking-tight">{t('rail.upcoming')}</h2>
+              {upcomingCharges.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">{t('rail.upcomingEmpty')}</p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {upcomingCharges.map((charge) => (
+                    <li key={`${charge.ruleId}-${charge.on}`}>
+                      <Link
+                        href={route(`/s/${spaceId}/subscriptions/${charge.ruleId}`)}
+                        className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
+                      >
+                        <span className="min-w-0 truncate">
+                          <span className="font-medium">{charge.name}</span>
+                          <span className="mt-0.5 block text-xs text-muted-foreground">
+                            {charge.on}
+                          </span>
+                        </span>
+                        <Amount
+                          minor={charge.amountMinor}
+                          currency={charge.currency}
+                          className="text-sm"
+                        />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className="rounded-xl border border-border bg-surface/40 p-4">
+              <h2 className="text-sm font-medium tracking-tight">{t('rail.goals')}</h2>
+              {goalProgress.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">{t('rail.goalsEmpty')}</p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {goalProgress.map((goal) => (
+                    <li key={goal.id}>
+                      <Link
+                        href={route(`/s/${spaceId}/goals/${goal.id}`)}
+                        className="block rounded-lg px-2 py-2 hover:bg-surface-raised"
+                      >
+                        <div className="flex items-center justify-between gap-2 text-sm">
+                          <span className="truncate font-medium">{goal.name}</span>
+                          <span className="text-muted-foreground">
+                            {Math.round(goal.ratio * 100)}%
+                          </span>
+                        </div>
+                        <ProgressBar className="mt-1.5" value={goal.ratio} label={goal.name} />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            {spaceKind !== 'solo' ? (
+              <section
+                className="rounded-xl border border-border bg-surface/40 p-4"
+                data-testid="rail-balances"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-sm font-medium tracking-tight">{t('rail.balances')}</h2>
+                  <Link
+                    href={route(`/s/${spaceId}/balances`)}
+                    className="text-xs font-medium text-foreground underline-offset-2 hover:underline"
+                  >
+                    {t('rail.settleLink')}
+                  </Link>
+                </div>
+                {outstandingBalances.length === 0 ? (
+                  <p className="mt-2 text-xs text-muted-foreground">{t('rail.balancesEmpty')}</p>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {outstandingBalances.map((row) => (
+                      <li key={`${row.fromName}-${row.toName}-${row.amountMinor}`}>
+                        <Link
+                          href={route(`/s/${spaceId}/balances`)}
+                          className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
+                        >
+                          <span className="min-w-0 truncate">
+                            {row.fromName} → {row.toName}
+                          </span>
+                          <Amount minor={row.amountMinor} currency={currency} className="text-sm" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ) : null}
+          </aside>
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }
 

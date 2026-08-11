@@ -48,6 +48,7 @@ function NotificationsBellInner({
         setUnread((n) => n + 1);
         if (row.kind === 'budget_threshold' || row.kind === 'budget_exceeded') {
           toast(row.title, { description: row.body ?? undefined });
+          window.dispatchEvent(new CustomEvent('nido:budget-alert', { detail: row }));
         }
       },
     );

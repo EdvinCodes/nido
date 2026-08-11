@@ -34,7 +34,7 @@ test.describe('ledger', () => {
     await composer.getByRole('button', { name: /guardar|save/i }).click();
     await expect(composer).toBeHidden({ timeout: 15_000 });
 
-    const expenseRow = page.getByRole('button', { name: expense.re }).first();
+    const expenseRow = page.getByRole('main').getByRole('button', { name: expense.re }).first();
     await expect(expenseRow).toBeVisible({ timeout: 15_000 });
 
     await expenseRow.click();
@@ -50,7 +50,9 @@ test.describe('ledger', () => {
     await expect(undo).toBeVisible({ timeout: 15_000 });
 
     await undo.click();
-    await expect(page.getByRole('button', { name: expense.re }).first()).toBeVisible({
+    await expect(
+      page.getByRole('main').getByRole('button', { name: expense.re }).first(),
+    ).toBeVisible({
       timeout: 10_000,
     });
   });

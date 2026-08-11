@@ -6,18 +6,24 @@ test.describe('budgets', () => {
   test('lists seeded budgets and opens detail', async ({ page }) => {
     const spaceId = await signInDemo(page);
     await page.goto(`/s/${spaceId}/budgets`);
-    await expect(page.getByRole('heading', { name: /presupuestos|budgets/i })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { name: /presupuestos|budgets/i }),
+    ).toBeVisible();
     await expect(page.getByText(/compra semanal|salir a comer/i).first()).toBeVisible();
 
     await page.getByRole('link', { name: /salir a comer/i }).click();
     await expect(page).toHaveURL(new RegExp(`/s/${spaceId}/budgets/[0-9a-f-]{36}$`));
-    await expect(page.getByRole('heading', { name: /salir a comer/i })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { name: /salir a comer/i }),
+    ).toBeVisible();
   });
 
   test('has no serious axe violations on budgets', async ({ page }) => {
     const spaceId = await signInDemo(page);
     await page.goto(`/s/${spaceId}/budgets`);
-    await expect(page.getByRole('heading', { name: /presupuestos|budgets/i })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { name: /presupuestos|budgets/i }),
+    ).toBeVisible();
     await expectNoA11yViolations(page);
   });
 });

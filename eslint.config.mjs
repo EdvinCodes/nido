@@ -124,7 +124,7 @@ const eslintConfig = defineConfig([
 
   // Tests and config files are allowed to be looser.
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.config.{ts,mts,mjs}', 'scripts/**'],
+    files: ['**/*.test.{ts,tsx}', '**/*.config.{ts,mts,mjs}', 'scripts/**', 'e2e/**'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',

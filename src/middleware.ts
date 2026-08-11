@@ -12,6 +12,6 @@ export const config = {
      * cookie is refreshed on every navigation and every Server Action without wasting a
      * round trip on files that never need a session.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|serwist|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest)$).*)',
   ],
 };

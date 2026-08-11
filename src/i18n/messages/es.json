@@ -425,7 +425,9 @@
     "hasAttachment": "Con adjunto",
     "selectedCount": "{count} seleccionados",
     "clearSelection": "Limpiar",
-    "bulkDeleted": "Se eliminaron {count} movimientos"
+    "bulkDeleted": "Se eliminaron {count} movimientos",
+    "pendingSync": "Pendiente de sync",
+    "pendingCount": "{count} pendientes de sincronizar"
   },
   "transactions": {
     "addTitle": "Añadir movimiento",
@@ -451,6 +453,7 @@
     "exactAmount": "Importe exacto (céntimos)",
     "giveRest": "Dar el resto",
     "created": "Movimiento guardado",
+    "savedOffline": "Guardado sin conexión — se sincronizará al reconectar",
     "manualRate": "Tipo de cambio manual",
     "manualRatePlaceholder": "Tipo hacia la moneda base",
     "deleted": "Movimiento eliminado",
@@ -740,7 +743,7 @@
     "empty": "Nada nuevo.",
     "settingsLink": "Ajustes de notificaciones",
     "settingsTitle": "Notificaciones",
-    "settingsBody": "Elige qué alertas ves en la app. Email y push llegan en una fase posterior.",
+    "settingsBody": "Elige cómo recibir alertas de cada evento. Los cambios aplican a este espacio.",
     "columns": {
       "kind": "Tipo",
       "inApp": "En la app",
@@ -749,6 +752,29 @@
     },
     "soon": "Pronto",
     "disabledUntilP10": "Disponible en una fase posterior",
+    "emailUnavailable": "Email requiere RESEND_API_KEY",
+    "pushUnavailable": "Push requiere claves VAPID",
+    "quietHoursTitle": "Horas de silencio",
+    "quietHoursBody": "Las notificaciones push se retienen en horas de silencio y se envían al terminar la ventana.",
+    "quietHoursEnabled": "Activar horas de silencio",
+    "quietHoursStart": "Desde",
+    "quietHoursEnd": "Hasta",
+    "testTitle": "Probar notificaciones",
+    "testInApp": "Probar toast en la app",
+    "testInAppSent": "Prueba en la app mostrada",
+    "testPush": "Enviar push de prueba",
+    "testPushSent": "Push de prueba enviado",
+    "testEmail": "Enviar email de prueba",
+    "testEmailSent": "Email de prueba enviado",
+    "pushTitle": "Push del navegador",
+    "pushBody": "Recibe alertas de presupuesto y novedades del hogar en este dispositivo.",
+    "pushEnable": "Activar push",
+    "pushDisable": "Desactivar push",
+    "pushIosTitle": "Instala Nido primero",
+    "pushIosBody": "En iPhone, el push web solo funciona si instalas Nido en la pantalla de inicio desde Safari.",
+    "pushPrePromptTitle": "No te pierdas nada",
+    "pushPrePromptBody": "Activa push para recibir alertas de presupuesto sin abrir la app.",
+    "pushPrePromptLater": "Ahora no",
     "kinds": {
       "budget_threshold": "Umbral de presupuesto",
       "budget_exceeded": "Presupuesto superado",
@@ -760,8 +786,23 @@
       "member_joined": "Miembro unido",
       "import_finished": "Importación lista",
       "bank_sync_failed": "Fallo de sync bancaria",
-      "insight": "Insight"
+      "insight": "Insight",
+      "period_close": "Cierre de periodo"
     }
+  },
+
+  "pwa": {
+    "offlineTitle": "Estás sin conexión",
+    "offlineBody": "Nido no pudo conectar con la red. Las páginas en caché pueden seguir funcionando; los datos nuevos se sincronizarán al reconectar.",
+    "offlineBanner": "Sin conexión — puedes añadir gastos; se sincronizarán al reconectar. Editar y analítica requieren conexión.",
+    "updateTitle": "Actualización disponible",
+    "updateBody": "Hay una nueva versión de Nido.",
+    "updateAction": "Recargar",
+    "installTitle": "Instalar Nido",
+    "installBody": "Añade Nido a tu pantalla de inicio para acceso rápido y captura offline.",
+    "installIosBody": "Toca Compartir y luego Añadir a pantalla de inicio para instalar Nido en iOS.",
+    "installAction": "Instalar",
+    "installDismiss": "Cerrar"
   },
 
   "import": {

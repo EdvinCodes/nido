@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import type { TransactionView } from '@/features/transactions/types';
 
 type ComposerMode = 'closed' | 'create' | 'edit' | 'scan';
@@ -51,6 +59,16 @@ export function TransactionComposerProvider({ children }: { children: ReactNode 
   const clearOptimistic = useCallback(() => {
     setOptimisticTransaction(null);
   }, []);
+
+  useEffect(() => {
+    const onFlushed = () => {
+      clearOptimistic();
+    };
+    window.addEventListener('nido:offline-flushed', onFlushed);
+    return () => {
+      window.removeEventListener('nido:offline-flushed', onFlushed);
+    };
+  }, [clearOptimistic]);
 
   const value = useMemo(
     () => ({

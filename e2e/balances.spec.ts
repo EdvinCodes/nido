@@ -82,7 +82,9 @@ test.describe('balances and settlements', () => {
     const spaceId = await signUpCouple(host, hostEmail, `Balances ${Date.now()}`);
 
     await host.goto(`/s/${spaceId}/settings/members`);
-    await expect(host.getByRole('heading', { level: 1, name: /members|miembros/i })).toBeVisible({
+    await expect(
+      host.getByRole('main').getByRole('heading', { level: 1, name: /members|miembros/i }),
+    ).toBeVisible({
       timeout: 30_000,
     });
     await host

@@ -70,6 +70,8 @@ export type TransactionView = {
   splits: TransactionSplitView[];
   tags: TransactionTagView[];
   attachment_count: number;
+  /** Present for optimistic / offline rows not yet confirmed by the server. */
+  sync_status?: 'pending' | 'syncing' | 'failed';
 };
 
 /** One row of `nido.accounts`. */

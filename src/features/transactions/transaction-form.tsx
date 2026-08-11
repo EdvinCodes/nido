@@ -24,6 +24,8 @@ import {
 } from '@/features/attachments/attachment-picker';
 import { invokeReceiptExtract } from '@/features/attachments/lib/invoke-extract';
 import { pollReceiptExtraction } from '@/features/attachments/lib/poll-ocr';
+import { enqueuePendingTransaction } from '@/features/offline/db';
+import { useOfflineOptional } from '@/features/offline/offline-provider';
 import { createTransaction } from '@/features/transactions/actions';
 import { useTransactionComposer } from '@/features/transactions/composer-context';
 import { buildOptimisticTransaction } from '@/features/transactions/lib/build-optimistic-transaction';
@@ -37,6 +39,8 @@ import type { AccountRow } from '@/features/transactions/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { transactionsQueryKey } from '@/features/transactions/hooks';
 import { cn } from '@/lib/utils';
+import { hapticSuccess } from '@/lib/haptics';
+import { KeyboardAwareScroll } from '@/components/mobile/keyboard-aware-scroll';
 
 type CategoryOption = {
   id: string;
@@ -129,7 +133,9 @@ export function TransactionComposerHost({
             <ComposerTitle scanMode={scanMode} />
           </SheetTitle>
         </SheetHeader>
-        <div className="px-1 pb-6">{form}</div>
+        <KeyboardAwareScroll>
+          <div className="px-1 pb-[max(1.5rem,env(safe-area-inset-bottom))]">{form}</div>
+        </KeyboardAwareScroll>
       </SheetContent>
     </Sheet>
   );
@@ -174,6 +180,7 @@ function TransactionForm({
   const locale = useLocale();
   const { space, participantId, userId } = useSpaceContext();
   const { insertOptimistic, clearOptimistic } = useTransactionComposer();
+  const offline = useOfflineOptional();
   const queryClient = useQueryClient();
   const [pending, startTransition] = useTransition();
   const pickerRef = useRef<AttachmentPickerHandle>(null);
@@ -297,7 +304,9 @@ function TransactionForm({
     const account = accounts.find((a) => a.id === accountId) ?? null;
     const toAccount = accounts.find((a) => a.id === toAccountId) ?? null;
     const payer = participants.find((p) => p.id === payerId) ?? null;
-    const optimisticId = `optimistic-${crypto.randomUUID()}`;
+    const clientId = crypto.randomUUID();
+    const requestId = crypto.randomUUID();
+    const optimisticId = `optimistic-${clientId}`;
     const optimisticTx = buildOptimisticTransaction({
       id: optimisticId,
       spaceId: space.id,
@@ -317,42 +326,64 @@ function TransactionForm({
       participants,
     });
 
+    const input = {
+      spaceId: space.id,
+      requestId,
+      kind,
+      amountMinor,
+      currency,
+      bookedOn,
+      description: description || undefined,
+      merchant: merchant || null,
+      notes: notes || null,
+      ...(useManualRate && manualRate
+        ? { baseRateManual: true, baseRate: Number(manualRate) }
+        : {}),
+      categoryId: kind === 'transfer' ? null : categoryId || null,
+      accountId: accountId || null,
+      toAccountId: kind === 'transfer' ? toAccountId || null : null,
+      payerParticipantId: kind === 'transfer' ? null : payerId || null,
+      splitMode: kind === 'transfer' ? 'personal' : splitMode,
+      participants:
+        kind === 'transfer'
+          ? []
+          : selected.map((p) => {
+              const row: {
+                participantId: string;
+                weight?: number;
+                owedMinor?: number;
+              } = { participantId: p.participantId };
+              if (p.weight !== undefined) row.weight = p.weight;
+              if (p.owedMinor != null) row.owedMinor = Number(p.owedMinor);
+              return row;
+            }),
+      tagIds: [] as string[],
+    };
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      insertOptimistic({ ...optimisticTx, sync_status: 'pending' });
+      void (async () => {
+        await enqueuePendingTransaction({
+          clientId,
+          requestId,
+          spaceId: space.id,
+          createdAt: new Date().toISOString(),
+          input,
+          optimistic: { ...optimisticTx, sync_status: 'pending' },
+          status: 'pending',
+        });
+        await offline?.refreshPending();
+        hapticSuccess();
+        toast.success(t('savedOffline'));
+        onDone();
+      })();
+      return;
+    }
+
     insertOptimistic(optimisticTx);
 
     startTransition(async () => {
-      const result = await createTransaction({
-        spaceId: space.id,
-        requestId: crypto.randomUUID(),
-        kind,
-        amountMinor,
-        currency,
-        bookedOn,
-        description: description || undefined,
-        merchant: merchant || null,
-        notes: notes || null,
-        ...(useManualRate && manualRate
-          ? { baseRateManual: true, baseRate: Number(manualRate) }
-          : {}),
-        categoryId: kind === 'transfer' ? null : categoryId || null,
-        accountId: accountId || null,
-        toAccountId: kind === 'transfer' ? toAccountId || null : null,
-        payerParticipantId: kind === 'transfer' ? null : payerId || null,
-        splitMode: kind === 'transfer' ? 'personal' : splitMode,
-        participants:
-          kind === 'transfer'
-            ? []
-            : selected.map((p) => {
-                const row: {
-                  participantId: string;
-                  weight?: number;
-                  owedMinor?: number;
-                } = { participantId: p.participantId };
-                if (p.weight !== undefined) row.weight = p.weight;
-                if (p.owedMinor != null) row.owedMinor = Number(p.owedMinor);
-                return row;
-              }),
-        tagIds: [],
-      });
+      const result = await createTransaction(input);
 
       clearOptimistic();
 
@@ -364,6 +395,7 @@ function TransactionForm({
       const txId = result.data.id;
       await pickerRef.current?.linkToTransaction(txId);
 
+      hapticSuccess();
       toast.success(t('created'));
       await queryClient.invalidateQueries({ queryKey: transactionsQueryKey(space.id, {}) });
       onDone();

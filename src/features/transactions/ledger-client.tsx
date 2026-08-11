@@ -33,6 +33,8 @@ import type { TagRow, TransactionView } from '@/features/transactions/types';
 import { parseLedgerFilters } from '@/features/transactions/lib/parse-ledger-filters';
 import { LedgerRow } from '@/features/transactions/ledger-row';
 import { useLedgerRealtime } from '@/features/transactions/use-ledger-realtime';
+import { useOfflineOptional } from '@/features/offline/offline-provider';
+import { PullToRefresh } from '@/components/mobile/pull-to-refresh';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 import { formatMoney, money, parseMoney } from '@/lib/money';
@@ -84,6 +86,7 @@ export function LedgerClient({
   const locale = useLocale();
   const { space, participantId } = useSpaceContext();
   const composer = useTransactionComposerOptional();
+  const offline = useOfflineOptional();
   const [detail, setDetail] = useState<TransactionView | null>(null);
   const [detailAttachments, setDetailAttachments] = useState<AttachmentRow[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -153,8 +156,20 @@ export function LedgerClient({
   const highlightedIds = useLedgerRealtime(spaceId);
 
   const fetchedRows = useMemo(() => query.data?.pages.flatMap((p) => p.rows) ?? [], [query.data]);
+
+  const pendingRows = useMemo(
+    () => (offline?.pending ?? []).map((p) => p.optimistic),
+    [offline?.pending],
+  );
+
+  const mergedFetched = useMemo(() => {
+    const ids = new Set(fetchedRows.map((r) => r.id));
+    const extra = pendingRows.filter((r) => !ids.has(r.id));
+    return [...extra, ...fetchedRows];
+  }, [fetchedRows, pendingRows]);
+
   const [rows, applyOptimistic] = useOptimistic(
-    fetchedRows,
+    mergedFetched,
     (current, pendingTx: TransactionView | null) => {
       if (!pendingTx) return current;
       if (current.some((row) => row.id === pendingTx.id)) return current;
@@ -188,6 +203,16 @@ export function LedgerClient({
       void query.fetchNextPage();
     }
   });
+
+  useEffect(() => {
+    const onFlushed = () => {
+      void query.refetch();
+    };
+    window.addEventListener('nido:offline-flushed', onFlushed);
+    return () => {
+      window.removeEventListener('nido:offline-flushed', onFlushed);
+    };
+  }, [query]);
 
   function clearFilters(): void {
     void setUrlState({
@@ -319,430 +344,445 @@ export function LedgerClient({
     );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 pt-4 pb-3 backdrop-blur-md lg:px-8">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
-          <div className="hidden items-center gap-2 lg:flex">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                void exportLedgerAction({ spaceId, format: 'csv' }).then((res) => {
-                  if (!res.ok) return;
-                  const blob = new Blob(
-                    [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
-                    {
-                      type: res.data.mimeType,
-                    },
-                  );
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = res.data.fileName;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                });
-              }}
-            >
-              {tImport('exportCsv')}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                void exportLedgerAction({ spaceId, format: 'xlsx' }).then((res) => {
-                  if (!res.ok) return;
-                  const blob = new Blob(
-                    [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
-                    {
-                      type: res.data.mimeType,
-                    },
-                  );
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = res.data.fileName;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                });
-              }}
-            >
-              {tImport('exportXlsx')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                composer?.openCreate();
-              }}
-            >
-              {t('add')}
-            </Button>
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Input
-            value={urlState.q}
-            onChange={(e) => {
-              void setUrlState({ q: e.target.value });
-            }}
-            placeholder={t('searchPlaceholder')}
-            className="max-w-xs"
-            aria-label={t('searchPlaceholder')}
-          />
-          <select
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-            value={urlState.kind || 'all'}
-            onChange={(e) => {
-              void setUrlState({
-                kind: e.target.value === 'all' ? '' : e.target.value,
-              });
-            }}
-            aria-label={t('filterKind')}
-          >
-            <option value="all">{t('allKinds')}</option>
-            <option value="expense">{tTx('kind.expense')}</option>
-            <option value="income">{tTx('kind.income')}</option>
-            <option value="transfer">{tTx('kind.transfer')}</option>
-          </select>
-          <Input
-            type="date"
-            value={urlState.from}
-            onChange={(e) => {
-              void setUrlState({ from: e.target.value });
-            }}
-            aria-label={t('dateFrom')}
-            className="w-auto"
-          />
-          <Input
-            type="date"
-            value={urlState.to}
-            onChange={(e) => {
-              void setUrlState({ to: e.target.value });
-            }}
-            aria-label={t('dateTo')}
-            className="w-auto"
-          />
-          {tags.length > 0 ? (
-            <select
-              className="h-9 max-w-[10rem] rounded-md border border-input bg-background px-2 text-sm"
-              value={urlState.tags[0] ?? ''}
-              onChange={(e) => {
-                const id = e.target.value;
-                void setUrlState({ tags: id ? [id] : [] });
-              }}
-              aria-label={t('filterTags')}
-            >
-              <option value="">{t('allTags')}</option>
-              {tags.map((tag) => (
-                <option key={tag.id} value={tag.id}>
-                  {tag.name}
-                </option>
-              ))}
-            </select>
-          ) : null}
-          <Input
-            type="text"
-            inputMode="decimal"
-            placeholder={t('amountMin')}
-            value={minorToMajorInput(urlState.min)}
-            onChange={(e) => {
-              void setUrlState({ min: majorToMinorInput(e.target.value) });
-            }}
-            aria-label={t('amountMin')}
-            className="w-24"
-          />
-          <Input
-            type="text"
-            inputMode="decimal"
-            placeholder={t('amountMax')}
-            value={minorToMajorInput(urlState.max)}
-            onChange={(e) => {
-              void setUrlState({ max: majorToMinorInput(e.target.value) });
-            }}
-            aria-label={t('amountMax')}
-            className="w-24"
-          />
-          <button
-            type="button"
-            aria-pressed={urlState.shared}
-            className={filterChipClass(urlState.shared)}
-            onClick={() => {
-              void setUrlState({ shared: !urlState.shared });
-            }}
-          >
-            {t('sharedOnly')}
-          </button>
-          <button
-            type="button"
-            aria-pressed={urlState.mine}
-            className={filterChipClass(urlState.mine)}
-            onClick={() => {
-              void setUrlState({ mine: !urlState.mine });
-            }}
-          >
-            {t('mineOnly')}
-          </button>
-          <button
-            type="button"
-            aria-pressed={urlState.attached}
-            data-testid="filter-has-attachment"
-            className={filterChipClass(urlState.attached)}
-            onClick={() => {
-              void setUrlState({ attached: !urlState.attached });
-            }}
-          >
-            {t('hasAttachment')}
-          </button>
-          {hasFilters ? (
-            <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
-              {t('clearFilters')}
-            </Button>
-          ) : null}
-        </div>
-      </div>
-
-      {query.isError ? (
-        <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
-          <p className="text-muted-foreground">{t('error')}</p>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              void query.refetch();
-            }}
-          >
-            {t('retry')}
-          </Button>
-        </div>
-      ) : null}
-
-      {query.status === 'pending' && rows.length === 0 ? (
-        <div className="flex flex-col gap-2 px-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full" />
-          ))}
-        </div>
-      ) : null}
-
-      {query.status === 'success' && rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
-          <p className="font-medium">{t('emptyTitle')}</p>
-          <p className="max-w-sm text-sm text-muted-foreground">{t('emptyBody')}</p>
-        </div>
-      ) : null}
-
-      {rows.length > 0 ? (
-        <div ref={parentRef} className="min-h-0 flex-1 overflow-auto px-2 lg:px-6">
-          <div
-            className="relative w-full"
-            style={{ height: `${String(virtualizer.getTotalSize())}px` }}
-          >
-            {virtualizer.getVirtualItems().map((virtualRow) => {
-              const item = items[virtualRow.index];
-              if (!item) return null;
-              return (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  ref={virtualizer.measureElement}
-                  className="absolute top-0 left-0 w-full"
-                  style={{ transform: `translateY(${String(virtualRow.start)}px)` }}
-                >
-                  {item.type === 'header' ? (
-                    <div className="flex items-center justify-between px-2 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                      <span>
-                        {new Intl.DateTimeFormat(locale, {
-                          weekday: 'short',
-                          day: 'numeric',
-                          month: 'short',
-                          timeZone: space.timezone,
-                        }).format(new Date(`${item.day}T12:00:00Z`))}
-                      </span>
-                      <Amount
-                        minor={Math.abs(item.subtotal)}
-                        currency={item.currency}
-                        locale={locale}
-                        tone={item.subtotal < 0 ? 'expense' : item.subtotal > 0 ? 'income' : 'none'}
-                        className="text-xs"
-                      />
-                    </div>
-                  ) : (
-                    <LedgerRow
-                      tx={item.tx}
-                      highlighted={highlightedIds.has(item.tx.id)}
-                      selectionMode={selectionMode}
-                      selected={selectedIds.has(item.tx.id)}
-                      onOpen={() => {
-                        setDetail(item.tx);
-                      }}
-                      onToggleSelect={() => {
-                        toggleSelected(item.tx.id);
-                      }}
-                      onEnterSelection={() => {
-                        setSelectedIds(new Set([item.tx.id]));
-                      }}
-                      onSwipeDelete={() => {
-                        onDelete(item.tx);
-                      }}
-                      onSwipeEdit={() => {
-                        setDetail(item.tx);
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          {query.isFetchingNextPage ? (
-            <p className="py-3 text-center text-xs text-muted-foreground">{t('loadingMore')}</p>
-          ) : null}
-        </div>
-      ) : null}
-
-      <Sheet
-        open={detail != null}
-        onOpenChange={(open) => {
-          if (!open) setDetail(null);
-        }}
-      >
-        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
-          {detail ? (
-            <>
-              <SheetHeader>
-                <SheetTitle>
-                  {detail.merchant || detail.description || tTx(`kind.${detail.kind}`)}
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col gap-4 px-1 pb-6">
-                <Amount
-                  minor={detail.amount_minor}
-                  currency={detail.currency}
-                  locale={locale}
-                  tone={toneForKind(detail.kind)}
-                  className="text-2xl font-medium"
-                />
-                <dl className="grid grid-cols-2 gap-2 text-sm">
-                  <dt className="text-muted-foreground">{tTx('date')}</dt>
-                  <dd>{detail.booked_on}</dd>
-                  <dt className="text-muted-foreground">{tTx('category')}</dt>
-                  <dd>{detail.category_name ?? '—'}</dd>
-                  <dt className="text-muted-foreground">{tTx('payer')}</dt>
-                  <dd>{detail.payer_name ?? '—'}</dd>
-                  <dt className="text-muted-foreground">{tTx('account')}</dt>
-                  <dd>{detail.account_name ?? '—'}</dd>
-                </dl>
-                {detail.splits.length > 0 ? (
-                  space.kind === 'solo' ? (
-                    <ul className="flex flex-col gap-1.5">
-                      {detail.splits.map((s) => (
-                        <li key={s.id} className="flex items-center justify-between text-sm">
-                          <span>{s.display_name}</span>
-                          <Amount
-                            minor={s.owed_minor}
-                            currency={detail.currency}
-                            locale={locale}
-                            className="text-sm"
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                        {tBalances('ledgerImpact')}
-                      </p>
-                      <ul className="flex flex-col gap-1.5">
-                        {detail.splits.map((s) => {
-                          const paid =
-                            detail.payer_participant_id === s.participant_id
-                              ? detail.kind === 'income'
-                                ? -detail.base_amount_minor
-                                : detail.base_amount_minor
-                              : 0;
-                          const owed =
-                            detail.kind === 'income' ? -s.base_owed_minor : s.base_owed_minor;
-                          const delta = paid - owed;
-                          return (
-                            <li key={s.id} className="flex flex-col gap-0.5 text-sm">
-                              <div className="flex items-center justify-between gap-2">
-                                <span>{s.display_name}</span>
-                                <Amount
-                                  minor={delta}
-                                  currency={detail.currency}
-                                  locale={locale}
-                                  tone="auto"
-                                  className="text-sm font-medium"
-                                />
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {tBalances('ledgerPaid')}:{' '}
-                                {formatMoney(money(paid, detail.currency), { locale })}
-                                {' · '}
-                                {tBalances('ledgerOwed')}:{' '}
-                                {formatMoney(money(owed, detail.currency), { locale })}
-                              </p>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )
-                ) : null}
-                <AttachmentGallery
-                  spaceId={spaceId}
-                  transactionId={detail.id}
-                  attachments={detailAttachments}
-                />
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pending}
-                    onClick={() => {
-                      onDuplicate(detail);
-                    }}
-                  >
-                    {tTx('duplicate')}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    disabled={pending}
-                    onClick={() => {
-                      onDelete(detail);
-                    }}
-                  >
-                    {tTx('delete')}
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : null}
-        </SheetContent>
-      </Sheet>
-
-      {selectionMode ? (
-        <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 border-t border-border bg-surface-raised px-4 py-3 lg:bottom-0">
-          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
-            <p className="text-sm font-medium">{t('selectedCount', { count: selectedIds.size })}</p>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
-                {t('clearSelection')}
+    <PullToRefresh
+      onRefresh={async () => {
+        await query.refetch();
+      }}
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 pt-4 pb-3 backdrop-blur-md lg:px-8">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
+            <div className="hidden items-center gap-2 lg:flex">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  void exportLedgerAction({ spaceId, format: 'csv' }).then((res) => {
+                    if (!res.ok) return;
+                    const blob = new Blob(
+                      [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
+                      {
+                        type: res.data.mimeType,
+                      },
+                    );
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = res.data.fileName;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  });
+                }}
+              >
+                {tImport('exportCsv')}
               </Button>
               <Button
                 type="button"
-                variant="destructive"
-                size="sm"
-                disabled={pending}
-                onClick={onBulkDelete}
+                variant="outline"
+                onClick={() => {
+                  void exportLedgerAction({ spaceId, format: 'xlsx' }).then((res) => {
+                    if (!res.ok) return;
+                    const blob = new Blob(
+                      [Uint8Array.from(atob(res.data.base64), (c) => c.charCodeAt(0))],
+                      {
+                        type: res.data.mimeType,
+                      },
+                    );
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = res.data.fileName;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  });
+                }}
               >
-                {tTx('delete')}
+                {tImport('exportXlsx')}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  composer?.openCreate();
+                }}
+              >
+                {t('add')}
               </Button>
             </div>
           </div>
+          {(offline?.pending.length ?? 0) > 0 ? (
+            <p className="mt-2 text-xs text-warning" data-testid="pending-sync-banner">
+              {t('pendingCount', { count: offline?.pending.length ?? 0 })}
+            </p>
+          ) : null}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Input
+              value={urlState.q}
+              onChange={(e) => {
+                void setUrlState({ q: e.target.value });
+              }}
+              placeholder={t('searchPlaceholder')}
+              className="max-w-xs"
+              aria-label={t('searchPlaceholder')}
+            />
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={urlState.kind || 'all'}
+              onChange={(e) => {
+                void setUrlState({
+                  kind: e.target.value === 'all' ? '' : e.target.value,
+                });
+              }}
+              aria-label={t('filterKind')}
+            >
+              <option value="all">{t('allKinds')}</option>
+              <option value="expense">{tTx('kind.expense')}</option>
+              <option value="income">{tTx('kind.income')}</option>
+              <option value="transfer">{tTx('kind.transfer')}</option>
+            </select>
+            <Input
+              type="date"
+              value={urlState.from}
+              onChange={(e) => {
+                void setUrlState({ from: e.target.value });
+              }}
+              aria-label={t('dateFrom')}
+              className="w-auto"
+            />
+            <Input
+              type="date"
+              value={urlState.to}
+              onChange={(e) => {
+                void setUrlState({ to: e.target.value });
+              }}
+              aria-label={t('dateTo')}
+              className="w-auto"
+            />
+            {tags.length > 0 ? (
+              <select
+                className="h-9 max-w-[10rem] rounded-md border border-input bg-background px-2 text-sm"
+                value={urlState.tags[0] ?? ''}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  void setUrlState({ tags: id ? [id] : [] });
+                }}
+                aria-label={t('filterTags')}
+              >
+                <option value="">{t('allTags')}</option>
+                {tags.map((tag) => (
+                  <option key={tag.id} value={tag.id}>
+                    {tag.name}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            <Input
+              type="text"
+              inputMode="decimal"
+              placeholder={t('amountMin')}
+              value={minorToMajorInput(urlState.min)}
+              onChange={(e) => {
+                void setUrlState({ min: majorToMinorInput(e.target.value) });
+              }}
+              aria-label={t('amountMin')}
+              className="w-24"
+            />
+            <Input
+              type="text"
+              inputMode="decimal"
+              placeholder={t('amountMax')}
+              value={minorToMajorInput(urlState.max)}
+              onChange={(e) => {
+                void setUrlState({ max: majorToMinorInput(e.target.value) });
+              }}
+              aria-label={t('amountMax')}
+              className="w-24"
+            />
+            <button
+              type="button"
+              aria-pressed={urlState.shared}
+              className={filterChipClass(urlState.shared)}
+              onClick={() => {
+                void setUrlState({ shared: !urlState.shared });
+              }}
+            >
+              {t('sharedOnly')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={urlState.mine}
+              className={filterChipClass(urlState.mine)}
+              onClick={() => {
+                void setUrlState({ mine: !urlState.mine });
+              }}
+            >
+              {t('mineOnly')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={urlState.attached}
+              data-testid="filter-has-attachment"
+              className={filterChipClass(urlState.attached)}
+              onClick={() => {
+                void setUrlState({ attached: !urlState.attached });
+              }}
+            >
+              {t('hasAttachment')}
+            </button>
+            {hasFilters ? (
+              <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
+                {t('clearFilters')}
+              </Button>
+            ) : null}
+          </div>
         </div>
-      ) : null}
-    </div>
+
+        {query.isError ? (
+          <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
+            <p className="text-muted-foreground">{t('error')}</p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void query.refetch();
+              }}
+            >
+              {t('retry')}
+            </Button>
+          </div>
+        ) : null}
+
+        {query.status === 'pending' && rows.length === 0 ? (
+          <div className="flex flex-col gap-2 px-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))}
+          </div>
+        ) : null}
+
+        {query.status === 'success' && rows.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
+            <p className="font-medium">{t('emptyTitle')}</p>
+            <p className="max-w-sm text-sm text-muted-foreground">{t('emptyBody')}</p>
+          </div>
+        ) : null}
+
+        {rows.length > 0 ? (
+          <div ref={parentRef} className="min-h-0 flex-1 overflow-auto px-2 lg:px-6">
+            <div
+              className="relative w-full"
+              style={{ height: `${String(virtualizer.getTotalSize())}px` }}
+            >
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                const item = items[virtualRow.index];
+                if (!item) return null;
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={virtualizer.measureElement}
+                    className="absolute top-0 left-0 w-full"
+                    style={{ transform: `translateY(${String(virtualRow.start)}px)` }}
+                  >
+                    {item.type === 'header' ? (
+                      <div className="flex items-center justify-between px-2 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                        <span>
+                          {new Intl.DateTimeFormat(locale, {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            timeZone: space.timezone,
+                          }).format(new Date(`${item.day}T12:00:00Z`))}
+                        </span>
+                        <Amount
+                          minor={Math.abs(item.subtotal)}
+                          currency={item.currency}
+                          locale={locale}
+                          tone={
+                            item.subtotal < 0 ? 'expense' : item.subtotal > 0 ? 'income' : 'none'
+                          }
+                          className="text-xs"
+                        />
+                      </div>
+                    ) : (
+                      <LedgerRow
+                        tx={item.tx}
+                        highlighted={highlightedIds.has(item.tx.id)}
+                        selectionMode={selectionMode}
+                        selected={selectedIds.has(item.tx.id)}
+                        onOpen={() => {
+                          setDetail(item.tx);
+                        }}
+                        onToggleSelect={() => {
+                          toggleSelected(item.tx.id);
+                        }}
+                        onEnterSelection={() => {
+                          setSelectedIds(new Set([item.tx.id]));
+                        }}
+                        onSwipeDelete={() => {
+                          onDelete(item.tx);
+                        }}
+                        onSwipeEdit={() => {
+                          setDetail(item.tx);
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {query.isFetchingNextPage ? (
+              <p className="py-3 text-center text-xs text-muted-foreground">{t('loadingMore')}</p>
+            ) : null}
+          </div>
+        ) : null}
+
+        <Sheet
+          open={detail != null}
+          onOpenChange={(open) => {
+            if (!open) setDetail(null);
+          }}
+        >
+          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
+            {detail ? (
+              <>
+                <SheetHeader>
+                  <SheetTitle>
+                    {detail.merchant || detail.description || tTx(`kind.${detail.kind}`)}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 px-1 pb-6">
+                  <Amount
+                    minor={detail.amount_minor}
+                    currency={detail.currency}
+                    locale={locale}
+                    tone={toneForKind(detail.kind)}
+                    className="text-2xl font-medium"
+                  />
+                  <dl className="grid grid-cols-2 gap-2 text-sm">
+                    <dt className="text-muted-foreground">{tTx('date')}</dt>
+                    <dd>{detail.booked_on}</dd>
+                    <dt className="text-muted-foreground">{tTx('category')}</dt>
+                    <dd>{detail.category_name ?? '—'}</dd>
+                    <dt className="text-muted-foreground">{tTx('payer')}</dt>
+                    <dd>{detail.payer_name ?? '—'}</dd>
+                    <dt className="text-muted-foreground">{tTx('account')}</dt>
+                    <dd>{detail.account_name ?? '—'}</dd>
+                  </dl>
+                  {detail.splits.length > 0 ? (
+                    space.kind === 'solo' ? (
+                      <ul className="flex flex-col gap-1.5">
+                        {detail.splits.map((s) => (
+                          <li key={s.id} className="flex items-center justify-between text-sm">
+                            <span>{s.display_name}</span>
+                            <Amount
+                              minor={s.owed_minor}
+                              currency={detail.currency}
+                              locale={locale}
+                              className="text-sm"
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                          {tBalances('ledgerImpact')}
+                        </p>
+                        <ul className="flex flex-col gap-1.5">
+                          {detail.splits.map((s) => {
+                            const paid =
+                              detail.payer_participant_id === s.participant_id
+                                ? detail.kind === 'income'
+                                  ? -detail.base_amount_minor
+                                  : detail.base_amount_minor
+                                : 0;
+                            const owed =
+                              detail.kind === 'income' ? -s.base_owed_minor : s.base_owed_minor;
+                            const delta = paid - owed;
+                            return (
+                              <li key={s.id} className="flex flex-col gap-0.5 text-sm">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span>{s.display_name}</span>
+                                  <Amount
+                                    minor={delta}
+                                    currency={detail.currency}
+                                    locale={locale}
+                                    tone="auto"
+                                    className="text-sm font-medium"
+                                  />
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {tBalances('ledgerPaid')}:{' '}
+                                  {formatMoney(money(paid, detail.currency), { locale })}
+                                  {' · '}
+                                  {tBalances('ledgerOwed')}:{' '}
+                                  {formatMoney(money(owed, detail.currency), { locale })}
+                                </p>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )
+                  ) : null}
+                  <AttachmentGallery
+                    spaceId={spaceId}
+                    transactionId={detail.id}
+                    attachments={detailAttachments}
+                  />
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => {
+                        onDuplicate(detail);
+                      }}
+                    >
+                      {tTx('duplicate')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={pending}
+                      onClick={() => {
+                        onDelete(detail);
+                      }}
+                    >
+                      {tTx('delete')}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </SheetContent>
+        </Sheet>
+
+        {selectionMode ? (
+          <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 border-t border-border bg-surface-raised px-4 py-3 lg:bottom-0">
+            <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+              <p className="text-sm font-medium">
+                {t('selectedCount', { count: selectedIds.size })}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+                  {t('clearSelection')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  disabled={pending}
+                  onClick={onBulkDelete}
+                >
+                  {tTx('delete')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </PullToRefresh>
   );
 }

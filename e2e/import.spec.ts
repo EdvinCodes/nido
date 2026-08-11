@@ -10,7 +10,6 @@ test.describe('import', () => {
     const token = `e2e${testInfo.parallelIndex}${Math.random().toString(36).slice(2, 8)}`;
     const cents = String(Math.floor(Math.random() * 90) + 10);
     const merchant = `E2E IMPORT ${token}`;
-    const amountRe = new RegExp(`${cents}[,.]50`);
     const csv = `Fecha;Concepto;Importe\n15/08/2026;${merchant};-${cents},50\n`;
 
     const spaceId = await signInDemo(page);
@@ -49,6 +48,8 @@ test.describe('import', () => {
     });
 
     await page.goto(`/s/${spaceId}/ledger`);
-    await expect(page.getByRole('button', { name: amountRe })).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole('main').getByRole('button', { name: new RegExp(token, 'i') }),
+    ).toBeVisible({ timeout: 15_000 });
   });
 });

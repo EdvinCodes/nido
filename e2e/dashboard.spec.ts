@@ -7,7 +7,9 @@ test.describe('dashboard', () => {
     const spaceId = await signInDemo(page);
 
     await page.goto(`/s/${spaceId}?period=last_3_months`);
-    await expect(page.getByRole('heading', { name: /panel|dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { name: /panel|dashboard/i }),
+    ).toBeVisible();
     await expect(page.getByText(/ingresos|income/i).first()).toBeVisible();
     await expect(page.getByText(/gastos|expenses/i).first()).toBeVisible();
 
@@ -22,7 +24,9 @@ test.describe('dashboard', () => {
   test('has no serious axe violations on the seeded dashboard', async ({ page }) => {
     const spaceId = await signInDemo(page);
     await page.goto(`/s/${spaceId}?period=last_3_months`);
-    await expect(page.getByRole('heading', { name: /panel|dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { name: /panel|dashboard/i }),
+    ).toBeVisible();
     await expectNoA11yViolations(page);
   });
 });

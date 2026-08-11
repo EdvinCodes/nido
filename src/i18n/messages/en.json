@@ -232,7 +232,10 @@
       "upcoming": "Upcoming charges",
       "upcomingEmpty": "Nothing due in the next two weeks.",
       "goals": "Goal progress",
-      "goalsEmpty": "No active goals yet."
+      "goalsEmpty": "No active goals yet.",
+      "balances": "Balances",
+      "balancesEmpty": "Everyone is square.",
+      "settleLink": "Settle up"
     }
   },
 
@@ -630,6 +633,64 @@
     "errors": {
       "amount": "Enter a name and positive amount."
     }
+  },
+
+  "balances": {
+    "title": "Balances",
+    "headlineSquare": "You are all square",
+    "headlineOwes": "{from} owes {to} {amount}",
+    "paid": "Paid",
+    "owed": "Owed",
+    "net": "Net",
+    "toggleSimplified": "Simplified",
+    "togglePairwise": "Pairwise",
+    "simplifyExplain": "Simplification finds the fewest transfers that clear every balance. Pairwise shows every bilateral debt before that cleanup.",
+    "settleUp": "Settle up",
+    "markPaid": "Mark as paid",
+    "propose": "Propose settlement",
+    "confirm": "Confirm",
+    "dispute": "Dispute",
+    "reverse": "Reverse",
+    "pendingTitle": "Waiting for your confirmation",
+    "pendingLine": "{from} → {to}: {amount}",
+    "transferLine": "{from} pays {to} {amount}",
+    "noTransfers": "No outstanding transfers.",
+    "history": "Settlement history",
+    "historyEmpty": "No settlements yet.",
+    "historyLine": "{from} → {to} · {amount} · {date} · {method}",
+    "breakdownTitle": "What built {name}'s balance",
+    "breakdownPaidOwed": "Paid {paid} · owed {owed}",
+    "breakdownEmpty": "No contributing transactions in this period.",
+    "applyPeriod": "Apply",
+    "status": {
+      "proposed": "Proposed",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed",
+      "reversed": "Reversed"
+    },
+    "method": {
+      "cash": "Cash",
+      "transfer": "Transfer",
+      "bizum": "Bizum",
+      "other": "Other"
+    },
+    "fields": {
+      "amount": "Amount",
+      "confirmAmount": "Confirm amount",
+      "method": "Method",
+      "date": "Date",
+      "note": "Note",
+      "disputeNote": "Why dispute?",
+      "from": "From",
+      "to": "To"
+    },
+    "errors": {
+      "amount": "Enter a positive amount."
+    },
+    "ledgerImpact": "Position impact",
+    "ledgerPaid": "Paid",
+    "ledgerOwed": "Owed",
+    "ledgerDelta": "Delta"
   },
 
   "notifications": {

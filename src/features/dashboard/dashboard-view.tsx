@@ -60,6 +60,7 @@ export function DashboardView({
   categoryBudgetProgress = {},
   upcomingCharges = [],
   goalProgress = [],
+  outstandingBalances = [],
 }: {
   spaceId: string;
   spaceKind: string;
@@ -85,6 +86,11 @@ export function DashboardView({
     ratio: number;
     remainingMinor: number;
     currency: string;
+  }>;
+  outstandingBalances?: Array<{
+    fromName: string;
+    toName: string;
+    amountMinor: number;
   }>;
 }) {
   const t = useTranslations('dashboard');
@@ -524,6 +530,41 @@ export function DashboardView({
               </ul>
             )}
           </section>
+          {spaceKind !== 'solo' ? (
+            <section
+              className="rounded-xl border border-border bg-surface/40 p-4"
+              data-testid="rail-balances"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-medium tracking-tight">{t('rail.balances')}</h2>
+                <Link
+                  href={route(`/s/${spaceId}/balances`)}
+                  className="text-xs font-medium text-foreground underline-offset-2 hover:underline"
+                >
+                  {t('rail.settleLink')}
+                </Link>
+              </div>
+              {outstandingBalances.length === 0 ? (
+                <p className="mt-2 text-xs text-muted-foreground">{t('rail.balancesEmpty')}</p>
+              ) : (
+                <ul className="mt-3 space-y-2">
+                  {outstandingBalances.map((row) => (
+                    <li key={`${row.fromName}-${row.toName}-${row.amountMinor}`}>
+                      <Link
+                        href={route(`/s/${spaceId}/balances`)}
+                        className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm hover:bg-surface-raised"
+                      >
+                        <span className="min-w-0 truncate">
+                          {row.fromName} → {row.toName}
+                        </span>
+                        <Amount minor={row.amountMinor} currency={currency} className="text-sm" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ) : null}
         </aside>
       </div>
     </div>

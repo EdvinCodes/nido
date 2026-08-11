@@ -9,6 +9,7 @@ import {
   getSpaceSummary,
   spaceHasTransactions,
 } from '@/features/dashboard/queries';
+import { getOutstandingBalanceRail } from '@/features/balances/queries';
 import { getActiveGoalProgress } from '@/features/goals/queries';
 import { getProfile, getSpaceForMember } from '@/features/spaces/queries';
 import { getUpcomingCharges } from '@/features/subscriptions/queries';
@@ -118,14 +119,30 @@ async function DashboardLoaded({
     );
   }
 
-  const [summary, attentionBudgets, categoryBudgetProgress, upcomingCharges, goalProgress] =
-    await Promise.all([
-      getSpaceSummary({ spaceId, from, to }),
-      getAttentionBudgets(spaceId),
-      getCategoryBudgetProgress(spaceId),
-      getUpcomingCharges(spaceId, 14),
-      getActiveGoalProgress(spaceId),
-    ]);
+  const [
+    summary,
+    attentionBudgets,
+    categoryBudgetProgress,
+    upcomingCharges,
+    goalProgress,
+    balanceRail,
+  ] = await Promise.all([
+    getSpaceSummary({ spaceId, from, to }),
+    getAttentionBudgets(spaceId),
+    getCategoryBudgetProgress(spaceId),
+    getUpcomingCharges(spaceId, 14),
+    getActiveGoalProgress(spaceId),
+    spaceKind === 'solo'
+      ? Promise.resolve({
+          currency,
+          transfers: [] as Array<{
+            fromName: string;
+            toName: string;
+            amountMinor: number;
+          }>,
+        })
+      : getOutstandingBalanceRail(spaceId),
+  ]);
   const previousSeries = await getSpaceSeries({
     spaceId,
     from: summary.previous_from,
@@ -148,6 +165,7 @@ async function DashboardLoaded({
       categoryBudgetProgress={categoryBudgetProgress}
       upcomingCharges={upcomingCharges}
       goalProgress={goalProgress}
+      outstandingBalances={balanceRail.transfers}
     />
   );
 }

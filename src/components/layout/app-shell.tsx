@@ -37,6 +37,7 @@ export function AppShell({
   spaces,
   role,
   spaceName,
+  spaceKind,
   notifications,
   unreadCount,
 }: {
@@ -45,6 +46,7 @@ export function AppShell({
   spaces: SpaceList;
   role: MemberRole;
   spaceName: string;
+  spaceKind: string;
   notifications: NotificationRow[];
   unreadCount: number;
 }) {
@@ -67,6 +69,7 @@ export function AppShell({
         spaces={spaces}
         role={role}
         spaceName={spaceName}
+        spaceKind={spaceKind}
         headerAction={isDesktop ? bell : null}
       />
       <div className="flex min-h-full flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">

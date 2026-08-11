@@ -75,6 +75,7 @@ export function LedgerClient({
 }) {
   const t = useTranslations('ledger');
   const tTx = useTranslations('transactions');
+  const tBalances = useTranslations('balances');
   const locale = useLocale();
   const { space, participantId } = useSpaceContext();
   const composer = useTransactionComposerOptional();
@@ -559,19 +560,61 @@ export function LedgerClient({
                   <dd>{detail.account_name ?? '—'}</dd>
                 </dl>
                 {detail.splits.length > 0 ? (
-                  <ul className="flex flex-col gap-1.5">
-                    {detail.splits.map((s) => (
-                      <li key={s.id} className="flex items-center justify-between text-sm">
-                        <span>{s.display_name}</span>
-                        <Amount
-                          minor={s.owed_minor}
-                          currency={detail.currency}
-                          locale={locale}
-                          className="text-sm"
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                  space.kind === 'solo' ? (
+                    <ul className="flex flex-col gap-1.5">
+                      {detail.splits.map((s) => (
+                        <li key={s.id} className="flex items-center justify-between text-sm">
+                          <span>{s.display_name}</span>
+                          <Amount
+                            minor={s.owed_minor}
+                            currency={detail.currency}
+                            locale={locale}
+                            className="text-sm"
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                        {tBalances('ledgerImpact')}
+                      </p>
+                      <ul className="flex flex-col gap-1.5">
+                        {detail.splits.map((s) => {
+                          const paid =
+                            detail.payer_participant_id === s.participant_id
+                              ? detail.kind === 'income'
+                                ? -detail.base_amount_minor
+                                : detail.base_amount_minor
+                              : 0;
+                          const owed =
+                            detail.kind === 'income' ? -s.base_owed_minor : s.base_owed_minor;
+                          const delta = paid - owed;
+                          return (
+                            <li key={s.id} className="flex flex-col gap-0.5 text-sm">
+                              <div className="flex items-center justify-between gap-2">
+                                <span>{s.display_name}</span>
+                                <Amount
+                                  minor={delta}
+                                  currency={detail.currency}
+                                  locale={locale}
+                                  tone="auto"
+                                  className="text-sm font-medium"
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {tBalances('ledgerPaid')}:{' '}
+                                {formatMoney(money(paid, detail.currency), { locale })}
+                                {' · '}
+                                {tBalances('ledgerOwed')}:{' '}
+                                {formatMoney(money(owed, detail.currency), { locale })}
+                              </p>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )
                 ) : null}
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Button

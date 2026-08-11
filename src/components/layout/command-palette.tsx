@@ -1,7 +1,15 @@
 'use client';
 
 import { Command } from 'cmdk';
-import { ArrowLeftRight, LayoutDashboard, Plus, Receipt, Settings, Wallet } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  LayoutDashboard,
+  Plus,
+  Receipt,
+  Scale,
+  Settings,
+  Wallet,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -19,7 +27,7 @@ export function CommandPalette({ spaceId }: { spaceId: string }) {
   const locale = useLocale();
   const router = useRouter();
   const composer = useTransactionComposerOptional();
-  const { spaces } = useSpaceContext();
+  const { spaces, space } = useSpaceContext();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [hits, setHits] = useState<SearchTransactionHit[]>([]);
@@ -170,6 +178,18 @@ export function CommandPalette({ spaceId }: { spaceId: string }) {
                 <Receipt className="size-4 shrink-0" aria-hidden />
                 {tNav('ledger')}
               </Command.Item>
+              {space.kind !== 'solo' ? (
+                <Command.Item
+                  value={tNav('balances')}
+                  onSelect={() => {
+                    go(`/s/${spaceId}/balances`);
+                  }}
+                  className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground aria-selected:bg-surface-raised"
+                >
+                  <Scale className="size-4 shrink-0" aria-hidden />
+                  {tNav('balances')}
+                </Command.Item>
+              ) : null}
               <Command.Item
                 value={tNav('accounts')}
                 onSelect={() => {

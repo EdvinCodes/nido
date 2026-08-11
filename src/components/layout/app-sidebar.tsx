@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { key: 'ledger', href: '/ledger', icon: Receipt, ready: true },
   { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: true },
   { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: true },
-  { key: 'balances', href: '/balances', icon: Scale, ready: false },
+  { key: 'balances', href: '/balances', icon: Scale, ready: true },
   { key: 'subscriptions', href: '/subscriptions', icon: Repeat, ready: true },
   { key: 'reports', href: '/reports', icon: BarChart3, ready: false },
   { key: 'assistant', href: '/assistant', icon: Bot, ready: false },
@@ -39,6 +39,7 @@ export function AppSidebar({
   spaceId,
   spaces,
   spaceName,
+  spaceKind,
   headerAction,
 }: {
   activePath: string;
@@ -46,10 +47,15 @@ export function AppSidebar({
   spaces: SpaceList;
   role: MemberRole;
   spaceName: string;
+  spaceKind: string;
   headerAction?: ReactNode;
 }) {
   const t = useTranslations('nav');
   void spaceName;
+  const items = NAV_ITEMS.filter((item) => {
+    if (spaceKind !== 'solo') return true;
+    return item.key !== 'balances';
+  });
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
@@ -60,7 +66,7 @@ export function AppSidebar({
         {headerAction}
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Primary">
-        {NAV_ITEMS.map(({ key, href, icon: Icon, ready }) => {
+        {items.map(({ key, href, icon: Icon, ready }) => {
           const fullHref = `/s/${spaceId}${href}`;
           const active =
             href === '' ? activePath === `/s/${spaceId}` : activePath.startsWith(fullHref);

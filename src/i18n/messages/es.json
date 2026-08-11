@@ -232,7 +232,10 @@
       "upcoming": "Cargos próximos",
       "upcomingEmpty": "Nada en las próximas dos semanas.",
       "goals": "Progreso de metas",
-      "goalsEmpty": "Aún no hay metas activas."
+      "goalsEmpty": "Aún no hay metas activas.",
+      "balances": "Saldos",
+      "balancesEmpty": "Estáis en paz.",
+      "settleLink": "Liquidar"
     }
   },
 
@@ -630,6 +633,64 @@
     "errors": {
       "amount": "Introduce un nombre y un importe positivo."
     }
+  },
+
+  "balances": {
+    "title": "Saldos",
+    "headlineSquare": "Estáis en paz",
+    "headlineOwes": "{from} debe a {to} {amount}",
+    "paid": "Pagado",
+    "owed": "Adeudado",
+    "net": "Neto",
+    "toggleSimplified": "Simplificado",
+    "togglePairwise": "Par a par",
+    "simplifyExplain": "La simplificación encuentra las transferencias mínimas que cierran todos los saldos. Par a par muestra cada deuda bilateral antes de ese ajuste.",
+    "settleUp": "Liquidar",
+    "markPaid": "Marcar como pagado",
+    "propose": "Proponer liquidación",
+    "confirm": "Confirmar",
+    "dispute": "Disputar",
+    "reverse": "Revertir",
+    "pendingTitle": "Pendiente de tu confirmación",
+    "pendingLine": "{from} → {to}: {amount}",
+    "transferLine": "{from} paga a {to} {amount}",
+    "noTransfers": "No hay transferencias pendientes.",
+    "history": "Historial de liquidaciones",
+    "historyEmpty": "Aún no hay liquidaciones.",
+    "historyLine": "{from} → {to} · {amount} · {date} · {method}",
+    "breakdownTitle": "Qué compone el saldo de {name}",
+    "breakdownPaidOwed": "Pagó {paid} · adeudó {owed}",
+    "breakdownEmpty": "No hay movimientos en este periodo.",
+    "applyPeriod": "Aplicar",
+    "status": {
+      "proposed": "Propuesta",
+      "confirmed": "Confirmada",
+      "disputed": "Disputada",
+      "reversed": "Revertida"
+    },
+    "method": {
+      "cash": "Efectivo",
+      "transfer": "Transferencia",
+      "bizum": "Bizum",
+      "other": "Otro"
+    },
+    "fields": {
+      "amount": "Importe",
+      "confirmAmount": "Importe a confirmar",
+      "method": "Método",
+      "date": "Fecha",
+      "note": "Nota",
+      "disputeNote": "¿Por qué la disputas?",
+      "from": "Desde",
+      "to": "Hasta"
+    },
+    "errors": {
+      "amount": "Introduce un importe positivo."
+    },
+    "ledgerImpact": "Impacto en saldos",
+    "ledgerPaid": "Pagado",
+    "ledgerOwed": "Adeudado",
+    "ledgerDelta": "Delta"
   },
 
   "notifications": {

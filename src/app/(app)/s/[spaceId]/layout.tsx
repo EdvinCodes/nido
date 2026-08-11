@@ -53,6 +53,7 @@ export default async function SpaceLayout({
           spaces={spaces}
           role={membership.role}
           spaceName={membership.space.name}
+          spaceKind={membership.space.kind}
           notifications={notifications}
           unreadCount={unreadCount}
         >

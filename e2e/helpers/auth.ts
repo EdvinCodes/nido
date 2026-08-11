@@ -17,20 +17,23 @@ function parseSpaceId(url: string): string {
 /** Lands on a space dashboard after sign-in (seed users must exist — `pnpm db:reset`). */
 export async function signInDemo(
   page: Page,
-  email = DEMO_ALEX.email,
-  password = DEMO_ALEX.password,
+  email: string = DEMO_ALEX.email,
+  password: string = DEMO_ALEX.password,
 ) {
   await page.goto('/sign-in');
 
-  const devAlex = page.getByRole('button', { name: /entrar como alex|sign in as alex/i });
+  const isSam = email.toLowerCase().includes('sam@');
+  const devButton = page.getByRole('button', {
+    name: isSam ? /entrar como sam|sign in as sam/i : /entrar como alex|sign in as alex/i,
+  });
   // Wait for the client panel (or fall back to the password form).
-  const hasDevLogin = await devAlex
+  const hasDevLogin = await devButton
     .waitFor({ state: 'visible', timeout: 5_000 })
     .then(() => true)
     .catch(() => false);
 
   if (hasDevLogin) {
-    await devAlex.click();
+    await devButton.click();
   } else {
     await page.getByLabel(/correo|email/i).fill(email);
     await page.getByLabel(/contraseña|password/i).fill(password);

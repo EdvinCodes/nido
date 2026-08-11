@@ -13,13 +13,16 @@ tame subscriptions, and eventually just _ask_ your data where the money is going
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-black.svg)](https://supabase.com)
 [![PWA](https://img.shields.io/badge/PWA-installable-black.svg)](#)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FEdvinCodes%2Fnido&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_APP_URL,SUPABASE_SERVICE_ROLE_KEY&project-name=nido&repository-name=nido)
+
 </div>
 
 ---
 
-> **Status: foundations complete (phase 00).** The product is being built phase by phase.
-> Follow [`docs/phases/README.md`](./docs/phases/README.md) for progress. Phase 01 (auth &
-> spaces) is next.
+> **Status: MVP nearly complete (phase 11 of 13).** Phases 00–10 are shipped; landing polish
+> and the AI assistant remain. Track progress in [`docs/phases/README.md`](./docs/phases/README.md).
+
+![Nido ledger screenshot](./public/screenshots/marketing/hero.png)
 
 ## Why Nido
 
@@ -66,6 +69,9 @@ Full reasoning and rejected alternatives: [`docs/07-ADR.md`](./docs/07-ADR.md).
 
 ## Documentation
 
+Browse the spec at [`/docs`](http://localhost:3000/docs) when running locally, or read the
+Markdown files in [`docs/`](./docs/).
+
 | Document                                                 | Purpose                                                                 |
 | -------------------------------------------------------- | ----------------------------------------------------------------------- |
 | [`docs/00-PROJECT.md`](./docs/00-PROJECT.md)             | Vision, scope, principles, personas, glossary, roadmap                  |
@@ -80,27 +86,43 @@ Full reasoning and rejected alternatives: [`docs/07-ADR.md`](./docs/07-ADR.md).
 
 ## Getting started
 
-> Available after phase 00. Requires [Docker](https://docs.docker.com/get-docker/) for the
-> local Supabase stack.
+Requires [Docker](https://docs.docker.com/get-docker/) for the local Supabase stack and Node 22+.
 
 ```bash
 git clone https://github.com/EdvinCodes/nido.git
 cd nido
 pnpm install
 cp .env.example .env.local
-pnpm supabase start      # local Postgres + Auth + Storage via Docker
-pnpm db:reset            # apply migrations and seed demo data
+pnpm db:start      # local Postgres + Auth + Storage
+pnpm db:reset      # apply migrations and seed demo data
 pnpm dev
 ```
 
 Open <http://localhost:3000>. The seed creates a demo space with two members and three
 months of realistic transactions so every screen has something to show.
 
+Regenerate marketing screenshots after UI changes:
+
+```bash
+pnpm dev   # in one terminal
+pnpm screenshots
+```
+
 ## Self-hosting
 
-Nido runs on the Supabase free tier plus Vercel's hobby plan, which is enough for a
-household. It can also be fully self-hosted with `docker compose` (Supabase self-hosted +
-the Next.js app). See [`docs/01-ARCHITECTURE.md`](./docs/01-ARCHITECTURE.md).
+**Docker Compose** (Next.js app + Supabase CLI on the host):
+
+```bash
+pnpm db:start && pnpm db:reset
+docker compose up --build
+```
+
+Copy keys from `supabase status` into `.env.local` before building. See
+[`docs/01-ARCHITECTURE.md`](./docs/01-ARCHITECTURE.md) §10.
+
+**Vercel + Supabase Cloud** is the primary deployment path — use the Deploy button above and
+set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`, and
+`SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Privacy
 
@@ -111,8 +133,8 @@ No analytics, no trackers, no third-party pixels.
 
 ## Contributing
 
-Issues and pull requests are welcome. Read [`docs/06-CONVENTIONS.md`](./docs/06-CONVENTIONS.md)
-first — it covers commit format, branch naming, and the definition of done.
+Issues and pull requests are welcome. Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) and
+[`docs/06-CONVENTIONS.md`](./docs/06-CONVENTIONS.md) first.
 
 ## License
 

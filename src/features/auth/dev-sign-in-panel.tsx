@@ -32,7 +32,9 @@ export function DevSignInPanel({ next }: { next?: string }) {
 
   return (
     <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4">
-      <p className="text-xs font-medium tracking-wide text-primary uppercase">{t('badge')}</p>
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        {t('badge')}
+      </p>
       <p className="mt-1 text-sm text-muted-foreground">{t('hint')}</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <Button

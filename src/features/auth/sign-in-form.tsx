@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { route } from '@/lib/routes';
 import {
   signInAction,
   signInWithGoogleAction,
@@ -16,7 +17,6 @@ import {
 } from '@/features/auth/actions';
 import { signInSchema, type SignInInput } from '@/features/auth/schemas';
 import { DevSignInPanel } from '@/features/auth/dev-sign-in-panel';
-import { route } from '@/lib/routes';
 
 export function SignInForm() {
   const t = useTranslations('auth');
@@ -75,7 +75,10 @@ export function SignInForm() {
             <Label htmlFor="password">
               {t('signIn') === 'Sign in' ? 'Password' : 'Contraseña'}
             </Label>
-            <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+            <Link
+              href={route('/forgot-password')}
+              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
               {t('forgotPassword')}
             </Link>
           </div>

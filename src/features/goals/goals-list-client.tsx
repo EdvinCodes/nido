@@ -80,7 +80,7 @@ export function GoalsListClient({
                   ? 'text-muted-foreground'
                   : card.projection.onPace
                     ? 'text-accent'
-                    : 'text-warning';
+                    : 'text-warning-text';
               return (
                 <li
                   key={card.id}

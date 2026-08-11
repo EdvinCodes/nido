@@ -37,6 +37,7 @@
   --expense-foreground: oklch(0.99 0.004 85);
   --warning: oklch(0.68 0.14 78);
   --warning-foreground: oklch(0.2 0.008 65);
+  --warning-text: oklch(0.45 0.13 70);
   --danger: oklch(0.55 0.2 25);
   --danger-foreground: oklch(0.99 0.004 85);
   --destructive: var(--danger);
@@ -109,6 +110,7 @@
   --expense-foreground: oklch(0.18 0.02 28);
   --warning: oklch(0.82 0.15 85);
   --warning-foreground: oklch(0.18 0.02 85);
+  --warning-text: oklch(0.82 0.15 85);
   --danger: oklch(0.62 0.2 22);
   --danger-foreground: oklch(0.98 0.004 85);
   --destructive: var(--danger);
@@ -185,6 +187,7 @@
   --color-expense-foreground: var(--expense-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-text: var(--warning-text);
   --color-danger: var(--danger);
   --color-danger-foreground: var(--danger-foreground);
   --color-destructive: var(--destructive);

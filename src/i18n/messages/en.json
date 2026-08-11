@@ -46,7 +46,8 @@
       "row2": "Metro Madrid",
       "row2Sub": "Transport · Sam",
       "row3": "Paycheque",
-      "row3Sub": "Income · Alex"
+      "row3Sub": "Income · Alex",
+      "imageAlt": "Ledger with recent household transactions"
     },
     "problem": {
       "title": "The spreadsheet is not enough",
@@ -71,19 +72,23 @@
       "items": {
         "splits": {
           "title": "Exact splits",
-          "body": "Five split modes. Cents always add up — the database enforces it."
+          "body": "Five split modes. Cents always add up — the database enforces it.",
+          "imageAlt": "Split editor with exact amounts in Nido"
         },
-        "ledger": {
-          "title": "Instant ledger",
-          "body": "Every expense, income, and transfer in a fast, filterable shared list."
+        "dashboard": {
+          "title": "Household dashboard",
+          "body": "Spending trends, recent activity, and budget progress at a glance.",
+          "imageAlt": "Dashboard with charts and recent transactions"
         },
         "budgets": {
           "title": "Budgets with alerts",
-          "body": "Category limits and warnings before you overspend, in your home currency."
+          "body": "Category limits and warnings before you overspend, in your home currency.",
+          "imageAlt": "Budget list with progress bars and alerts"
         },
         "balances": {
           "title": "Balances between people",
-          "body": "Who owes whom, simplified. No informal running tabs."
+          "body": "Who owes whom, simplified. No informal running tabs.",
+          "imageAlt": "Balance summary between household members"
         }
       }
     },
@@ -115,6 +120,7 @@
     "openSource": {
       "title": "Open and auditable",
       "body": "Next.js, Supabase, and strict TypeScript. Clone it, deploy it, make it yours.",
+      "docsLink": "Read the documentation →",
       "stack": {
         "next": "Next.js 16",
         "supabase": "Supabase",
@@ -126,10 +132,54 @@
       "title": "Get started in minutes",
       "body": "Create your space, invite your household, and log the first expense."
     },
+    "assistant": {
+      "title": "Ask your data — on your terms",
+      "subtitle": "Optional AI assistant with bring-your-own-key. Nothing leaves your database unless you configure a provider.",
+      "badge": "Optional · BYOK",
+      "question": "Where did we spend the most on groceries last month?",
+      "answer": "€412 across 14 transactions. Mercadona accounted for €268 (65%). Alex paid 58%, Sam 42%.",
+      "footnote": "Illustrative example. The assistant uses read-only tools over your space data."
+    },
     "footer": {
       "tagline": "Shared household finance with numbers you can trust.",
       "signIn": "Sign in",
+      "docs": "Docs",
+      "privacy": "Privacy",
+      "changelog": "Changelog",
+      "brand": "Brand",
+      "navLabel": "Footer",
       "copyright": "© {year} Nido. Open source under MIT."
+    },
+    "pages": {
+      "privacy": {
+        "title": "Privacy",
+        "description": "How Nido handles your household financial data.",
+        "p1": "Your data lives in your Supabase project — not on our servers. We do not sell, rent, or profile your spending.",
+        "p2": "The hosted demo sends no analytics pixels and no third-party trackers. Error reporting (Sentry) is off unless you add a DSN.",
+        "p3": "The optional AI assistant sends prompts only to the model provider you configure, with your own API key. You can run it fully offline with a local model.",
+        "p4": "Self-hosting means you control backups, retention, and access. Read the source — it is MIT licensed."
+      },
+      "changelog": {
+        "title": "Changelog",
+        "description": "Release history from git tags.",
+        "subtitle": "Annotated tags from the repository.",
+        "empty": "No release tags yet. Follow main for the latest work."
+      },
+      "brand": {
+        "title": "Brand",
+        "description": "Nido logo, colours, and typography.",
+        "subtitle": "Assets for press, contributors, and self-hosters.",
+        "logoTitle": "Logo",
+        "logoUsage": "Use the lockup on light or dark backgrounds. The mark alone works for favicons and app icons. Do not stretch or recolour outside the token palette.",
+        "colorsTitle": "Colour tokens",
+        "typeTitle": "Typography",
+        "typeBody": "Instrument Serif for display headlines. Geist Sans for UI and body. Geist Mono for amounts and code."
+      },
+      "docs": {
+        "title": "Documentation",
+        "description": "Project specification and architecture.",
+        "subtitle": "The same docs shipped in the repository, rendered here for browsing."
+      }
     }
   },
   "nav": {
@@ -176,6 +226,18 @@
     "addExpense": "Add expense",
     "addIncome": "Add income",
     "addFromReceipt": "Add from receipt"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "palette": "Open command palette",
+    "newTransaction": "New transaction",
+    "goDashboard": "Go to dashboard",
+    "goLedger": "Go to ledger",
+    "goBudgets": "Go to budgets",
+    "goGoals": "Go to goals",
+    "goReports": "Go to reports",
+    "goSettings": "Go to settings",
+    "showHelp": "Show this dialog"
   },
   "charts": {
     "empty": "Nothing to chart in this period",
@@ -284,7 +346,7 @@
       "email_exists": "An account already exists with this email. Try signing in.",
       "rate_limited": "Too many attempts. Try again in a moment.",
       "weak_password": "Choose a stronger password.",
-      "auth_error": "Something went wrong. Please try again.",
+      "auth_error": "Sign-in failed. Check your connection and try again.",
       "oauth": "Google sign-in is not available right now.",
       "validation": "Please check the form and try again."
     }
@@ -397,7 +459,7 @@
     "signInPrompt": "Sign in or create an account to accept this invite."
   },
   "errors": {
-    "title": "Something went wrong",
+    "title": "This page failed to load",
     "description": "An unexpected error occurred. You can retry or go back home.",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist or has moved."

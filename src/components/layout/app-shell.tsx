@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
+import { KeyboardShortcuts } from '@/components/layout/keyboard-shortcuts';
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
 import { SpaceSwitcher } from '@/components/layout/space-switcher';
 import type { MemberRole } from '@/lib/auth';
@@ -82,6 +83,7 @@ export function AppShell({
         {children}
         <MobileTabBar activePath={pathname} spaceId={spaceId} isAiConfigured={isAiConfigured} />
         <CommandPalette spaceId={spaceId} isAiConfigured={isAiConfigured} />
+        <KeyboardShortcuts spaceId={spaceId} isAiConfigured={isAiConfigured} />
       </div>
     </div>
   );

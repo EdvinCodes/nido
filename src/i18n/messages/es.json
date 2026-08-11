@@ -46,7 +46,8 @@
       "row2": "Metro Madrid",
       "row2Sub": "Transporte · Sam",
       "row3": "Nómina",
-      "row3Sub": "Ingresos · Alex"
+      "row3Sub": "Ingresos · Alex",
+      "imageAlt": "Libro de movimientos con transacciones recientes del hogar"
     },
     "problem": {
       "title": "La hoja de cálculo ya no da abasto",
@@ -71,19 +72,23 @@
       "items": {
         "splits": {
           "title": "Reparto exacto",
-          "body": "Cinco modos de división. Los céntimos siempre cuadran — la base de datos lo garantiza."
+          "body": "Cinco modos de división. Los céntimos siempre cuadran — la base de datos lo garantiza.",
+          "imageAlt": "Editor de reparto con importes exactos en Nido"
         },
-        "ledger": {
-          "title": "Libro al instante",
-          "body": "Cada gasto, ingreso y transferencia en una lista rápida, filtrable y compartida."
+        "dashboard": {
+          "title": "Panel del hogar",
+          "body": "Tendencias de gasto, actividad reciente y avance de presupuestos de un vistazo.",
+          "imageAlt": "Panel con gráficos y movimientos recientes"
         },
         "budgets": {
           "title": "Presupuestos con avisos",
-          "body": "Límites por categoría y alertas antes de pasarte, en la moneda de tu hogar."
+          "body": "Límites por categoría y alertas antes de pasarte, en la moneda de tu hogar.",
+          "imageAlt": "Lista de presupuestos con barras de progreso y avisos"
         },
         "balances": {
           "title": "Saldos entre personas",
-          "body": "Quién debe a quién, simplificado. Sin cuentas corrientes informales."
+          "body": "Quién debe a quién, simplificado. Sin cuentas corrientes informales.",
+          "imageAlt": "Resumen de saldos entre miembros del hogar"
         }
       }
     },
@@ -115,6 +120,7 @@
     "openSource": {
       "title": "Abierto y auditable",
       "body": "Next.js, Supabase y TypeScript estricto. Clónalo, despliégalo y hazlo tuyo.",
+      "docsLink": "Leer la documentación →",
       "stack": {
         "next": "Next.js 16",
         "supabase": "Supabase",
@@ -126,10 +132,54 @@
       "title": "Empieza en minutos",
       "body": "Crea tu espacio, invita a tu hogar y registra el primer gasto."
     },
+    "assistant": {
+      "title": "Pregunta a tus datos — a tu manera",
+      "subtitle": "Asistente opcional con clave propia. Nada sale de tu base de datos salvo que configures un proveedor.",
+      "badge": "Opcional · clave propia",
+      "question": "¿Dónde gastamos más en compras el mes pasado?",
+      "answer": "412 € en 14 movimientos. Mercadona sumó 268 € (65 %). Alex pagó el 58 %, Sam el 42 %.",
+      "footnote": "Ejemplo ilustrativo. El asistente usa herramientas de solo lectura sobre los datos de tu espacio."
+    },
     "footer": {
       "tagline": "Finanzas del hogar compartidas, con cifras en las que confiar.",
       "signIn": "Iniciar sesión",
+      "docs": "Docs",
+      "privacy": "Privacidad",
+      "changelog": "Cambios",
+      "brand": "Marca",
+      "navLabel": "Pie de página",
       "copyright": "© {year} Nido. Código abierto bajo MIT."
+    },
+    "pages": {
+      "privacy": {
+        "title": "Privacidad",
+        "description": "Cómo Nido trata los datos financieros de tu hogar.",
+        "p1": "Tus datos viven en tu proyecto Supabase — no en nuestros servidores. No vendemos ni perfilamos tu gasto.",
+        "p2": "La demo alojada no envía píxeles de analítica ni rastreadores de terceros. Sentry está desactivado salvo que añadas un DSN.",
+        "p3": "El asistente opcional envía prompts solo al proveedor que configures, con tu propia clave. Puedes usarlo offline con un modelo local.",
+        "p4": "Autohospedando controlas copias de seguridad, retención y acceso. Lee el código — licencia MIT."
+      },
+      "changelog": {
+        "title": "Cambios",
+        "description": "Historial de versiones desde etiquetas git.",
+        "subtitle": "Etiquetas anotadas del repositorio.",
+        "empty": "Aún no hay etiquetas de release. Sigue main para lo último."
+      },
+      "brand": {
+        "title": "Marca",
+        "description": "Logo, colores y tipografía de Nido.",
+        "subtitle": "Recursos para prensa, contribuidores y autohospedaje.",
+        "logoTitle": "Logo",
+        "logoUsage": "Usa el lockup sobre fondos claros u oscuros. La marca sola sirve para favicons e iconos. No estires ni recolores fuera de la paleta de tokens.",
+        "colorsTitle": "Tokens de color",
+        "typeTitle": "Tipografía",
+        "typeBody": "Instrument Serif para titulares. Geist Sans para UI y cuerpo. Geist Mono para importes y código."
+      },
+      "docs": {
+        "title": "Documentación",
+        "description": "Especificación y arquitectura del proyecto.",
+        "subtitle": "Los mismos docs del repositorio, renderizados aquí para consulta."
+      }
     }
   },
   "nav": {
@@ -176,6 +226,18 @@
     "addExpense": "Añadir gasto",
     "addIncome": "Añadir ingreso",
     "addFromReceipt": "Añadir desde ticket"
+  },
+  "shortcuts": {
+    "title": "Atajos de teclado",
+    "palette": "Abrir paleta de comandos",
+    "newTransaction": "Nuevo movimiento",
+    "goDashboard": "Ir al inicio",
+    "goLedger": "Ir a movimientos",
+    "goBudgets": "Ir a presupuestos",
+    "goGoals": "Ir a metas",
+    "goReports": "Ir a informes",
+    "goSettings": "Ir a ajustes",
+    "showHelp": "Mostrar este diálogo"
   },
   "charts": {
     "empty": "Nada que graficar en este periodo",
@@ -397,7 +459,7 @@
     "signInPrompt": "Entra o crea una cuenta para aceptar esta invitación."
   },
   "errors": {
-    "title": "Algo ha fallado",
+    "title": "No se pudo cargar esta página",
     "description": "Ha ocurrido un error inesperado. Puedes reintentar o volver al inicio.",
     "notFoundTitle": "Página no encontrada",
     "notFoundDescription": "La ruta que buscas no existe o ha cambiado."

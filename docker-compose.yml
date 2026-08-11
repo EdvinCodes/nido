@@ -1,0 +1,27 @@
+# Self-hosted Nido — Next.js app + local Supabase (via CLI).
+#
+# Quick start:
+#   1. cp .env.example .env.local && fill in keys from `pnpm db:start`
+#   2. pnpm db:start && pnpm db:reset
+#   3. docker compose up --build
+#
+# Supabase runs through the Supabase CLI (Docker under the hood). This compose file
+# builds and serves the Next.js standalone image, pointing at Supabase on the host.
+
+services:
+  nido:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_STANDALONE: 'true'
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.local
+    environment:
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://host.docker.internal:54321
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on: []

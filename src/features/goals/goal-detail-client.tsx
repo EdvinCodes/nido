@@ -146,7 +146,9 @@ export function GoalDetailClient({
 
           {detail.projection.requiredMonthlyMinor !== null ? (
             <p
-              className={detail.projection.onPace ? 'text-sm text-accent' : 'text-sm text-warning'}
+              className={
+                detail.projection.onPace ? 'text-sm text-accent' : 'text-sm text-warning-text'
+              }
             >
               {t('pace', {
                 need: formatMoney(money(detail.projection.requiredMonthlyMinor, detail.currency), {

@@ -1,6 +1,59 @@
+import type { Metadata } from 'next';
+import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { MarketingFooter } from '@/components/marketing/marketing-footer';
+import { MarketingHeader } from '@/components/marketing/marketing-header';
+import { locales } from '@/i18n/locales';
 
-/** Marketing shell. Display font is loaded once on the root layout. */
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('metadata');
+  const locale = await getLocale();
+
+  return {
+    title: { default: t('title'), template: `%s · ${t('title')}` },
+    description: t('description'),
+    metadataBase: new URL(appUrl),
+    alternates: {
+      canonical: '/',
+      languages: Object.fromEntries(locales.map((loc) => [loc, `/${loc === locale ? '' : ''}`])),
+    },
+    openGraph: {
+      type: 'website',
+      locale,
+      siteName: 'Nido',
+      title: t('title'),
+      description: t('description'),
+    },
+  };
+}
+
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  return <div className="flex flex-1 flex-col">{children}</div>;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Nido',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    description:
+      'Collaborative household finance — shared expenses, fair splits, budgets, and reports.',
+    url: appUrl,
+    license: 'https://opensource.org/licenses/MIT',
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="flex min-h-full flex-1 flex-col">
+        <MarketingHeader />
+        <main className="flex flex-1 flex-col">{children}</main>
+        <MarketingFooter />
+      </div>
+    </>
+  );
 }

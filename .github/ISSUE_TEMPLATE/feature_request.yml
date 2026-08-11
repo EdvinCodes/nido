@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest an improvement
+title: '[Feature]: '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What household finance problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: checkboxes
+    id: phase
+    attributes:
+      label: Phase alignment
+      description: Check if this belongs to a planned phase in docs/phases/
+      options:
+        - label: I checked docs/phases/ and BACKLOG.md

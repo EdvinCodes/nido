@@ -43,6 +43,8 @@ const transactionFields = {
   participants: z.array(splitParticipantSchema).default([]),
   tagIds: z.array(z.uuid()).default([]),
   isPending: z.boolean().optional(),
+  baseRate: z.number().positive().optional(),
+  baseRateManual: z.boolean().optional(),
 } as const;
 
 function refineShape(

@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { Amount } from '@/components/money/amount';
+import { ConvertedAmount } from '@/components/money/converted-amount';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { can, type MemberRole } from '@/lib/auth';
@@ -33,12 +34,16 @@ import type { AccountRow } from '@/features/transactions/types';
 function SortableRow({
   account,
   balanceMinor,
+  baseCurrency,
+  baseEquivalent,
   canEdit,
   onRename,
   onArchive,
 }: {
   account: AccountRow;
   balanceMinor: number | null;
+  baseCurrency: string;
+  baseEquivalent?: { baseMinor: number; rate: number; asOf: string };
   canEdit: boolean;
   onRename: (name: string) => void;
   onArchive: () => void;
@@ -87,6 +92,20 @@ function SortableRow({
             <>
               {' · '}
               <Amount minor={balanceMinor} currency={account.currency} className="inline text-xs" />
+              {account.currency !== baseCurrency && baseEquivalent ? (
+                <>
+                  {' · '}
+                  <ConvertedAmount
+                    baseMinor={baseEquivalent.baseMinor}
+                    baseCurrency={baseCurrency}
+                    originalMinor={balanceMinor}
+                    originalCurrency={account.currency}
+                    baseRate={baseEquivalent.rate}
+                    rateAsOf={baseEquivalent.asOf}
+                    className="inline text-xs text-muted-foreground"
+                  />
+                </>
+              ) : null}
             </>
           ) : null}
         </p>
@@ -105,11 +124,15 @@ export function AccountsManager({
   role,
   initial,
   balances,
+  baseCurrency,
+  baseBalances,
 }: {
   spaceId: string;
   role: MemberRole;
   initial: AccountRow[];
   balances: Record<string, number>;
+  baseCurrency: string;
+  baseBalances: Record<string, { baseMinor: number; rate: number; asOf: string }>;
 }) {
   const t = useTranslations('accounts');
   const [items, setItems] = useState(initial);
@@ -190,6 +213,8 @@ export function AccountsManager({
                 key={account.id}
                 account={account}
                 balanceMinor={balances[account.id] ?? null}
+                baseCurrency={baseCurrency}
+                {...(baseBalances[account.id] ? { baseEquivalent: baseBalances[account.id] } : {})}
                 canEdit={canEdit}
                 onRename={(name) => {
                   startTransition(async () => {

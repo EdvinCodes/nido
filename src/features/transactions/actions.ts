@@ -56,6 +56,10 @@ function toRpcPayload(
   };
   if (input.currency !== undefined) payload.currency = input.currency;
   if (input.isPending !== undefined) payload.is_pending = input.isPending;
+  if (input.baseRateManual) {
+    payload.base_rate_manual = true;
+    if (input.baseRate !== undefined) payload.base_rate = input.baseRate;
+  }
   return payload;
 }
 

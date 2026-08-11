@@ -126,4 +126,6 @@ export type TransactionRpcPayload = {
   tag_ids?: string[];
   is_pending?: boolean;
   occurred_at?: string | null;
+  base_rate?: number;
+  base_rate_manual?: boolean;
 };

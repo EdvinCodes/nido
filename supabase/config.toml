@@ -409,6 +409,15 @@ verify_jwt = false
 [functions.attachment-purge]
 verify_jwt = false
 
+[functions.fx-refresh]
+verify_jwt = false
+
+[functions.period-close]
+verify_jwt = false
+
+[functions.bank-sync]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

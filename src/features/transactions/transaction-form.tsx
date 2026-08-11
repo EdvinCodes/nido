@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useTransition, type ReactNode } from 'react'
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { AmountInput } from '@/components/money/amount-input';
+import { CurrencySelect } from '@/components/money/currency-select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -69,11 +70,13 @@ export function TransactionComposerHost({
   categories,
   accounts,
   participants,
+  recentCurrencies,
   isAiConfigured,
 }: {
   categories: CategoryOption[];
   accounts: AccountRow[];
   participants: SplitEditorParticipant[];
+  recentCurrencies: string[];
   isAiConfigured: boolean;
 }) {
   const { mode, close } = useTransactionComposer();
@@ -86,6 +89,7 @@ export function TransactionComposerHost({
       categories={categories}
       accounts={accounts}
       participants={participants}
+      recentCurrencies={recentCurrencies}
       onDone={close}
       scanMode={scanMode}
       isAiConfigured={isAiConfigured}
@@ -151,6 +155,7 @@ function TransactionForm({
   categories,
   accounts,
   participants,
+  recentCurrencies,
   onDone,
   scanMode = false,
   isAiConfigured = false,
@@ -158,6 +163,7 @@ function TransactionForm({
   categories: CategoryOption[];
   accounts: AccountRow[];
   participants: SplitEditorParticipant[];
+  recentCurrencies: string[];
   onDone: () => void;
   scanMode?: boolean;
   isAiConfigured?: boolean;
@@ -184,6 +190,9 @@ function TransactionForm({
 
   const [kind, setKind] = useState<'expense' | 'income' | 'transfer'>('expense');
   const [amountMinor, setAmountMinor] = useState<number | null>(null);
+  const [currency, setCurrency] = useState(space.base_currency);
+  const [manualRate, setManualRate] = useState('');
+  const [useManualRate, setUseManualRate] = useState(false);
   const [categoryId, setCategoryId] = useState<string>('');
   const [bookedOn, setBookedOn] = useState(() => todayIso(space.timezone));
   const [description, setDescription] = useState('');
@@ -295,7 +304,7 @@ function TransactionForm({
       userId,
       kind,
       amountMinor,
-      currency: space.base_currency,
+      currency,
       bookedOn,
       description: description || merchant || t(`kind.${kind}`),
       merchant,
@@ -316,11 +325,14 @@ function TransactionForm({
         requestId: crypto.randomUUID(),
         kind,
         amountMinor,
-        currency: space.base_currency,
+        currency,
         bookedOn,
         description: description || undefined,
         merchant: merchant || null,
         notes: notes || null,
+        ...(useManualRate && manualRate
+          ? { baseRateManual: true, baseRate: Number(manualRate) }
+          : {}),
         categoryId: kind === 'transfer' ? null : categoryId || null,
         accountId: accountId || null,
         toAccountId: kind === 'transfer' ? toAccountId || null : null,
@@ -406,20 +418,55 @@ function TransactionForm({
         <Label htmlFor="tx-amount">
           <SuggestedLabel suggested={suggestedFields.amount}>{t('amount')}</SuggestedLabel>
         </Label>
-        <AmountInput
-          id="tx-amount"
-          currency={space.base_currency}
-          locale={locale}
-          valueMinor={amountMinor}
-          onValueChange={(value) => {
-            clearSuggestions();
-            setAmountMinor(value);
-            setSuggestedFields((prev) => ({ ...prev, amount: false }));
-          }}
-          aria-label={t('amount')}
-          className={cn(suggestedFields.amount && 'ring-1 ring-primary/40')}
-        />
+        <div className="flex gap-2">
+          <AmountInput
+            id="tx-amount"
+            currency={currency}
+            locale={locale}
+            valueMinor={amountMinor}
+            onValueChange={(value) => {
+              clearSuggestions();
+              setAmountMinor(value);
+              setSuggestedFields((prev) => ({ ...prev, amount: false }));
+            }}
+            aria-label={t('amount')}
+            className={cn('flex-1', suggestedFields.amount && 'ring-1 ring-primary/40')}
+          />
+          <CurrencySelect
+            value={currency}
+            onValueChange={setCurrency}
+            baseCurrency={space.base_currency}
+            recentCurrencies={recentCurrencies}
+            className="w-[110px]"
+          />
+        </div>
       </div>
+
+      {currency !== space.base_currency ? (
+        <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-raised p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={useManualRate}
+              onChange={(e) => {
+                setUseManualRate(e.target.checked);
+              }}
+            />
+            {t('manualRate')}
+          </label>
+          {useManualRate ? (
+            <Input
+              inputMode="decimal"
+              placeholder={t('manualRatePlaceholder')}
+              value={manualRate}
+              onChange={(e) => {
+                setManualRate(e.target.value);
+              }}
+              aria-label={t('manualRate')}
+            />
+          ) : null}
+        </div>
+      ) : null}
 
       {kind !== 'transfer' ? (
         <div className="flex flex-col gap-1.5">

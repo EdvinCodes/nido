@@ -12,6 +12,7 @@ export const notificationKindSchema = z.enum([
   'import_finished',
   'bank_sync_failed',
   'insight',
+  'period_close',
 ]);
 
 export const markReadSchema = z.object({

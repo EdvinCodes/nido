@@ -451,6 +451,8 @@
     "exactAmount": "Importe exacto (céntimos)",
     "giveRest": "Dar el resto",
     "created": "Movimiento guardado",
+    "manualRate": "Tipo de cambio manual",
+    "manualRatePlaceholder": "Tipo hacia la moneda base",
     "deleted": "Movimiento eliminado",
     "duplicated": "Movimiento duplicado",
     "restored": "Movimiento restaurado",
@@ -843,6 +845,51 @@
       "enableStep3": "Redespliega y vuelve aquí para conectar cuentas",
       "csvFallback": "Mientras tanto, usa Importar para subir extractos manualmente.",
       "goImport": "Ir a Importar"
+    }
+  },
+
+  "currency": {
+    "selectLabel": "Moneda",
+    "pinned": "Recientes y base",
+    "all": "Todas las monedas",
+    "base": "base"
+  },
+
+  "reports": {
+    "title": "Informes",
+    "subtitle": "Cierres mensuales y tendencias del hogar",
+    "compare": "Comparar periodos",
+    "compareTitle": "Comparar dos periodos",
+    "compareRun": "Comparar",
+    "periodA": "Periodo A",
+    "periodB": "Periodo B",
+    "back": "Volver a informes",
+    "savingsRate": "Tasa de ahorro",
+    "savingsRateTrend": "Tasa de ahorro en el tiempo",
+    "closedPeriods": "Periodos cerrados",
+    "empty": "Aún no hay cierres. Aparecerán tras el primer cierre mensual.",
+    "exportPdf": "Exportar PDF",
+    "exportXlsx": "Exportar Excel",
+    "exportCsv": "Exportar CSV",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "net": "Neto",
+    "topChanges": "Mayores cambios vs periodo anterior",
+    "budgetPerformance": "Rendimiento de presupuestos",
+    "categoryImpact": "Impacto por categoría",
+    "noDrivers": "Sin cambios significativos por categoría."
+  },
+
+  "settings": {
+    "space": {
+      "title": "Ajustes del espacio",
+      "baseCurrency": "Moneda base",
+      "saveBaseCurrency": "Cambiar moneda base",
+      "confirmBaseCurrencyTitle": "¿Recalcular todas las cifras históricas?",
+      "confirmBaseCurrencyBody": "Cada movimiento se convertirá a la nueva moneda base con el tipo del día. No se puede deshacer.",
+      "baseCurrencyUpdated": "Moneda base actualizada",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar"
     }
   }
 }

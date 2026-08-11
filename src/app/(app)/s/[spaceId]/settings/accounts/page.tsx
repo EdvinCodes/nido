@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { AccountsManager } from '@/features/accounts/accounts-manager';
 import { getAccountBalance, listAccounts } from '@/features/accounts/queries';
+import { getAccountBaseBalances } from '@/features/money/queries';
 import { getSpaceForMember } from '@/features/spaces/queries';
 
 export default async function AccountsSettingsPage({
@@ -20,12 +21,21 @@ export default async function AccountsSettingsPage({
     }),
   );
 
+  const baseBalances = await getAccountBaseBalances(
+    accounts,
+    balances,
+    membership.space.base_currency,
+    membership.space.timezone,
+  );
+
   return (
     <AccountsManager
       spaceId={spaceId}
       role={membership.role}
       initial={accounts}
       balances={balances}
+      baseCurrency={membership.space.base_currency}
+      baseBalances={baseBalances}
     />
   );
 }

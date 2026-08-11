@@ -451,6 +451,8 @@
     "exactAmount": "Exact amount (cents)",
     "giveRest": "Give the rest",
     "created": "Transaction saved",
+    "manualRate": "Override exchange rate",
+    "manualRatePlaceholder": "Rate to base currency",
     "deleted": "Transaction deleted",
     "duplicated": "Transaction duplicated",
     "restored": "Transaction restored",
@@ -843,6 +845,51 @@
       "enableStep3": "Redeploy and return here to connect accounts",
       "csvFallback": "Until then, use Import to upload statements manually.",
       "goImport": "Go to Import"
+    }
+  },
+
+  "currency": {
+    "selectLabel": "Currency",
+    "pinned": "Recent & base",
+    "all": "All currencies",
+    "base": "base"
+  },
+
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Monthly closes and household trends",
+    "compare": "Compare periods",
+    "compareTitle": "Compare two periods",
+    "compareRun": "Compare",
+    "periodA": "Period A",
+    "periodB": "Period B",
+    "back": "Back to reports",
+    "savingsRate": "Savings rate",
+    "savingsRateTrend": "Savings rate over time",
+    "closedPeriods": "Closed periods",
+    "empty": "No closed periods yet. They appear after the first monthly close.",
+    "exportPdf": "Export PDF",
+    "exportXlsx": "Export Excel",
+    "exportCsv": "Export CSV",
+    "income": "Income",
+    "expenses": "Expenses",
+    "net": "Net",
+    "topChanges": "Largest changes vs previous period",
+    "budgetPerformance": "Budget performance",
+    "categoryImpact": "Category impact",
+    "noDrivers": "No significant category changes."
+  },
+
+  "settings": {
+    "space": {
+      "title": "Space settings",
+      "baseCurrency": "Base currency",
+      "saveBaseCurrency": "Change base currency",
+      "confirmBaseCurrencyTitle": "Recompute all historical figures?",
+      "confirmBaseCurrencyBody": "Every transaction will be converted to the new base currency using the rate on its date. This cannot be undone.",
+      "baseCurrencyUpdated": "Base currency updated",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
     }
   }
 }

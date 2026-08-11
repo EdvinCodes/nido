@@ -8,6 +8,7 @@ import { SpaceProvider } from '@/features/spaces/space-context';
 import { TransactionComposerProvider } from '@/features/transactions/composer-context';
 import { getActiveParticipants } from '@/features/transactions/queries';
 import { TransactionComposerHost } from '@/features/transactions/transaction-form';
+import { getRecentCurrencies } from '@/features/reports/queries';
 import { getUnreadNotificationCount, listNotifications } from '@/features/notifications/queries';
 import { createClient } from '@/lib/supabase/server';
 
@@ -28,16 +29,25 @@ export default async function SpaceLayout({
     .update({ last_active_space_id: spaceId })
     .eq('id', membership.userId);
 
-  const [spaces, categories, accounts, participants, notifications, unreadCount, aiReady] =
-    await Promise.all([
-      getUserSpaces(),
-      getCategories(spaceId),
-      listAccounts(spaceId),
-      getActiveParticipants(spaceId),
-      listNotifications(spaceId),
-      getUnreadNotificationCount(spaceId),
-      Promise.resolve(isAiConfigured()),
-    ]);
+  const [
+    spaces,
+    categories,
+    accounts,
+    participants,
+    notifications,
+    unreadCount,
+    aiReady,
+    recentCurrencies,
+  ] = await Promise.all([
+    getUserSpaces(),
+    getCategories(spaceId),
+    listAccounts(spaceId),
+    getActiveParticipants(spaceId),
+    listNotifications(spaceId),
+    getUnreadNotificationCount(spaceId),
+    Promise.resolve(isAiConfigured()),
+    getRecentCurrencies(spaceId),
+  ]);
 
   return (
     <SpaceProvider
@@ -79,6 +89,7 @@ export default async function SpaceLayout({
             position: p.position,
           }))}
           isAiConfigured={aiReady}
+          recentCurrencies={recentCurrencies}
         />
       </TransactionComposerProvider>
     </SpaceProvider>

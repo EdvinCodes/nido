@@ -630,6 +630,45 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_rates: {
+        Row: {
+          as_of: string
+          base: string
+          quote: string
+          rate: number
+          source: string
+        }
+        Insert: {
+          as_of: string
+          base: string
+          quote: string
+          rate: number
+          source?: string
+        }
+        Update: {
+          as_of?: string
+          base?: string
+          quote?: string
+          rate?: number
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exchange_rates_base_fkey"
+            columns: ["base"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "exchange_rates_quote_fkey"
+            columns: ["quote"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       goal_contributions: {
         Row: {
           amount_minor: number
@@ -1176,6 +1215,41 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      period_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          period_from: string
+          period_to: string
+          space_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          period_from: string
+          period_to: string
+          space_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          period_from?: string
+          period_to?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "period_snapshots_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
             referencedColumns: ["id"]
           },
         ]
@@ -1904,6 +1978,7 @@ export type Database = {
           amount_minor: number
           base_amount_minor: number
           base_rate: number
+          base_rate_manual: boolean
           booked_on: string
           category_id: string | null
           created_at: string
@@ -1933,6 +2008,7 @@ export type Database = {
           amount_minor: number
           base_amount_minor: number
           base_rate?: number
+          base_rate_manual?: boolean
           booked_on: string
           category_id?: string | null
           created_at?: string
@@ -1962,6 +2038,7 @@ export type Database = {
           amount_minor?: number
           base_amount_minor?: number
           base_rate?: number
+          base_rate_manual?: boolean
           booked_on?: string
           category_id?: string | null
           created_at?: string
@@ -2198,6 +2275,14 @@ export type Database = {
         Returns: string
       }
       _fnv1a64: { Args: { p_input: string }; Returns: string }
+      _fx_rate: {
+        Args: { p_base: unknown; p_on: string; p_quote: unknown }
+        Returns: {
+          as_of: string
+          fallback: boolean
+          rate: number
+        }[]
+      }
       _insert_splits: {
         Args: {
           p_amount_minor: number
@@ -2266,6 +2351,7 @@ export type Database = {
       }
       apply_rule_to_ledger: { Args: { p_rule_id: string }; Returns: number }
       attachment_storage_paths: { Args: { p_id: string }; Returns: Json }
+      backfill_base_amounts: { Args: { p_space_id: string }; Returns: number }
       balance_breakdown: {
         Args: {
           p_from?: string
@@ -2286,6 +2372,10 @@ export type Database = {
       }
       confirm_settlement: {
         Args: { p_amount_minor?: number; p_id: string }
+        Returns: Json
+      }
+      convert: {
+        Args: { p_amount: number; p_from: unknown; p_on: string; p_to: unknown }
         Returns: Json
       }
       create_space: {
@@ -2392,6 +2482,10 @@ export type Database = {
           starts_on: string
         }[]
       }
+      period_snapshot: {
+        Args: { p_from: string; p_space_id: string; p_to: string }
+        Returns: Json
+      }
       propose_settlement: { Args: { p: Json }; Returns: Json }
       purge_stale_attachments: { Args: never; Returns: number }
       recompute_budget_period: {
@@ -2427,6 +2521,7 @@ export type Database = {
       }
       reverse_settlement: { Args: { p_id: string }; Returns: Json }
       run_budget_alerts: { Args: { p_through?: string }; Returns: number }
+      run_period_close_all: { Args: never; Returns: Json }
       run_recurring_all: { Args: { p_today?: string }; Returns: Json }
       run_recurring_for_space: {
         Args: { p_space_id: string; p_today?: string }
@@ -2459,6 +2554,10 @@ export type Database = {
         }
         Returns: Json
       }
+      store_period_snapshot: {
+        Args: { p_from: string; p_space_id: string; p_to: string }
+        Returns: string
+      }
       suggest_budgets: { Args: { p_space_id: string }; Returns: Json }
       transaction_fingerprint: {
         Args: {
@@ -2473,7 +2572,12 @@ export type Database = {
         Returns: string
       }
       undo_import: { Args: { p_batch_id: string }; Returns: Json }
+      update_space_base_currency: {
+        Args: { p_base_currency: unknown; p_space_id: string }
+        Returns: undefined
+      }
       update_transaction: { Args: { p: Json; p_id: string }; Returns: Json }
+      upsert_exchange_rates: { Args: { p_rates: Json }; Returns: number }
     }
     Enums: {
       account_kind:
@@ -2506,6 +2610,7 @@ export type Database = {
         | "import_finished"
         | "bank_sync_failed"
         | "insight"
+        | "period_close"
       recurrence_freq: "day" | "week" | "month" | "year"
       recurring_kind: "subscription" | "bill" | "income" | "transfer"
       space_kind: "solo" | "couple" | "shared"
@@ -2663,6 +2768,7 @@ export const Constants = {
         "import_finished",
         "bank_sync_failed",
         "insight",
+        "period_close",
       ],
       recurrence_freq: ["day", "week", "month", "year"],
       recurring_kind: ["subscription", "bill", "income", "transfer"],

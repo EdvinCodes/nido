@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: true },
   { key: 'balances', href: '/balances', icon: Scale, ready: true },
   { key: 'subscriptions', href: '/subscriptions', icon: Repeat, ready: true },
-  { key: 'reports', href: '/reports', icon: BarChart3, ready: false },
+  { key: 'reports', href: '/reports', icon: BarChart3, ready: true },
   { key: 'assistant', href: '/assistant', icon: Bot, ready: false },
   { key: 'settings', href: '/settings/members', icon: Settings, ready: true },
 ] as const;

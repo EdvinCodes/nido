@@ -58,23 +58,7 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
   }
 
   if (filters.hasAttachment) {
-    const { data: attached, error: attError } = await supabase
-      .from('attachments')
-      .select('transaction_id')
-      .eq('space_id', parsed.spaceId)
-      .not('transaction_id', 'is', null);
-    if (attError) throw new Error(attError.message);
-    const ids = [
-      ...new Set(
-        attached
-          .map((row) => row.transaction_id)
-          .filter((id): id is string => typeof id === 'string'),
-      ),
-    ];
-    if (ids.length === 0) {
-      return { rows: [], nextCursor: null };
-    }
-    query = query.in('id', ids);
+    query = query.gt('attachment_count', 0);
   }
 
   if (filters.tagIds?.length) {

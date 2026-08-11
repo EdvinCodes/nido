@@ -40,6 +40,7 @@ export function AppShell({
   spaceKind,
   notifications,
   unreadCount,
+  isAiConfigured = false,
 }: {
   children: ReactNode;
   spaceId: string;
@@ -49,6 +50,7 @@ export function AppShell({
   spaceKind: string;
   notifications: NotificationRow[];
   unreadCount: number;
+  isAiConfigured?: boolean;
 }) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
@@ -78,8 +80,8 @@ export function AppShell({
           {isDesktop === false ? bell : null}
         </div>
         {children}
-        <MobileTabBar activePath={pathname} spaceId={spaceId} />
-        <CommandPalette spaceId={spaceId} />
+        <MobileTabBar activePath={pathname} spaceId={spaceId} isAiConfigured={isAiConfigured} />
+        <CommandPalette spaceId={spaceId} isAiConfigured={isAiConfigured} />
       </div>
     </div>
   );

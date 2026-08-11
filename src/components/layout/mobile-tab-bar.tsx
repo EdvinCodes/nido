@@ -2,15 +2,29 @@
 
 import { LayoutDashboard, MoreHorizontal, PiggyBank, Plus, Receipt } from 'lucide-react';
 import Link from 'next/link';
+import { useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
 import { useTransactionComposerOptional } from '@/features/transactions/composer-context';
 
-export function MobileTabBar({ activePath, spaceId }: { activePath: string; spaceId: string }) {
+const LONG_PRESS_MS = 480;
+
+export function MobileTabBar({
+  activePath,
+  spaceId,
+  isAiConfigured = false,
+}: {
+  activePath: string;
+  spaceId: string;
+  isAiConfigured?: boolean;
+}) {
   const t = useTranslations('nav');
+  const tAttachments = useTranslations('attachments');
   const base = `/s/${spaceId}`;
   const composer = useTransactionComposerOptional();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);
 
   const tabs = [
     { key: 'dashboard' as const, href: base, icon: LayoutDashboard, primary: false, ready: true },
@@ -32,6 +46,13 @@ export function MobileTabBar({ activePath, spaceId }: { activePath: string; spac
     },
   ];
 
+  function clearLongPress(): void {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }
+
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 flex items-end justify-around border-t border-border bg-background/95 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
@@ -46,10 +67,24 @@ export function MobileTabBar({ activePath, spaceId }: { activePath: string; spac
               key={key}
               type="button"
               className="-mt-5 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-float"
-              aria-label={t(key)}
-              onClick={() => {
+              aria-label={isAiConfigured ? tAttachments('fabLabelWithScan') : t(key)}
+              onPointerDown={() => {
+                didLongPress.current = false;
+                clearLongPress();
+                if (isAiConfigured) {
+                  longPressTimer.current = setTimeout(() => {
+                    didLongPress.current = true;
+                    composer?.openScanReceipt();
+                  }, LONG_PRESS_MS);
+                }
+              }}
+              onPointerUp={() => {
+                clearLongPress();
+                if (didLongPress.current) return;
                 composer?.openCreate();
               }}
+              onPointerLeave={clearLongPress}
+              onPointerCancel={clearLongPress}
             >
               <Icon className="size-6" aria-hidden />
             </button>

@@ -3,13 +3,14 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { TransactionView } from '@/features/transactions/types';
 
-type ComposerMode = 'closed' | 'create' | 'edit';
+type ComposerMode = 'closed' | 'create' | 'edit' | 'scan';
 
 type ComposerState = {
   mode: ComposerMode;
   transactionId: string | null;
   optimisticTransaction: TransactionView | null;
   openCreate: () => void;
+  openScanReceipt: () => void;
   openEdit: (transactionId: string) => void;
   close: () => void;
   insertOptimistic: (tx: TransactionView) => void;
@@ -26,6 +27,11 @@ export function TransactionComposerProvider({ children }: { children: ReactNode 
   const openCreate = useCallback(() => {
     setTransactionId(null);
     setMode('create');
+  }, []);
+
+  const openScanReceipt = useCallback(() => {
+    setTransactionId(null);
+    setMode('scan');
   }, []);
 
   const openEdit = useCallback((id: string) => {
@@ -52,6 +58,7 @@ export function TransactionComposerProvider({ children }: { children: ReactNode 
       transactionId,
       optimisticTransaction,
       openCreate,
+      openScanReceipt,
       openEdit,
       close,
       insertOptimistic,
@@ -62,6 +69,7 @@ export function TransactionComposerProvider({ children }: { children: ReactNode 
       transactionId,
       optimisticTransaction,
       openCreate,
+      openScanReceipt,
       openEdit,
       close,
       insertOptimistic,

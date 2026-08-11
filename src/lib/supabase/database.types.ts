@@ -1701,6 +1701,7 @@ export type Database = {
           account_id: string | null
           account_name: string | null
           amount_minor: number | null
+          attachment_count: number | null
           base_amount_minor: number | null
           base_rate: number | null
           booked_on: string | null

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
+import { isAiConfigured } from '@/lib/ai/is-configured';
 import { listAccounts } from '@/features/accounts/queries';
 import { getCategories, getSpaceForMember, getUserSpaces } from '@/features/spaces/queries';
 import { SpaceProvider } from '@/features/spaces/space-context';
@@ -27,7 +28,7 @@ export default async function SpaceLayout({
     .update({ last_active_space_id: spaceId })
     .eq('id', membership.userId);
 
-  const [spaces, categories, accounts, participants, notifications, unreadCount] =
+  const [spaces, categories, accounts, participants, notifications, unreadCount, aiReady] =
     await Promise.all([
       getUserSpaces(),
       getCategories(spaceId),
@@ -35,6 +36,7 @@ export default async function SpaceLayout({
       getActiveParticipants(spaceId),
       listNotifications(spaceId),
       getUnreadNotificationCount(spaceId),
+      Promise.resolve(isAiConfigured()),
     ]);
 
   return (
@@ -56,6 +58,7 @@ export default async function SpaceLayout({
           spaceKind={membership.space.kind}
           notifications={notifications}
           unreadCount={unreadCount}
+          isAiConfigured={aiReady}
         >
           {children}
         </AppShell>
@@ -75,6 +78,7 @@ export default async function SpaceLayout({
             color: p.color,
             position: p.position,
           }))}
+          isAiConfigured={aiReady}
         />
       </TransactionComposerProvider>
     </SpaceProvider>

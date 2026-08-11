@@ -400,6 +400,15 @@ verify_jwt = false
 [functions.recurring-run]
 verify_jwt = false
 
+[functions.receipt-process]
+verify_jwt = false
+
+[functions.receipt-extract]
+verify_jwt = false
+
+[functions.attachment-purge]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

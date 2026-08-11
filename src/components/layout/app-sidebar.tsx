@@ -4,6 +4,7 @@ import {
   BarChart3,
   Bot,
   CircleDollarSign,
+  Images,
   LayoutDashboard,
   PiggyBank,
   Receipt,
@@ -25,6 +26,7 @@ type SpaceList = Awaited<ReturnType<typeof getUserSpaces>>;
 const NAV_ITEMS = [
   { key: 'dashboard', href: '', icon: LayoutDashboard, ready: true },
   { key: 'ledger', href: '/ledger', icon: Receipt, ready: true },
+  { key: 'receipts', href: '/receipts', icon: Images, ready: true },
   { key: 'budgets', href: '/budgets', icon: PiggyBank, ready: true },
   { key: 'goals', href: '/goals', icon: CircleDollarSign, ready: true },
   { key: 'balances', href: '/balances', icon: Scale, ready: true },

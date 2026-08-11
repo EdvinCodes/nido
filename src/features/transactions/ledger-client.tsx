@@ -22,6 +22,9 @@ import {
   duplicateTransaction,
   restoreTransaction,
 } from '@/features/transactions/actions';
+import { listTransactionAttachments } from '@/features/attachments/actions';
+import { AttachmentGallery } from '@/features/attachments/attachment-gallery';
+import type { AttachmentRow } from '@/features/attachments/queries';
 import { useInfiniteTransactions } from '@/features/transactions/hooks';
 import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
@@ -80,9 +83,29 @@ export function LedgerClient({
   const { space, participantId } = useSpaceContext();
   const composer = useTransactionComposerOptional();
   const [detail, setDetail] = useState<TransactionView | null>(null);
+  const [detailAttachments, setDetailAttachments] = useState<AttachmentRow[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [pending, startTransition] = useTransition();
   const selectionMode = selectedIds.size > 0;
+
+  useEffect(() => {
+    if (!detail) {
+      setDetailAttachments([]);
+      return;
+    }
+    let cancelled = false;
+    void listTransactionAttachments({
+      spaceId,
+      transactionId: detail.id,
+    }).then((result) => {
+      if (!cancelled && result.ok) {
+        setDetailAttachments(result.data);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [detail, spaceId]);
 
   const [urlState, setUrlState] = useQueryStates({
     q: parseAsString.withDefault(''),
@@ -414,6 +437,7 @@ export function LedgerClient({
           <button
             type="button"
             aria-pressed={urlState.attached}
+            data-testid="filter-has-attachment"
             className={filterChipClass(urlState.attached)}
             onClick={() => {
               void setUrlState({ attached: !urlState.attached });
@@ -616,6 +640,11 @@ export function LedgerClient({
                     </div>
                   )
                 ) : null}
+                <AttachmentGallery
+                  spaceId={spaceId}
+                  transactionId={detail.id}
+                  attachments={detailAttachments}
+                />
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Button
                     type="button"

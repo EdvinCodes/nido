@@ -3,6 +3,7 @@
 import { Command } from 'cmdk';
 import {
   ArrowLeftRight,
+  Camera,
   LayoutDashboard,
   Plus,
   Receipt,
@@ -21,7 +22,13 @@ import { useTransactionComposerOptional } from '@/features/transactions/composer
 import { formatMoney, money } from '@/lib/money';
 import { route } from '@/lib/routes';
 
-export function CommandPalette({ spaceId }: { spaceId: string }) {
+export function CommandPalette({
+  spaceId,
+  isAiConfigured = false,
+}: {
+  spaceId: string;
+  isAiConfigured?: boolean;
+}) {
   const t = useTranslations('commandPalette');
   const tNav = useTranslations('nav');
   const locale = useLocale();
@@ -155,6 +162,21 @@ export function CommandPalette({ spaceId }: { spaceId: string }) {
                 <ArrowLeftRight className="size-4 shrink-0" aria-hidden />
                 {t('addIncome')}
               </Command.Item>
+              {isAiConfigured ? (
+                <Command.Item
+                  value={`${t('addFromReceipt')} receipt scan`}
+                  onSelect={() => {
+                    setOpen(false);
+                    setQuery('');
+                    setHits([]);
+                    composer?.openScanReceipt();
+                  }}
+                  className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground aria-selected:bg-surface-raised"
+                >
+                  <Camera className="size-4 shrink-0" aria-hidden />
+                  {t('addFromReceipt')}
+                </Command.Item>
+              ) : null}
             </Command.Group>
 
             <Command.Group heading={t('navigate')} className="mt-2 text-xs text-muted-foreground">
@@ -177,6 +199,16 @@ export function CommandPalette({ spaceId }: { spaceId: string }) {
               >
                 <Receipt className="size-4 shrink-0" aria-hidden />
                 {tNav('ledger')}
+              </Command.Item>
+              <Command.Item
+                value={tNav('receipts')}
+                onSelect={() => {
+                  go(`/s/${spaceId}/receipts`);
+                }}
+                className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground aria-selected:bg-surface-raised"
+              >
+                <Receipt className="size-4 shrink-0" aria-hidden />
+                {tNav('receipts')}
               </Command.Item>
               {space.kind !== 'solo' ? (
                 <Command.Item

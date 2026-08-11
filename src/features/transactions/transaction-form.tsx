@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { Sparkles } from 'lucide-react';
+import { useMemo, useRef, useState, useTransition, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { AmountInput } from '@/components/money/amount-input';
@@ -16,8 +17,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { linkAttachment } from '@/features/attachments/actions';
-import { AttachmentPicker } from '@/features/attachments/attachment-picker';
+import {
+  AttachmentPicker,
+  type AttachmentPickerHandle,
+} from '@/features/attachments/attachment-picker';
+import { invokeReceiptExtract } from '@/features/attachments/lib/invoke-extract';
+import { pollReceiptExtraction } from '@/features/attachments/lib/poll-ocr';
 import { createTransaction } from '@/features/transactions/actions';
 import { useTransactionComposer } from '@/features/transactions/composer-context';
 import { buildOptimisticTransaction } from '@/features/transactions/lib/build-optimistic-transaction';
@@ -30,6 +35,7 @@ import { useMediaQuery } from '@/lib/use-media-query';
 import type { AccountRow } from '@/features/transactions/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { transactionsQueryKey } from '@/features/transactions/hooks';
+import { cn } from '@/lib/utils';
 
 type CategoryOption = {
   id: string;
@@ -63,13 +69,16 @@ export function TransactionComposerHost({
   categories,
   accounts,
   participants,
+  isAiConfigured,
 }: {
   categories: CategoryOption[];
   accounts: AccountRow[];
   participants: SplitEditorParticipant[];
+  isAiConfigured: boolean;
 }) {
   const { mode, close } = useTransactionComposer();
-  const open = mode === 'create';
+  const open = mode === 'create' || mode === 'scan';
+  const scanMode = mode === 'scan';
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   const form = (
@@ -78,6 +87,8 @@ export function TransactionComposerHost({
       accounts={accounts}
       participants={participants}
       onDone={close}
+      scanMode={scanMode}
+      isAiConfigured={isAiConfigured}
     />
   );
 
@@ -92,7 +103,7 @@ export function TransactionComposerHost({
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              <ComposerTitle />
+              <ComposerTitle scanMode={scanMode} />
             </DialogTitle>
           </DialogHeader>
           {form}
@@ -111,7 +122,7 @@ export function TransactionComposerHost({
       <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-xl">
         <SheetHeader>
           <SheetTitle>
-            <ComposerTitle />
+            <ComposerTitle scanMode={scanMode} />
           </SheetTitle>
         </SheetHeader>
         <div className="px-1 pb-6">{form}</div>
@@ -120,9 +131,20 @@ export function TransactionComposerHost({
   );
 }
 
-function ComposerTitle() {
+function ComposerTitle({ scanMode }: { scanMode: boolean }) {
   const t = useTranslations('transactions');
-  return <>{t('addTitle')}</>;
+  const tAttachments = useTranslations('attachments');
+  return <>{scanMode ? tAttachments('scanTitle') : t('addTitle')}</>;
+}
+
+function SuggestedLabel({ children, suggested }: { children: ReactNode; suggested?: boolean }) {
+  if (!suggested) return <>{children}</>;
+  return (
+    <span className="inline-flex items-center gap-1">
+      {children}
+      <Sparkles className="size-3 text-primary" aria-hidden />
+    </span>
+  );
 }
 
 function TransactionForm({
@@ -130,19 +152,25 @@ function TransactionForm({
   accounts,
   participants,
   onDone,
+  scanMode = false,
+  isAiConfigured = false,
 }: {
   categories: CategoryOption[];
   accounts: AccountRow[];
   participants: SplitEditorParticipant[];
   onDone: () => void;
+  scanMode?: boolean;
+  isAiConfigured?: boolean;
 }) {
   const t = useTranslations('transactions');
+  const tAttachments = useTranslations('attachments');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const { space, participantId, userId } = useSpaceContext();
   const { insertOptimistic, clearOptimistic } = useTransactionComposer();
   const queryClient = useQueryClient();
   const [pending, startTransition] = useTransition();
+  const pickerRef = useRef<AttachmentPickerHandle>(null);
 
   const defaultSplit: SplitMode = space.kind === 'solo' ? 'personal' : 'equal';
   const defaultSelected: SplitParticipantInput[] =
@@ -166,8 +194,15 @@ function TransactionForm({
   const [payerId, setPayerId] = useState(participantId);
   const [splitMode, setSplitMode] = useState<SplitMode>(defaultSplit);
   const [selected, setSelected] = useState<SplitParticipantInput[]>(defaultSelected);
-  const [advanced, setAdvanced] = useState(false);
-  const [attachmentIds, setAttachmentIds] = useState<string[]>([]);
+  const [advanced, setAdvanced] = useState(scanMode);
+  const [extracting, setExtracting] = useState(false);
+  const [hasSuggestions, setHasSuggestions] = useState(false);
+  const [suggestedFields, setSuggestedFields] = useState({
+    amount: false,
+    category: false,
+    bookedOn: false,
+    merchant: false,
+  });
 
   const filteredCategories = useMemo(
     () =>
@@ -191,6 +226,59 @@ function TransactionForm({
     (kind === 'transfer'
       ? Boolean(accountId && toAccountId && accountId !== toAccountId)
       : Boolean(categoryId && payerId && splitOk));
+
+  function clearSuggestions(): void {
+    setHasSuggestions(false);
+    setSuggestedFields({
+      amount: false,
+      category: false,
+      bookedOn: false,
+      merchant: false,
+    });
+  }
+
+  async function runExtraction(attachmentId: string): Promise<void> {
+    if (!isAiConfigured) return;
+    setExtracting(true);
+    try {
+      await invokeReceiptExtract({
+        attachmentId,
+        categories: categories.map((c) => ({ id: c.id, name: c.name })),
+      });
+      const result = await pollReceiptExtraction(attachmentId);
+      if (!result) return;
+
+      const nextSuggested = {
+        amount: false,
+        category: false,
+        bookedOn: false,
+        merchant: false,
+      };
+
+      if (result.total_minor != null) {
+        setAmountMinor(result.total_minor);
+        nextSuggested.amount = true;
+      }
+      if (result.booked_on) {
+        setBookedOn(result.booked_on);
+        nextSuggested.bookedOn = true;
+      }
+      if (result.merchant) {
+        setMerchant(result.merchant);
+        setAdvanced(true);
+        nextSuggested.merchant = true;
+      }
+      if (result.category_id) {
+        setCategoryId(result.category_id);
+        nextSuggested.category = true;
+      }
+
+      setSuggestedFields(nextSuggested);
+      setHasSuggestions(Object.values(nextSuggested).some(Boolean));
+    } finally {
+      setExtracting(false);
+    }
+  }
 
   function save(): void {
     if (amountMinor == null || amountMinor <= 0) return;
@@ -262,15 +350,7 @@ function TransactionForm({
       }
 
       const txId = result.data.id;
-      await Promise.all(
-        attachmentIds.map((attachmentId) =>
-          linkAttachment({
-            spaceId: space.id,
-            attachmentId,
-            transactionId: txId,
-          }),
-        ),
-      );
+      await pickerRef.current?.linkToTransaction(txId);
 
       toast.success(t('created'));
       await queryClient.invalidateQueries({ queryKey: transactionsQueryKey(space.id, {}) });
@@ -286,39 +366,78 @@ function TransactionForm({
         save();
       }}
     >
-      <div className="flex gap-1">
-        {(['expense', 'income', 'transfer'] as const).map((k) => (
-          <Button
-            key={k}
-            type="button"
-            size="sm"
-            variant={kind === k ? 'default' : 'outline'}
-            onClick={() => {
-              setKind(k);
-            }}
-          >
-            {t(`kind.${k}`)}
-          </Button>
-        ))}
-      </div>
+      {scanMode && isAiConfigured && extracting ? (
+        <p className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-muted-foreground">
+          {tAttachments('extracting')}
+        </p>
+      ) : null}
+
+      {hasSuggestions ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="self-start"
+          onClick={clearSuggestions}
+        >
+          {tAttachments('clearSuggestions')}
+        </Button>
+      ) : null}
+
+      {!scanMode ? (
+        <div className="flex gap-1">
+          {(['expense', 'income', 'transfer'] as const).map((k) => (
+            <Button
+              key={k}
+              type="button"
+              size="sm"
+              variant={kind === k ? 'default' : 'outline'}
+              onClick={() => {
+                setKind(k);
+              }}
+            >
+              {t(`kind.${k}`)}
+            </Button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tx-amount">{t('amount')}</Label>
+        <Label htmlFor="tx-amount">
+          <SuggestedLabel suggested={suggestedFields.amount}>{t('amount')}</SuggestedLabel>
+        </Label>
         <AmountInput
           id="tx-amount"
           currency={space.base_currency}
           locale={locale}
           valueMinor={amountMinor}
-          onValueChange={setAmountMinor}
+          onValueChange={(value) => {
+            clearSuggestions();
+            setAmountMinor(value);
+            setSuggestedFields((prev) => ({ ...prev, amount: false }));
+          }}
           aria-label={t('amount')}
+          className={cn(suggestedFields.amount && 'ring-1 ring-primary/40')}
         />
       </div>
 
       {kind !== 'transfer' ? (
         <div className="flex flex-col gap-1.5">
-          <Label>{t('category')}</Label>
-          <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger aria-label={t('category')}>
+          <Label>
+            <SuggestedLabel suggested={suggestedFields.category}>{t('category')}</SuggestedLabel>
+          </Label>
+          <Select
+            value={categoryId}
+            onValueChange={(value) => {
+              clearSuggestions();
+              setCategoryId(value);
+              setSuggestedFields((prev) => ({ ...prev, category: false }));
+            }}
+          >
+            <SelectTrigger
+              aria-label={t('category')}
+              className={cn(suggestedFields.category && 'ring-1 ring-primary/40')}
+            >
               <SelectValue placeholder={t('categoryPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
@@ -372,6 +491,7 @@ function TransactionForm({
           variant={bookedOn === todayIso(space.timezone) ? 'default' : 'outline'}
           onClick={() => {
             setBookedOn(todayIso(space.timezone));
+            setSuggestedFields((prev) => ({ ...prev, bookedOn: false }));
           }}
         >
           {t('today')}
@@ -382,17 +502,20 @@ function TransactionForm({
           variant="outline"
           onClick={() => {
             setBookedOn(shiftIsoDate(todayIso(space.timezone), -1));
+            setSuggestedFields((prev) => ({ ...prev, bookedOn: false }));
           }}
         >
           {t('yesterday')}
         </Button>
         <Input
           type="date"
-          className="h-8 w-auto"
+          className={cn('h-8 w-auto', suggestedFields.bookedOn && 'ring-1 ring-primary/40')}
           value={bookedOn}
           onChange={(e) => {
             setBookedOn(e.target.value);
+            setSuggestedFields((prev) => ({ ...prev, bookedOn: false }));
           }}
+          aria-label={t('date')}
         />
       </div>
 
@@ -433,14 +556,18 @@ function TransactionForm({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="tx-merchant">{t('merchant')}</Label>
+            <Label htmlFor="tx-merchant">
+              <SuggestedLabel suggested={suggestedFields.merchant}>{t('merchant')}</SuggestedLabel>
+            </Label>
             <Input
               id="tx-merchant"
               value={merchant}
               onChange={(e) => {
                 setMerchant(e.target.value);
+                setSuggestedFields((prev) => ({ ...prev, merchant: false }));
               }}
               maxLength={120}
+              className={cn(suggestedFields.merchant && 'ring-1 ring-primary/40')}
             />
           </div>
           {kind !== 'transfer' ? (
@@ -498,9 +625,16 @@ function TransactionForm({
       ) : null}
 
       <AttachmentPicker
+        ref={pickerRef}
         spaceId={space.id}
-        onAttachmentIdsChange={setAttachmentIds}
         disabled={pending}
+        cameraFirst={scanMode}
+        autoOpen={scanMode}
+        onFirstUploadComplete={(attachmentId) => {
+          if (scanMode && isAiConfigured) {
+            void runExtraction(attachmentId);
+          }
+        }}
       />
 
       <Button type="submit" disabled={!canSave || pending} className="w-full">

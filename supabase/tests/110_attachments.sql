@@ -82,7 +82,7 @@ grant execute on function tests.create_user(text, text) to authenticated, anon, 
 grant execute on function tests.uid(text) to authenticated, anon, service_role;
 grant execute on function tests.authenticate_as(text) to authenticated, anon, service_role;
 
-select plan(7);
+select plan(8);
 
 select tests.create_user('att_alice');
 select tests.create_user('att_outsider');
@@ -205,6 +205,18 @@ select lives_ok(
     current_setting('test.att_space') || '/2026/08/' || gen_random_uuid()::text || '.webp'
   ),
   'member can insert receipt object under space path'
+);
+
+-- Outsider cannot select storage object in alice path.
+select tests.authenticate_as('att_outsider');
+select is(
+  (
+    select count(*)::int from storage.objects
+    where bucket_id = 'receipts'
+      and name = current_setting('test.att_path')
+  ),
+  0,
+  'outsider cannot select receipt object in another space path'
 );
 
 select * from finish();

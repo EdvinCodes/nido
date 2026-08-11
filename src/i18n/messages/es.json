@@ -135,6 +135,8 @@
   "nav": {
     "dashboard": "Inicio",
     "ledger": "Movimientos",
+    "receipts": "Tickets",
+    "storage": "Almacenamiento",
     "budgets": "Presupuestos",
     "goals": "Metas",
     "balances": "Saldos",
@@ -171,7 +173,8 @@
     "untitled": "Sin título",
     "addTransaction": "Añadir movimiento",
     "addExpense": "Añadir gasto",
-    "addIncome": "Añadir ingreso"
+    "addIncome": "Añadir ingreso",
+    "addFromReceipt": "Añadir desde ticket"
   },
   "charts": {
     "empty": "Nada que graficar en este periodo",
@@ -637,10 +640,33 @@
 
   "attachments": {
     "title": "Tickets",
+    "scanTitle": "Escanear ticket",
     "add": "Añadir",
     "remove": "Quitar",
+    "retry": "Reintentar subida",
     "dropHint": "Suelta una foto aquí, pégala del portapapeles o usa la cámara.",
     "sizeCompare": "{before} → {after}",
+    "galleryTitle": "Adjuntos",
+    "viewerTitle": "Visor de ticket",
+    "viewerCounter": "{current} de {total}",
+    "download": "Descargar",
+    "delete": "Eliminar adjunto",
+    "close": "Cerrar visor",
+    "previous": "Adjunto anterior",
+    "next": "Adjunto siguiente",
+    "loading": "Cargando…",
+    "emptyTitle": "Aún no hay tickets",
+    "emptyBody": "Adjunta una foto al registrar un gasto, o escanea un ticket para empezar.",
+    "extracting": "Leyendo tu ticket…",
+    "clearSuggestions": "Borrar sugerencias",
+    "fabLabelWithScan": "Añadir movimiento. Mantén pulsado para escanear un ticket.",
+    "storage": {
+      "title": "Almacenamiento de tickets",
+      "description": "Las fotos de tickets cuentan para la cuota de almacenamiento del espacio.",
+      "ofLimit": "de {limit}",
+      "fileCount": "{count, plural, one {# archivo} other {# archivos}}",
+      "freeTierNote": "El plan gratuito de Supabase incluye 1 GB de almacenamiento para todos los tickets."
+    },
     "errors": {
       "upload": "Error al subir. Inténtalo de nuevo."
     }

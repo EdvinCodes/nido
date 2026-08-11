@@ -118,8 +118,18 @@ Deno.serve(async (req) => {
   }
 
   if (detected === 'application/pdf') {
-    await admin.from('attachments').update({ mime_type: 'application/pdf' }).eq('id', row.id);
-    return new Response(JSON.stringify({ ok: true, mime: 'application/pdf' }), {
+    // PDF first-page rasterisation is not available in the Edge runtime without a
+    // native PDF library. The UI shows a generic document icon when thumb_path is null.
+    await admin
+      .from('attachments')
+      .update({
+        mime_type: 'application/pdf',
+        thumb_path: null,
+        width: null,
+        height: null,
+      })
+      .eq('id', row.id);
+    return new Response(JSON.stringify({ ok: true, mime: 'application/pdf', thumb: false }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }

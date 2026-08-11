@@ -6,6 +6,7 @@ import {
   attachmentIdSchema,
   createAttachmentSchema,
   linkAttachmentSchema,
+  listAttachmentsSchema,
   signedUrlSchema,
 } from './schemas';
 
@@ -13,6 +14,34 @@ function revalidateAttachments(spaceId: string): void {
   revalidatePath(`/s/${spaceId}/ledger`);
   revalidatePath(`/s/${spaceId}/receipts`);
 }
+
+export const listTransactionAttachments = authedAction()
+  .schema(listAttachmentsSchema)
+  .space(({ input }) => input.spaceId)
+  .action(async ({ input, ctx }) => {
+    if (!input.transactionId) {
+      return {
+        ok: false as const,
+        error: { code: 'missing_tx', message: 'transactionId required' },
+      };
+    }
+
+    const { data, error } = await ctx.supabase
+      .from('attachments')
+      .select('*')
+      .eq('space_id', input.spaceId)
+      .eq('transaction_id', input.transactionId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      return {
+        ok: false as const,
+        error: { code: 'attachment_list_failed', message: error.message },
+      };
+    }
+
+    return { ok: true as const, data };
+  });
 
 export const createAttachment = authedAction()
   .schema(createAttachmentSchema)

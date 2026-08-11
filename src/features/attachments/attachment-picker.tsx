@@ -1,12 +1,20 @@
 'use client';
 
-import { Paperclip, X } from 'lucide-react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
+import { Paperclip, RotateCcw, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { cn } from '@/lib/utils';
-import { createAttachment, deleteAttachment } from './actions';
+import { createAttachment, deleteAttachment, linkAttachment } from './actions';
 import { ATTACHMENT_ACCEPT, ATTACHMENT_MAX_PER_TX, isAllowedAttachment } from './lib/compress';
 import { invokeReceiptProcess } from './lib/invoke-process';
 import { uploadReceipt } from './lib/upload';
@@ -20,41 +28,158 @@ type Item = {
   afterBytes?: number;
   error?: string;
   previewUrl?: string;
+  file?: File;
 };
 
-export function AttachmentPicker({
-  spaceId,
-  transactionId,
-  onAttachmentIdsChange,
-  disabled,
-}: {
-  spaceId: string;
-  transactionId?: string | null;
-  onAttachmentIdsChange: (ids: string[]) => void;
-  disabled?: boolean;
-}) {
+export type AttachmentPickerHandle = {
+  /** Completed attachment row ids (upload + DB insert done). */
+  getAttachmentIds: () => string[];
+  /** True while any file is still uploading or linking. */
+  hasPendingUploads: () => boolean;
+  /** Link completed and future uploads to a saved transaction. */
+  linkToTransaction: (transactionId: string) => Promise<void>;
+};
+
+export const AttachmentPicker = forwardRef<
+  AttachmentPickerHandle,
+  {
+    spaceId: string;
+    transactionId?: string | null;
+    onAttachmentIdsChange?: (ids: string[]) => void;
+    disabled?: boolean;
+    cameraFirst?: boolean;
+    autoOpen?: boolean;
+    onFirstUploadComplete?: (attachmentId: string) => void;
+  }
+>(function AttachmentPicker(
+  {
+    spaceId,
+    transactionId,
+    onAttachmentIdsChange,
+    disabled,
+    cameraFirst = false,
+    autoOpen = false,
+    onFirstUploadComplete,
+  },
+  ref,
+) {
   const t = useTranslations('attachments');
   const [items, setItems] = useState<Item[]>([]);
   const [pending, startTransition] = useTransition();
   const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const linkedTxRef = useRef<string | null>(transactionId ?? null);
+  const firstUploadRef = useRef(false);
 
-  function emitIds(next: Item[]): void {
-    onAttachmentIdsChange(
-      next.map((i) => i.attachmentId).filter((id): id is string => Boolean(id)),
-    );
+  useEffect(() => {
+    linkedTxRef.current = transactionId ?? linkedTxRef.current;
+  }, [transactionId]);
+
+  useEffect(() => {
+    if (autoOpen) {
+      fileInputRef.current?.click();
+    }
+  }, [autoOpen]);
+
+  const emitIds = useCallback(
+    (next: Item[]) => {
+      onAttachmentIdsChange?.(
+        next.map((i) => i.attachmentId).filter((id): id is string => Boolean(id)),
+      );
+    },
+    [onAttachmentIdsChange],
+  );
+
+  const linkIfNeeded = useCallback(
+    async (attachmentId: string) => {
+      const txId = linkedTxRef.current;
+      if (!txId) return;
+      await linkAttachment({ spaceId, attachmentId, transactionId: txId });
+    },
+    [spaceId],
+  );
+
+  async function uploadOne(file: File, localId: string): Promise<void> {
+    try {
+      const uploaded = await uploadReceipt({
+        spaceId,
+        file,
+        onProgress: (p) => {
+          setItems((prev) =>
+            prev.map((item) => (item.localId === localId ? { ...item, progress: p.ratio } : item)),
+          );
+        },
+      });
+
+      const result = await createAttachment({
+        spaceId,
+        transactionId: linkedTxRef.current,
+        storagePath: uploaded.storagePath,
+        mimeType: uploaded.mimeType,
+        sizeBytes: uploaded.sizeBytes,
+        width: uploaded.width,
+        height: uploaded.height,
+        blurhash: uploaded.blurhash,
+      });
+
+      setItems((prev) => {
+        const next = prev.map((item) => {
+          if (item.localId !== localId) return item;
+          if (!result.ok) {
+            return {
+              ...item,
+              error: result.error.message,
+              progress: 0,
+              beforeBytes: uploaded.beforeBytes,
+              afterBytes: uploaded.afterBytes,
+            };
+          }
+          const { error: _cleared, ...rest } = item;
+          return {
+            ...rest,
+            attachmentId: result.data.id,
+            progress: 1,
+            beforeBytes: uploaded.beforeBytes,
+            afterBytes: uploaded.afterBytes,
+          };
+        });
+        emitIds(next);
+        return next;
+      });
+
+      if (result.ok) {
+        void invokeReceiptProcess(result.data.id);
+        if (linkedTxRef.current) {
+          void linkIfNeeded(result.data.id);
+        }
+        if (!firstUploadRef.current) {
+          firstUploadRef.current = true;
+          onFirstUploadComplete?.(result.data.id);
+        }
+      }
+    } catch (error) {
+      setItems((prev) =>
+        prev.map((item) =>
+          item.localId === localId
+            ? {
+                ...item,
+                error: error instanceof Error ? error.message : t('errors.upload'),
+                progress: 0,
+              }
+            : item,
+        ),
+      );
+    }
   }
 
-  async function handleFiles(fileList: FileList | File[]): Promise<void> {
+  function handleFiles(fileList: FileList | File[]): void {
     const files = [...fileList].filter(isAllowedAttachment);
     const room = ATTACHMENT_MAX_PER_TX - items.length;
     if (room <= 0) return;
-    await uploadBatch(files.slice(0, room));
-  }
 
-  async function uploadBatch(files: File[]): Promise<void> {
-    for (const file of files) {
+    for (const file of files.slice(0, room)) {
       const localId = crypto.randomUUID();
-      const entry: Item = { localId, name: file.name, progress: 0 };
+      const entry: Item = { localId, name: file.name, progress: 0, file };
       if (file.type.startsWith('image/')) {
         entry.previewUrl = URL.createObjectURL(file);
       }
@@ -64,72 +189,43 @@ export function AttachmentPicker({
         return [...prev, entry];
       });
 
-      try {
-        const uploaded = await uploadReceipt({
-          spaceId,
-          file,
-          onProgress: (p) => {
-            setItems((prev) =>
-              prev.map((item) =>
-                item.localId === localId ? { ...item, progress: p.ratio } : item,
-              ),
-            );
-          },
-        });
-
-        const result = await createAttachment({
-          spaceId,
-          transactionId: transactionId ?? null,
-          storagePath: uploaded.storagePath,
-          mimeType: uploaded.mimeType,
-          sizeBytes: uploaded.sizeBytes,
-          width: uploaded.width,
-          height: uploaded.height,
-          blurhash: uploaded.blurhash,
-        });
-
-        setItems((prev) => {
-          const next = prev.map((item) => {
-            if (item.localId !== localId) return item;
-            if (!result.ok) {
-              return {
-                ...item,
-                error: result.error.message,
-                progress: 0,
-                beforeBytes: uploaded.beforeBytes,
-                afterBytes: uploaded.afterBytes,
-              };
-            }
-            return {
-              ...item,
-              attachmentId: result.data.id,
-              progress: 1,
-              beforeBytes: uploaded.beforeBytes,
-              afterBytes: uploaded.afterBytes,
-            };
-          });
-          emitIds(next);
-          return next;
-        });
-
-        if (result.ok) {
-          void invokeReceiptProcess(result.data.id);
-        }
-      } catch (error) {
-        setItems((prev) =>
-          prev.map((item) =>
-            item.localId === localId
-              ? {
-                  ...item,
-                  error: error instanceof Error ? error.message : t('errors.upload'),
-                  progress: 0,
-                }
-              : item,
-          ),
-        );
-      }
+      void uploadOne(file, localId);
     }
   }
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getAttachmentIds: () =>
+        items.map((i) => i.attachmentId).filter((id): id is string => Boolean(id)),
+      hasPendingUploads: () =>
+        items.some((item) => !item.error && (item.progress < 1 || !item.attachmentId)),
+      linkToTransaction: async (txId: string) => {
+        linkedTxRef.current = txId;
+        await Promise.all(
+          items
+            .map((item) => item.attachmentId)
+            .filter((id): id is string => Boolean(id))
+            .map((attachmentId) => linkAttachment({ spaceId, attachmentId, transactionId: txId })),
+        );
+      },
+    }),
+    [items, spaceId],
+  );
+
+  useEffect(() => {
+    function onPaste(event: ClipboardEvent): void {
+      if (disabled) return;
+      const files = event.clipboardData?.files;
+      if (!files?.length) return;
+      event.preventDefault();
+      handleFiles(files);
+    }
+    window.addEventListener('paste', onPaste);
+    return () => {
+      window.removeEventListener('paste', onPaste);
+    };
+  });
 
   return (
     <div className="space-y-2" data-testid="attachment-picker">
@@ -141,24 +237,22 @@ export function AttachmentPicker({
             size="sm"
             variant="outline"
             disabled={disabled || pending || items.length >= ATTACHMENT_MAX_PER_TX}
-            onClick={(e) => {
-              const input = (e.currentTarget.parentElement as HTMLElement).querySelector(
-                'input[type=file]',
-              );
-              input?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            onClick={() => {
+              fileInputRef.current?.click();
             }}
           >
             <Paperclip className="size-4" aria-hidden />
             {t('add')}
           </Button>
           <input
+            ref={fileInputRef}
             type="file"
             accept={ATTACHMENT_ACCEPT}
-            capture="environment"
+            capture={cameraFirst ? 'environment' : undefined}
             multiple
             className="sr-only"
             onChange={(e) => {
-              if (e.target.files) void handleFiles(e.target.files);
+              if (e.target.files) handleFiles(e.target.files);
               e.target.value = '';
             }}
           />
@@ -180,7 +274,7 @@ export function AttachmentPicker({
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
-          if (e.dataTransfer.files.length) void handleFiles(e.dataTransfer.files);
+          if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
         }}
       >
         {t('dropHint')}
@@ -218,6 +312,29 @@ export function AttachmentPicker({
                 ) : null}
                 {item.error ? <p className="text-xs text-danger">{item.error}</p> : null}
               </div>
+              {item.error && item.file ? (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  aria-label={t('retry')}
+                  disabled={disabled}
+                  onClick={() => {
+                    const file = item.file;
+                    if (!file) return;
+                    setItems((prev) =>
+                      prev.map((v) => {
+                        if (v.localId !== item.localId) return v;
+                        const { error: _cleared, ...rest } = v;
+                        return { ...rest, progress: 0 };
+                      }),
+                    );
+                    void uploadOne(file, item.localId);
+                  }}
+                >
+                  <RotateCcw className="size-4" aria-hidden />
+                </Button>
+              ) : null}
               <Button
                 type="button"
                 size="icon"
@@ -249,7 +366,7 @@ export function AttachmentPicker({
       ) : null}
     </div>
   );
-}
+});
 
 function formatKb(bytes: number): string {
   return `${Math.max(1, Math.round(bytes / 1024))} KB`;

@@ -135,6 +135,8 @@
   "nav": {
     "dashboard": "Home",
     "ledger": "Ledger",
+    "receipts": "Receipts",
+    "storage": "Storage",
     "budgets": "Budgets",
     "goals": "Goals",
     "balances": "Balances",
@@ -171,7 +173,8 @@
     "untitled": "Untitled",
     "addTransaction": "Add transaction",
     "addExpense": "Add expense",
-    "addIncome": "Add income"
+    "addIncome": "Add income",
+    "addFromReceipt": "Add from receipt"
   },
   "charts": {
     "empty": "Nothing to chart in this period",
@@ -637,10 +640,33 @@
 
   "attachments": {
     "title": "Receipts",
+    "scanTitle": "Scan receipt",
     "add": "Add",
     "remove": "Remove",
+    "retry": "Retry upload",
     "dropHint": "Drop a photo here, paste from the clipboard, or use the camera.",
     "sizeCompare": "{before} → {after}",
+    "galleryTitle": "Attachments",
+    "viewerTitle": "Receipt viewer",
+    "viewerCounter": "{current} of {total}",
+    "download": "Download",
+    "delete": "Delete attachment",
+    "close": "Close viewer",
+    "previous": "Previous attachment",
+    "next": "Next attachment",
+    "loading": "Loading…",
+    "emptyTitle": "No receipts yet",
+    "emptyBody": "Attach a photo when recording an expense, or scan a receipt to get started.",
+    "extracting": "Reading your receipt…",
+    "clearSuggestions": "Clear suggestions",
+    "fabLabelWithScan": "Add transaction. Long-press to scan a receipt.",
+    "storage": {
+      "title": "Receipt storage",
+      "description": "Receipt photos count toward your space storage quota.",
+      "ofLimit": "of {limit}",
+      "fileCount": "{count, plural, one {# file} other {# files}}",
+      "freeTierNote": "The free Supabase tier includes 1 GB of storage across all receipt uploads."
+    },
     "errors": {
       "upload": "Upload failed. Try again."
     }

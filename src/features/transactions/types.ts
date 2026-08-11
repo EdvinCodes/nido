@@ -69,6 +69,7 @@ export type TransactionView = {
   payer_avatar_url: string | null;
   splits: TransactionSplitView[];
   tags: TransactionTagView[];
+  attachment_count: number;
 };
 
 /** One row of `nido.accounts`. */

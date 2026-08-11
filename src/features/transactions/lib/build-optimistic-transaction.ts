@@ -78,5 +78,6 @@ export function buildOptimisticTransaction(input: BuildOptimisticInput): Transac
     payer_avatar_url: null,
     splits,
     tags: [],
+    attachment_count: 0,
   };
 }

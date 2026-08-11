@@ -1,5 +1,6 @@
 'use client';
 
+import { Paperclip } from 'lucide-react';
 import { useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Amount, toneForKind } from '@/components/money/amount';
@@ -31,6 +32,7 @@ export function LedgerRow({
   onSwipeEdit: () => void;
 }) {
   const tTx = useTranslations('transactions');
+  const tLedger = useTranslations('ledger');
   const locale = useLocale();
   const pointerStartX = useRef<number | null>(null);
   const dragX = useRef(0);
@@ -160,13 +162,21 @@ export function LedgerRow({
               {tx.payer_name ? ` · ${tx.payer_name}` : ''}
             </span>
           </span>
-          <Amount
-            minor={tx.amount_minor}
-            currency={tx.currency}
-            locale={locale}
-            tone={toneForKind(tx.kind)}
-            className="text-sm font-medium"
-          />
+          <span className="flex shrink-0 items-center gap-1.5">
+            {(tx.attachment_count || 0) > 0 ? (
+              <Paperclip
+                className="size-3.5 text-muted-foreground"
+                aria-label={tLedger('hasAttachment')}
+              />
+            ) : null}
+            <Amount
+              minor={tx.amount_minor}
+              currency={tx.currency}
+              locale={locale}
+              tone={toneForKind(tx.kind)}
+              className="text-sm font-medium"
+            />
+          </span>
         </button>
       </div>
     </div>

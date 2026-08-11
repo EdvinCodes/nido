@@ -8,6 +8,14 @@ export type CompressResult = {
 
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
 
+export const COMPRESS_OPTIONS = {
+  maxWidthOrHeight: 1600,
+  initialQuality: 0.8,
+  fileType: 'image/webp',
+  useWebWorker: true,
+  preserveExif: false,
+} as const;
+
 /** Compress images to ≤1600px WebP @ 0.8. PDFs pass through unchanged. */
 export async function compressReceipt(file: File): Promise<CompressResult> {
   const beforeBytes = file.size;
@@ -15,13 +23,7 @@ export async function compressReceipt(file: File): Promise<CompressResult> {
     return { file, beforeBytes, afterBytes: beforeBytes };
   }
 
-  const compressed = await imageCompression(file, {
-    maxWidthOrHeight: 1600,
-    initialQuality: 0.8,
-    fileType: 'image/webp',
-    useWebWorker: true,
-    preserveExif: false,
-  });
+  const compressed = await imageCompression(file, COMPRESS_OPTIONS);
 
   const webp =
     compressed.type === 'image/webp'

@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { ChartShell } from './chart-shell';
-import { chartAxisStyle, chartColors, chartTooltipStyle } from './tokens';
+import { chartAxisStyle, chartColors, chartLegendStyle, chartTooltipStyle } from './tokens';
 
 export type StackedBarsPoint = {
   label: string;
@@ -69,7 +69,7 @@ export function StackedBars({
             contentStyle={chartTooltipStyle}
             formatter={(value) => valueFormatter(Number(value ?? 0))}
           />
-          <Legend />
+          <Legend wrapperStyle={chartLegendStyle} />
           {series.map((item) => (
             <Bar
               key={item.key}

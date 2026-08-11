@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { exportReportAction } from '@/features/reports/actions';
 import { formatSavingsRate } from '@/features/reports/lib/savings-rate';
 import type { PeriodSnapshotRow } from '@/features/reports/types';
+import { chartAxisStyle, chartColors, chartTooltipStyle } from '@/components/charts/tokens';
 import { route } from '@/lib/routes';
 import { toast } from 'sonner';
 
@@ -118,16 +119,21 @@ export function ReportsClient({
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} unit="%" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={chartColors.border}
+                strokeOpacity={0.5}
+              />
+              <XAxis dataKey="label" tick={chartAxisStyle} axisLine={false} tickLine={false} />
+              <YAxis tick={chartAxisStyle} axisLine={false} tickLine={false} unit="%" />
               <Tooltip
+                contentStyle={chartTooltipStyle}
                 formatter={(value) => {
                   if (value == null || Array.isArray(value)) return '—';
                   return `${String(value)}%`;
                 }}
               />
-              <Line type="monotone" dataKey="rate" stroke="hsl(var(--primary))" dot />
+              <Line type="monotone" dataKey="rate" stroke={chartColors.primary} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -635,6 +635,17 @@
     }
   },
 
+  "attachments": {
+    "title": "Tickets",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "dropHint": "Suelta una foto aquí, pégala del portapapeles o usa la cámara.",
+    "sizeCompare": "{before} → {after}",
+    "errors": {
+      "upload": "Error al subir. Inténtalo de nuevo."
+    }
+  },
+
   "balances": {
     "title": "Saldos",
     "headlineSquare": "Estáis en paz",

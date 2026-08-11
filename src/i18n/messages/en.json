@@ -635,6 +635,17 @@
     }
   },
 
+  "attachments": {
+    "title": "Receipts",
+    "add": "Add",
+    "remove": "Remove",
+    "dropHint": "Drop a photo here, paste from the clipboard, or use the camera.",
+    "sizeCompare": "{before} → {after}",
+    "errors": {
+      "upload": "Upload failed. Try again."
+    }
+  },
+
   "balances": {
     "title": "Balances",
     "headlineSquare": "You are all square",

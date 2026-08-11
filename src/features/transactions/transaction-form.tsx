@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { linkAttachment } from '@/features/attachments/actions';
+import { AttachmentPicker } from '@/features/attachments/attachment-picker';
 import { createTransaction } from '@/features/transactions/actions';
 import { useTransactionComposer } from '@/features/transactions/composer-context';
 import { buildOptimisticTransaction } from '@/features/transactions/lib/build-optimistic-transaction';
@@ -165,6 +167,7 @@ function TransactionForm({
   const [splitMode, setSplitMode] = useState<SplitMode>(defaultSplit);
   const [selected, setSelected] = useState<SplitParticipantInput[]>(defaultSelected);
   const [advanced, setAdvanced] = useState(false);
+  const [attachmentIds, setAttachmentIds] = useState<string[]>([]);
 
   const filteredCategories = useMemo(
     () =>
@@ -257,6 +260,18 @@ function TransactionForm({
         toast.error(result.error.message);
         return;
       }
+
+      const txId = result.data.id;
+      await Promise.all(
+        attachmentIds.map((attachmentId) =>
+          linkAttachment({
+            spaceId: space.id,
+            attachmentId,
+            transactionId: txId,
+          }),
+        ),
+      );
+
       toast.success(t('created'));
       await queryClient.invalidateQueries({ queryKey: transactionsQueryKey(space.id, {}) });
       onDone();
@@ -481,6 +496,12 @@ function TransactionForm({
           </div>
         </div>
       ) : null}
+
+      <AttachmentPicker
+        spaceId={space.id}
+        onAttachmentIdsChange={setAttachmentIds}
+        disabled={pending}
+      />
 
       <Button type="submit" disabled={!canSave || pending} className="w-full">
         {pending ? tCommon('loading') : tCommon('save')}

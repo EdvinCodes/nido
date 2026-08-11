@@ -81,6 +81,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "accounts_owner_participant_id_fkey"
+            columns: ["owner_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "accounts_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
@@ -269,6 +276,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "budgets_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "budgets_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
@@ -403,6 +417,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "goal_contributions_space_id_fkey"
@@ -935,6 +956,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "recurring_rules_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "recurring_rules_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
@@ -947,6 +975,126 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      settlements: {
+        Row: {
+          amount_minor: number
+          base_amount_minor: number
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          dispute_note: string | null
+          disputed_at: string | null
+          from_participant_id: string
+          id: string
+          method: string | null
+          note: string | null
+          reverse_of_id: string | null
+          reversed_at: string | null
+          settled_on: string
+          space_id: string
+          to_participant_id: string
+        }
+        Insert: {
+          amount_minor: number
+          base_amount_minor: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by: string
+          currency: string
+          dispute_note?: string | null
+          disputed_at?: string | null
+          from_participant_id: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          reverse_of_id?: string | null
+          reversed_at?: string | null
+          settled_on?: string
+          space_id: string
+          to_participant_id: string
+        }
+        Update: {
+          amount_minor?: number
+          base_amount_minor?: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          dispute_note?: string | null
+          disputed_at?: string | null
+          from_participant_id?: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          reverse_of_id?: string | null
+          reversed_at?: string | null
+          settled_on?: string
+          space_id?: string
+          to_participant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlements_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_from_participant_id_fkey"
+            columns: ["from_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_from_participant_id_fkey"
+            columns: ["from_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "settlements_reverse_of_id_fkey"
+            columns: ["reverse_of_id"]
+            isOneToOne: false
+            referencedRelation: "settlements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_to_participant_id_fkey"
+            columns: ["to_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlements_to_participant_id_fkey"
+            columns: ["to_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
           },
         ]
       }
@@ -1016,6 +1164,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "space_invitations_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "space_invitations_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
@@ -1056,6 +1211,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_members_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "space_members_space_id_fkey"
@@ -1200,6 +1362,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_splits_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "transaction_splits_space_id_fkey"
@@ -1397,6 +1566,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "transactions_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "transactions_recurring_rule_id_fkey"
             columns: ["recurring_rule_id"]
             isOneToOne: false
@@ -1421,6 +1597,24 @@ export type Database = {
       }
     }
     Views: {
+      v_participant_balances: {
+        Row: {
+          net_minor: number | null
+          owed_minor: number | null
+          paid_minor: number | null
+          participant_id: string | null
+          space_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_transactions: {
         Row: {
           account_color: string | null
@@ -1494,6 +1688,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "transactions_payer_participant_id_fkey"
+            columns: ["payer_participant_id"]
+            isOneToOne: false
+            referencedRelation: "v_participant_balances"
+            referencedColumns: ["participant_id"]
+          },
+          {
             foreignKeyName: "transactions_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
@@ -1557,6 +1758,17 @@ export type Database = {
         Args: { p_space_id: string; p_tag_ids: string[]; p_tx_id: string }
         Returns: undefined
       }
+      _settlement_counterparty_user: {
+        Args: { p: Database["nido"]["Tables"]["settlements"]["Row"] }
+        Returns: string
+      }
+      _settlement_involves_user: {
+        Args: {
+          p: Database["nido"]["Tables"]["settlements"]["Row"]
+          p_uid: string
+        }
+        Returns: boolean
+      }
       _split_config_to_participants: {
         Args: { p_split_config: Json }
         Returns: Json
@@ -1571,6 +1783,15 @@ export type Database = {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]
       }
+      balance_breakdown: {
+        Args: {
+          p_from?: string
+          p_participant_id: string
+          p_space_id: string
+          p_to?: string
+        }
+        Returns: Json
+      }
       budget_category_ids: {
         Args: { p_budget: Database["nido"]["Tables"]["budgets"]["Row"] }
         Returns: string[]
@@ -1578,6 +1799,10 @@ export type Database = {
       compute_budget_spent: {
         Args: { p_budget_id: string; p_from: string; p_to: string }
         Returns: number
+      }
+      confirm_settlement: {
+        Args: { p_amount_minor?: number; p_id: string }
+        Returns: Json
       }
       create_space: {
         Args: {
@@ -1603,6 +1828,10 @@ export type Database = {
       }
       detect_recurring_candidates: {
         Args: { p_space_id: string }
+        Returns: Json
+      }
+      dispute_settlement: {
+        Args: { p_id: string; p_note: string }
         Returns: Json
       }
       ensure_budget_periods: {
@@ -1654,6 +1883,7 @@ export type Database = {
         Returns: string
       }
       normalize_merchant: { Args: { p_merchant: string }; Returns: string }
+      pairwise_balances: { Args: { p_space_id: string }; Returns: Json }
       period_bounds: {
         Args: {
           p_month_starts_on: number
@@ -1666,6 +1896,7 @@ export type Database = {
           starts_on: string
         }[]
       }
+      propose_settlement: { Args: { p: Json }; Returns: Json }
       recompute_budget_period: {
         Args: { p_period_id: string }
         Returns: number
@@ -1697,6 +1928,7 @@ export type Database = {
         Args: { p_id: string; p_request_id?: string }
         Returns: Json
       }
+      reverse_settlement: { Args: { p_id: string }; Returns: Json }
       run_budget_alerts: { Args: { p_through?: string }; Returns: number }
       run_recurring_all: { Args: { p_today?: string }; Returns: Json }
       run_recurring_for_space: {

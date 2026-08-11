@@ -57,10 +57,24 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
     query = query.or(`payer_participant_id.eq.${pid},splits.cs.[{"participant_id":"${pid}"}]`);
   }
 
-  // Phase 07 will filter on a real attachment relation. Until then "has attachment"
-  // is a shareable URL flag that correctly yields an empty result set.
   if (filters.hasAttachment) {
-    query = query.eq('id', '00000000-0000-4000-8000-00000000dead');
+    const { data: attached, error: attError } = await supabase
+      .from('attachments')
+      .select('transaction_id')
+      .eq('space_id', parsed.spaceId)
+      .not('transaction_id', 'is', null);
+    if (attError) throw new Error(attError.message);
+    const ids = [
+      ...new Set(
+        attached
+          .map((row) => row.transaction_id)
+          .filter((id): id is string => typeof id === 'string'),
+      ),
+    ];
+    if (ids.length === 0) {
+      return { rows: [], nextCursor: null };
+    }
+    query = query.in('id', ids);
   }
 
   if (filters.tagIds?.length) {

@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/ui/progress-bar';
 import { cn } from '@/lib/utils';
 import { createAttachment, deleteAttachment } from './actions';
 import { ATTACHMENT_ACCEPT, ATTACHMENT_MAX_PER_TX, isAllowedAttachment } from './lib/compress';
+import { invokeReceiptProcess } from './lib/invoke-process';
 import { uploadReceipt } from './lib/upload';
 
 type Item = {
@@ -110,6 +111,10 @@ export function AttachmentPicker({
           emitIds(next);
           return next;
         });
+
+        if (result.ok) {
+          void invokeReceiptProcess(result.data.id);
+        }
       } catch (error) {
         setItems((prev) =>
           prev.map((item) =>

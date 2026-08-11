@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { Amount } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,14 +86,26 @@ export function BalancesClient({
   const [disputeNote, setDisputeNote] = useState('');
   const [confirmAmountMajor, setConfirmAmountMajor] = useState<Record<string, string>>({});
 
-  async function reloadModel(): Promise<void> {
+  const reloadModel = useCallback(async (): Promise<void> => {
     const result = await refreshBalancesModel({ spaceId });
     if (result.ok) setModel(result.data.model);
-  }
+  }, [spaceId]);
 
-  useBalancesRealtime(spaceId, () => {
-    void reloadModel();
-  });
+  useBalancesRealtime(spaceId, userId, reloadModel);
+
+  const awaitingCounterparty = model.settlements.some(
+    (s) => s.createdBy === userId && s.confirmedAt === null && s.disputedAt === null,
+  );
+
+  useEffect(() => {
+    if (!awaitingCounterparty) return;
+    const id = window.setInterval(() => {
+      void reloadModel();
+    }, 2_000);
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [awaitingCounterparty, reloadModel]);
 
   const headline = useMemo(
     () => balanceHeadline(model.balances, model.simplified),

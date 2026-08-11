@@ -35,7 +35,9 @@ test.describe('balances and settlements', () => {
     test.setTimeout(120_000);
     const spaceId = await signInDemo(page, DEMO_ALEX.email, DEMO_ALEX.password);
     await page.goto(`/s/${spaceId}/balances`);
-    await expect(page.getByTestId('balances-headline')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole('main').getByTestId('balances-headline')).toBeVisible({
+      timeout: 30_000,
+    });
     await page.goto(`/s/${spaceId}`);
     await expect(page.getByTestId('rail-balances')).toBeVisible({ timeout: 30_000 });
   });
@@ -115,7 +117,9 @@ test.describe('balances and settlements', () => {
     });
 
     await host.goto(`/s/${spaceId}/balances`);
-    await expect(host.getByTestId('balances-headline')).toBeVisible({ timeout: 30_000 });
+    await expect(host.getByRole('main').getByTestId('balances-headline')).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(host.getByTestId('simplified-transfer').first()).toBeVisible({ timeout: 20_000 });
     await host
       .getByTestId('simplified-transfer')
@@ -131,7 +135,10 @@ test.describe('balances and settlements', () => {
     await expect(guest.getByTestId('settlement-pending')).toHaveCount(0, { timeout: 30_000 });
 
     await expect(
-      host.locator('[data-testid="settlement-row"][data-status="confirmed"]').first(),
+      host
+        .getByRole('main')
+        .locator('[data-testid="settlement-row"][data-status="confirmed"]')
+        .first(),
     ).toBeVisible({ timeout: 45_000 });
 
     await hostCtx.close();
@@ -143,6 +150,8 @@ test.describe('balances and settlements', () => {
     test.setTimeout(90_000);
     const spaceId = await signInDemo(page, DEMO_SAM.email, DEMO_SAM.password);
     await page.goto(`/s/${spaceId}/balances`);
-    await expect(page.getByTestId('balances-headline')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole('main').getByTestId('balances-headline')).toBeVisible({
+      timeout: 30_000,
+    });
   });
 });

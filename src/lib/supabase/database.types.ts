@@ -96,6 +96,86 @@ export type Database = {
           },
         ]
       }
+      attachments: {
+        Row: {
+          blurhash: string | null
+          created_at: string
+          height: number | null
+          id: string
+          mime_type: string
+          ocr_result: Json | null
+          ocr_status: string
+          size_bytes: number
+          space_id: string
+          storage_path: string
+          thumb_path: string | null
+          transaction_id: string | null
+          uploaded_by: string
+          width: number | null
+        }
+        Insert: {
+          blurhash?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          ocr_result?: Json | null
+          ocr_status?: string
+          size_bytes: number
+          space_id: string
+          storage_path: string
+          thumb_path?: string | null
+          transaction_id?: string | null
+          uploaded_by: string
+          width?: number | null
+        }
+        Update: {
+          blurhash?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          ocr_result?: Json | null
+          ocr_status?: string
+          size_bytes?: number
+          space_id?: string
+          storage_path?: string
+          thumb_path?: string | null
+          transaction_id?: string | null
+          uploaded_by?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attachments_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attachments_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attachments_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "v_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attachments_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -1783,6 +1863,7 @@ export type Database = {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]
       }
+      attachment_storage_paths: { Args: { p_id: string }; Returns: Json }
       balance_breakdown: {
         Args: {
           p_from?: string
@@ -1897,6 +1978,7 @@ export type Database = {
         }[]
       }
       propose_settlement: { Args: { p: Json }; Returns: Json }
+      purge_stale_attachments: { Args: never; Returns: number }
       recompute_budget_period: {
         Args: { p_period_id: string }
         Returns: number
@@ -1952,6 +2034,7 @@ export type Database = {
         }
         Returns: Json
       }
+      space_storage_usage: { Args: { p_space_id: string }; Returns: Json }
       space_summary: {
         Args: {
           p_from: string

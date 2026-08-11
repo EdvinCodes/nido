@@ -96,6 +96,214 @@ export type Database = {
           },
         ]
       }
+      ai_consent: {
+        Row: {
+          consent_text: string
+          consented_at: string
+          consented_by: string
+          provider: string
+          retention_days: number
+          revoked_at: string | null
+          revoked_by: string | null
+          space_id: string
+          use_real_names: boolean
+        }
+        Insert: {
+          consent_text: string
+          consented_at?: string
+          consented_by: string
+          provider: string
+          retention_days?: number
+          revoked_at?: string | null
+          revoked_by?: string | null
+          space_id: string
+          use_real_names?: boolean
+        }
+        Update: {
+          consent_text?: string
+          consented_at?: string
+          consented_by?: string
+          provider?: string
+          retention_days?: number
+          revoked_at?: string | null
+          revoked_by?: string | null
+          space_id?: string
+          use_real_names?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_consent_consented_by_fkey"
+            columns: ["consented_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_consent_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_consent_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: true
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          space_id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          space_id: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          space_id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversations_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          body: string
+          created_at: string
+          dismissed_at: string | null
+          dismissed_by: string | null
+          evidence: Json
+          id: string
+          kind: string
+          potential_saving_minor: number | null
+          severity: string
+          space_id: string
+          subject_key: string | null
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          evidence?: Json
+          id?: string
+          kind: string
+          potential_saving_minor?: number | null
+          severity?: string
+          space_id: string
+          subject_key?: string | null
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          evidence?: Json
+          id?: string
+          kind?: string
+          potential_saving_minor?: number | null
+          severity?: string
+          space_id?: string
+          subject_key?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_dismissed_by_fkey"
+            columns: ["dismissed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_insights_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_messages: {
+        Row: {
+          content: Json
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          space_id: string
+          token_usage: Json | null
+          tool_calls: Json | null
+        }
+        Insert: {
+          content: Json
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          space_id: string
+          token_usage?: Json | null
+          tool_calls?: Json | null
+        }
+        Update: {
+          content?: Json
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          space_id?: string
+          token_usage?: Json | null
+          tool_calls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_messages_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attachments: {
         Row: {
           blurhash: string | null
@@ -2456,6 +2664,44 @@ export type Database = {
       }
       accept_invitation: { Args: { p_token: string }; Returns: string }
       account_balance: { Args: { p_account_id: string }; Returns: number }
+      ai_filter_transactions: {
+        Args: {
+          p_amount_max_minor?: number
+          p_amount_min_minor?: number
+          p_category_id?: string
+          p_from?: string
+          p_limit?: number
+          p_merchant?: string
+          p_participant_id?: string
+          p_space_id: string
+          p_text?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
+      ai_find_anomalies: {
+        Args: {
+          p_from: string
+          p_sensitivity?: number
+          p_space_id: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      ai_period_transaction_ids: {
+        Args: {
+          p_category_id?: string
+          p_from: string
+          p_kind?: string
+          p_limit?: number
+          p_participant_id?: string
+          p_space_id: string
+          p_to: string
+        }
+        Returns: string[]
+      }
+      ai_prune_old_conversations: { Args: never; Returns: number }
+      ai_revoke_consent: { Args: { p_space_id: string }; Returns: undefined }
       allocate: {
         Args: { p_total: number; p_weights: number[] }
         Returns: number[]

@@ -18,7 +18,16 @@ type NavShortcut = {
   path: string;
 };
 
-export function KeyboardShortcuts({ spaceId }: { spaceId: string; isAiConfigured?: boolean }) {
+export function KeyboardShortcuts({
+  spaceId,
+  assistantNavReady = false,
+  onToggleAssistant,
+}: {
+  spaceId: string;
+  isAiConfigured?: boolean;
+  assistantNavReady?: boolean;
+  onToggleAssistant?: (() => void) | undefined;
+}) {
   const t = useTranslations('shortcuts');
   const router = useRouter();
   const composer = useTransactionComposerOptional();
@@ -56,8 +65,17 @@ export function KeyboardShortcuts({ spaceId }: { spaceId: string; isAiConfigured
 
     function onKeyDown(event: KeyboardEvent): void {
       if (helpOpen) return;
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (isEditableTarget(event.target)) return;
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'j') {
+        if (assistantNavReady && onToggleAssistant) {
+          event.preventDefault();
+          onToggleAssistant();
+        }
+        return;
+      }
+
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
 
       if (pendingG.current) {
         const letter = event.key.toLowerCase();
@@ -93,10 +111,11 @@ export function KeyboardShortcuts({ spaceId }: { spaceId: string; isAiConfigured
       window.removeEventListener('keydown', onKeyDown);
       clearPendingG();
     };
-  }, [composer, go, helpOpen, navShortcuts]);
+  }, [assistantNavReady, composer, go, helpOpen, navShortcuts, onToggleAssistant]);
 
   const rows = [
     { keys: '⌘ K', label: t('palette') },
+    ...(assistantNavReady ? [{ keys: '⌘ J', label: t('toggleAssistant') }] : []),
     { keys: 'n', label: t('newTransaction') },
     { keys: 'g h', label: t('goDashboard') },
     { keys: 'g l', label: t('goLedger') },

@@ -124,6 +124,7 @@ export function LedgerClient({
     shared: parseAsBoolean.withDefault(false),
     mine: parseAsBoolean.withDefault(false),
     attached: parseAsBoolean.withDefault(false),
+    ids: parseAsArrayOf(parseAsString).withDefault([]),
   });
 
   const filters: TransactionFilters = useMemo(
@@ -141,6 +142,7 @@ export function LedgerClient({
           shared: urlState.shared,
           mine: urlState.mine,
           hasAttachment: urlState.attached,
+          transactionIds: urlState.ids,
         },
         participantId,
       ),

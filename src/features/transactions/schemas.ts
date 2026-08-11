@@ -147,6 +147,7 @@ export const transactionFiltersSchema = z.object({
    * query layer so shares/bookmarks keep working; matches are empty by design.
    */
   hasAttachment: z.boolean().optional(),
+  transactionIds: z.array(z.uuid()).max(50).optional(),
   /** Resolved from the signed-in member; not stored in the URL. */
   viewerParticipantId: z.uuid().optional(),
 });

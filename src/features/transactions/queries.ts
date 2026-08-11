@@ -60,6 +60,9 @@ export async function listTransactions(input: ListTransactionsInput): Promise<Tr
   if (filters.hasAttachment) {
     query = query.gt('attachment_count', 0);
   }
+  if (filters.transactionIds?.length) {
+    query = query.in('id', filters.transactionIds);
+  }
 
   if (filters.tagIds?.length) {
     const tagClauses = filters.tagIds.map((id) => `tags.cs.[{"id":"${id}"}]`).join(',');

@@ -12,6 +12,7 @@ type UrlLedgerParams = {
   shared?: boolean | undefined;
   mine?: boolean | undefined;
   hasAttachment?: boolean | undefined;
+  transactionIds?: string[] | undefined;
 };
 
 /** Maps ledger URL / nuqs state into a validated filter object for list queries. */
@@ -40,6 +41,7 @@ export function parseLedgerFilters(
     sharedOnly: params.shared === true ? true : undefined,
     mineOnly: mineOnly ? true : undefined,
     hasAttachment: params.hasAttachment === true ? true : undefined,
+    transactionIds: params.transactionIds?.length ? params.transactionIds : undefined,
     viewerParticipantId: mineOnly && viewerParticipantId ? viewerParticipantId : undefined,
   });
 }
@@ -67,6 +69,13 @@ export function parseLedgerFiltersFromSearchParams(
 
   const amountMin = parseMinorParam(sp.min);
   const amountMax = parseMinorParam(sp.max);
+  const idsParam = sp.ids;
+  const transactionIds =
+    typeof idsParam === 'string'
+      ? idsParam.split(',').filter(Boolean)
+      : Array.isArray(idsParam)
+        ? idsParam.filter((t): t is string => typeof t === 'string')
+        : [];
 
   return parseLedgerFilters(
     {
@@ -81,6 +90,7 @@ export function parseLedgerFiltersFromSearchParams(
       shared: truthySearchParam(sp.shared),
       mine: truthySearchParam(sp.mine),
       hasAttachment: truthySearchParam(sp.attached),
+      transactionIds,
     },
     viewerParticipantId,
   );

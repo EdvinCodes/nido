@@ -3,6 +3,10 @@ import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { PwaShortcutHandler } from '@/components/pwa/shortcut-handler';
+import { AssistantProvider } from '@/features/assistant/assistant-context';
+import { getAiConsent, isConsentActive, listConversations } from '@/features/assistant/queries';
+import { isAssistantConfigured } from '@/lib/ai/assistant-enabled';
+import { getModelLabel } from '@/lib/ai/providers';
 import { isAiConfigured } from '@/lib/ai/is-configured';
 import { listAccounts } from '@/features/accounts/queries';
 import { ConnectionStatus } from '@/features/offline/connection-status';
@@ -43,9 +47,15 @@ export default async function SpaceLayout({
     notifications,
     unreadCount,
     aiReady,
+    assistantConfigured,
+    aiConsent,
+    conversations,
     recentCurrencies,
     pushConfigured,
     vapidPublicKey,
+    budgetCount,
+    goalCount,
+    subscriptionCount,
   ] = await Promise.all([
     getUserSpaces(),
     getCategories(spaceId),
@@ -54,10 +64,23 @@ export default async function SpaceLayout({
     listNotifications(spaceId),
     getUnreadNotificationCount(spaceId),
     Promise.resolve(isAiConfigured()),
+    Promise.resolve(isAssistantConfigured()),
+    getAiConsent(spaceId),
+    listConversations(spaceId, membership.userId),
     getRecentCurrencies(spaceId),
     Promise.resolve(getPushConfigured()),
     Promise.resolve(getVapidPublicKey()),
+    supabase.from('budgets').select('*', { count: 'exact', head: true }).eq('space_id', spaceId),
+    supabase.from('goals').select('*', { count: 'exact', head: true }).eq('space_id', spaceId),
+    supabase
+      .from('recurring_rules')
+      .select('*', { count: 'exact', head: true })
+      .eq('space_id', spaceId)
+      .eq('kind', 'subscription'),
   ]);
+
+  const assistantConsentActive = isConsentActive(aiConsent);
+  const assistantNavReady = assistantConfigured && assistantConsentActive;
 
   return (
     <SpaceProvider
@@ -72,18 +95,31 @@ export default async function SpaceLayout({
       <TransactionComposerProvider>
         <OfflineProvider spaceId={spaceId}>
           <ConnectionStatus />
-          <AppShell
+          <AssistantProvider
             spaceId={spaceId}
-            spaces={spaces}
-            role={membership.role}
-            spaceName={membership.space.name}
-            spaceKind={membership.space.kind}
-            notifications={notifications}
-            unreadCount={unreadCount}
-            isAiConfigured={aiReady}
+            consentActive={assistantConsentActive}
+            modelLabel={assistantConfigured ? getModelLabel() : null}
+            conversations={conversations}
+            suggestedContext={{
+              hasBudgets: (budgetCount.count ?? 0) > 0,
+              hasGoals: (goalCount.count ?? 0) > 0,
+              hasSubscriptions: (subscriptionCount.count ?? 0) > 0,
+            }}
           >
-            {children}
-          </AppShell>
+            <AppShell
+              spaceId={spaceId}
+              spaces={spaces}
+              role={membership.role}
+              spaceName={membership.space.name}
+              spaceKind={membership.space.kind}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              isAiConfigured={aiReady}
+              assistantNavReady={assistantNavReady}
+            >
+              {children}
+            </AppShell>
+          </AssistantProvider>
           <Suspense fallback={null}>
             <PwaShortcutHandler />
           </Suspense>

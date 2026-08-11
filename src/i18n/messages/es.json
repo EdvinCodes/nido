@@ -199,6 +199,7 @@
     "categories": "Categorías",
     "accounts": "Cuentas",
     "profile": "Perfil",
+    "ai": "Asistente IA",
     "notifications": "Notificaciones",
     "spaceSettings": "Espacio",
     "rules": "Reglas",
@@ -240,6 +241,7 @@
     "goGoals": "Ir a metas",
     "goReports": "Ir a informes",
     "goSettings": "Ir a ajustes",
+    "toggleAssistant": "Mostrar/ocultar asistente",
     "showHelp": "Mostrar este diálogo"
   },
   "charts": {
@@ -749,6 +751,52 @@
     },
     "errors": {
       "upload": "Error al subir. Inténtalo de nuevo."
+    }
+  },
+
+  "assistant": {
+    "settings": {
+      "title": "Asistente IA",
+      "body": "Pregunta a tus datos en lenguaje natural. Opt-in por espacio con clave propia.",
+      "notConfigured": "Ningún proveedor de IA está configurado en el servidor. Añade AI_PROVIDER y la clave correspondiente en .env.local.",
+      "docsLink": "Ver documentación",
+      "provider": "Proveedor activo",
+      "unknownModel": "Modelo desconocido",
+      "consentProvider": "Consentimiento registrado para {provider}.",
+      "ollamaHint": "Recomendado: Ollama en local para que nada salga de tu máquina.",
+      "retention": "Retención de conversaciones (días)",
+      "realNames": "Usar nombres reales de participantes en las respuestas",
+      "consentBody": "Se enviarán cifras agregadas, nombres de categorías, comercios y hasta 50 movimientos por pregunta al proveedor configurado.",
+      "grant": "Activar asistente",
+      "revoke": "Revocar consentimiento y borrar conversaciones",
+      "saved": "Guardado",
+      "adminOnly": "Solo un administrador del espacio puede cambiar el consentimiento."
+    },
+    "panel": {
+      "title": "Asistente",
+      "placeholder": "Pregunta sobre tus finanzas…",
+      "send": "Enviar",
+      "empty": "Prueba: «¿Cuánto gastamos en comida el mes pasado?»",
+      "footer": "Generado por {model}. Verifica cifras importantes.",
+      "consentRequired": "Activa el asistente en Ajustes → IA antes de usarlo.",
+      "thinking": "Pensando…",
+      "stop": "Detener",
+      "retry": "Reintentar"
+    },
+    "history": {
+      "title": "Historial",
+      "empty": "Aún no hay conversaciones.",
+      "untitled": "Sin título",
+      "new": "Nueva conversación",
+      "export": "Exportar",
+      "delete": "Eliminar",
+      "openSettings": "Abrir ajustes de IA"
+    },
+    "insights": {
+      "title": "Insights",
+      "dismiss": "Descartar",
+      "potentialSaving": "Ahorro potencial: {amount}",
+      "viewTransactions": "Ver movimientos"
     }
   },
 

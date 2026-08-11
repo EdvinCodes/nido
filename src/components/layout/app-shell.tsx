@@ -6,6 +6,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { KeyboardShortcuts } from '@/components/layout/keyboard-shortcuts';
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar';
+import { useAssistantPanelOptional } from '@/features/assistant/assistant-context';
 import { SpaceSwitcher } from '@/components/layout/space-switcher';
 import type { MemberRole } from '@/lib/auth';
 import type { getUserSpaces } from '@/features/spaces/queries';
@@ -42,6 +43,7 @@ export function AppShell({
   notifications,
   unreadCount,
   isAiConfigured = false,
+  assistantNavReady = false,
 }: {
   children: ReactNode;
   spaceId: string;
@@ -52,9 +54,11 @@ export function AppShell({
   notifications: NotificationRow[];
   unreadCount: number;
   isAiConfigured?: boolean;
+  assistantNavReady?: boolean;
 }) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
+  const assistant = useAssistantPanelOptional();
   const bell =
     isDesktop === null ? null : (
       <NotificationsBell
@@ -74,6 +78,7 @@ export function AppShell({
         spaceName={spaceName}
         spaceKind={spaceKind}
         headerAction={isDesktop ? bell : null}
+        assistantNavReady={assistantNavReady}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 lg:hidden">
@@ -83,7 +88,18 @@ export function AppShell({
         {children}
         <MobileTabBar activePath={pathname} spaceId={spaceId} isAiConfigured={isAiConfigured} />
         <CommandPalette spaceId={spaceId} isAiConfigured={isAiConfigured} />
-        <KeyboardShortcuts spaceId={spaceId} isAiConfigured={isAiConfigured} />
+        <KeyboardShortcuts
+          spaceId={spaceId}
+          isAiConfigured={isAiConfigured}
+          assistantNavReady={assistantNavReady}
+          onToggleAssistant={
+            assistant
+              ? () => {
+                  assistant.toggle();
+                }
+              : undefined
+          }
+        />
       </div>
     </div>
   );

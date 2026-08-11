@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
 
 const ITEMS = [
+  { href: '/settings/ai', labelKey: 'ai' as const },
   { href: '/settings/profile', labelKey: 'profile' as const },
   { href: '/settings/members', labelKey: 'members' as const },
   { href: '/settings/space', labelKey: 'spaceSettings' as const },

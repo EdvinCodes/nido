@@ -16,6 +16,7 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   AI_PROVIDER: z.enum(['openai', 'anthropic', 'google', 'ollama']).optional(),
   AI_MODEL: z.string().optional(),
+  AI_DAILY_MESSAGE_LIMIT: z.coerce.number().int().min(1).max(500).optional(),
   OPENAI_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),

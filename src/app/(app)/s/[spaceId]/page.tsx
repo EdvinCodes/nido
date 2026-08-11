@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAttentionBudgets, getCategoryBudgetProgress } from '@/features/budgets/queries';
+import { AiInsightsRail } from '@/features/assistant/ai-insights-rail';
+import { listActiveInsights } from '@/features/assistant/queries';
 import { DashboardView } from '@/features/dashboard/dashboard-view';
 import { resolveDashboardPeriod } from '@/features/dashboard/lib/resolve-period';
 import {
@@ -126,6 +128,7 @@ async function DashboardLoaded({
     upcomingCharges,
     goalProgress,
     balanceRail,
+    insights,
   ] = await Promise.all([
     getSpaceSummary({ spaceId, from, to }),
     getAttentionBudgets(spaceId),
@@ -142,6 +145,7 @@ async function DashboardLoaded({
           }>,
         })
       : getOutstandingBalanceRail(spaceId),
+    listActiveInsights(spaceId),
   ]);
   const previousSeries = await getSpaceSeries({
     spaceId,
@@ -151,22 +155,29 @@ async function DashboardLoaded({
   });
 
   return (
-    <DashboardView
-      spaceId={spaceId}
-      spaceKind={spaceKind}
-      currency={currency}
-      timeZone={timeZone}
-      monthStartsOn={monthStartsOn}
-      weekStartsOn={weekStartsOn}
-      summary={summary}
-      series={toCumulativeSeries(previousSeries)}
-      isEmptySpace={false}
-      attentionBudgets={attentionBudgets}
-      categoryBudgetProgress={categoryBudgetProgress}
-      upcomingCharges={upcomingCharges}
-      goalProgress={goalProgress}
-      outstandingBalances={balanceRail.transfers}
-    />
+    <>
+      {insights.length ? (
+        <div className="px-4 pt-4 lg:px-8">
+          <AiInsightsRail spaceId={spaceId} currency={currency} insights={insights} />
+        </div>
+      ) : null}
+      <DashboardView
+        spaceId={spaceId}
+        spaceKind={spaceKind}
+        currency={currency}
+        timeZone={timeZone}
+        monthStartsOn={monthStartsOn}
+        weekStartsOn={weekStartsOn}
+        summary={summary}
+        series={toCumulativeSeries(previousSeries)}
+        isEmptySpace={false}
+        attentionBudgets={attentionBudgets}
+        categoryBudgetProgress={categoryBudgetProgress}
+        upcomingCharges={upcomingCharges}
+        goalProgress={goalProgress}
+        outstandingBalances={balanceRail.transfers}
+      />
+    </>
   );
 }
 

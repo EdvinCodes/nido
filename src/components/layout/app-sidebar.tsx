@@ -46,6 +46,7 @@ export function AppSidebar({
   spaceName,
   spaceKind,
   headerAction,
+  assistantNavReady = false,
 }: {
   activePath: string;
   spaceId: string;
@@ -54,10 +55,13 @@ export function AppSidebar({
   spaceName: string;
   spaceKind: string;
   headerAction?: ReactNode;
+  assistantNavReady?: boolean;
 }) {
   const t = useTranslations('nav');
   void spaceName;
-  const items = NAV_ITEMS.filter((item) => {
+  const items = NAV_ITEMS.map((item) =>
+    item.key === 'assistant' ? { ...item, ready: assistantNavReady } : item,
+  ).filter((item) => {
     if (spaceKind !== 'solo') return true;
     return item.key !== 'balances';
   });

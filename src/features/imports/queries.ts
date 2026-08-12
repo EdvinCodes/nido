@@ -53,6 +53,17 @@ export async function listMappingTemplates(spaceId: string): Promise<ImportMappi
   return data ?? [];
 }
 
+export async function listImportBatches(spaceId: string, limit = 8): Promise<ImportBatchRow[]> {
+  const supabase = await createClient();
+  const { data } = await untyped(supabase)
+    .from<ImportBatchRow>('import_batches')
+    .select('*')
+    .eq('space_id', spaceId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
 export async function getRecentImportBatch(spaceId: string): Promise<ImportBatchRow | null> {
   const supabase = await createClient();
   const { data } = await untyped(supabase)

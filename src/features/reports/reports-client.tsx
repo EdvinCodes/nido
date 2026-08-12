@@ -16,7 +16,7 @@ import { Amount } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
 import { exportReportAction } from '@/features/reports/actions';
 import { formatSavingsRate } from '@/features/reports/lib/savings-rate';
-import type { PeriodSnapshotRow } from '@/features/reports/types';
+import type { PeriodSnapshotPayload, PeriodSnapshotRow } from '@/features/reports/types';
 import { chartAxisStyle, chartColors, chartTooltipStyle } from '@/components/charts/tokens';
 import { route } from '@/lib/routes';
 import { toast } from 'sonner';
@@ -32,30 +32,42 @@ function downloadBase64(filename: string, mimeType: string, base64: string): voi
   URL.revokeObjectURL(url);
 }
 
+type OpenPeriod = {
+  periodFrom: string;
+  periodTo: string;
+  isCurrent: boolean;
+  payload: PeriodSnapshotPayload;
+};
+
 export function ReportsClient({
   spaceId,
   baseCurrency,
   snapshots,
   savingsSeries,
+  openPeriods,
 }: {
   spaceId: string;
   baseCurrency: string;
   snapshots: PeriodSnapshotRow[];
   savingsSeries: Array<{ periodFrom: string; periodTo: string; savingsRate: number | null }>;
+  openPeriods: OpenPeriod[];
 }) {
   const t = useTranslations('reports');
   const locale = useLocale();
   const [pending, startTransition] = useTransition();
 
   const latest = snapshots[0];
+  const exportTarget = latest ?? {
+    period_from: openPeriods[0]?.periodFrom,
+    period_to: openPeriods[0]?.periodTo,
+  };
 
-  function exportFormat(format: 'pdf' | 'xlsx' | 'csv'): void {
-    if (!latest) return;
+  function exportFormat(format: 'pdf' | 'xlsx' | 'csv', from: string, to: string): void {
     startTransition(async () => {
       const result = await exportReportAction({
         spaceId,
-        from: latest.period_from,
-        to: latest.period_to,
+        from,
+        to,
         format,
       });
       if (!result.ok) {
@@ -83,36 +95,101 @@ export function ReportsClient({
             <Link href={route(`/s/${spaceId}/reports/compare`)}>{t('compare')}</Link>
           </Button>
           <Button
-            disabled={pending || !latest}
+            disabled={pending || !exportTarget.period_from || !exportTarget.period_to}
             size="sm"
             onClick={() => {
-              exportFormat('pdf');
+              if (!exportTarget.period_from || !exportTarget.period_to) return;
+              exportFormat('pdf', exportTarget.period_from, exportTarget.period_to);
             }}
           >
             {t('exportPdf')}
           </Button>
           <Button
-            disabled={pending || !latest}
+            disabled={pending || !exportTarget.period_from || !exportTarget.period_to}
             size="sm"
             variant="outline"
             onClick={() => {
-              exportFormat('xlsx');
+              if (!exportTarget.period_from || !exportTarget.period_to) return;
+              exportFormat('xlsx', exportTarget.period_from, exportTarget.period_to);
             }}
           >
             {t('exportXlsx')}
           </Button>
           <Button
-            disabled={pending || !latest}
+            disabled={pending || !exportTarget.period_from || !exportTarget.period_to}
             size="sm"
             variant="outline"
             onClick={() => {
-              exportFormat('csv');
+              if (!exportTarget.period_from || !exportTarget.period_to) return;
+              exportFormat('csv', exportTarget.period_from, exportTarget.period_to);
             }}
           >
             {t('exportCsv')}
           </Button>
         </div>
       </div>
+
+      <section>
+        <h2 className="mb-3 text-sm font-medium">{t('openPeriods')}</h2>
+        <ul className="grid gap-3 md:grid-cols-3">
+          {openPeriods.map((period) => (
+            <li
+              key={`${period.periodFrom}-${period.periodTo}`}
+              className="rounded-xl border border-border bg-card p-4"
+            >
+              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                {period.isCurrent ? t('thisMonth') : t('pastMonth')}
+              </p>
+              <p className="mt-1 text-sm font-medium">
+                {period.periodFrom} – {period.periodTo}
+              </p>
+              <div className="mt-3 space-y-1 text-sm">
+                <div className="flex justify-between gap-2">
+                  <span className="text-muted-foreground">{t('income')}</span>
+                  <Amount
+                    minor={period.payload.totals.income_minor}
+                    currency={baseCurrency}
+                    locale={locale}
+                    tone="income"
+                  />
+                </div>
+                <div className="flex justify-between gap-2">
+                  <span className="text-muted-foreground">{t('expenses')}</span>
+                  <Amount
+                    minor={period.payload.totals.expense_minor}
+                    currency={baseCurrency}
+                    locale={locale}
+                    tone="expense"
+                  />
+                </div>
+                <div className="flex justify-between gap-2">
+                  <span className="text-muted-foreground">{t('net')}</span>
+                  <Amount
+                    minor={period.payload.totals.net_minor}
+                    currency={baseCurrency}
+                    locale={locale}
+                    tone={period.payload.totals.net_minor >= 0 ? 'income' : 'expense'}
+                  />
+                </div>
+                <p className="pt-1 text-xs text-muted-foreground">
+                  {t('savingsRate')}: {formatSavingsRate(period.payload.totals.savings_rate)}
+                </p>
+              </div>
+              <Button
+                className="mt-4"
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() => {
+                  exportFormat('pdf', period.periodFrom, period.periodTo);
+                }}
+              >
+                {t('exportPdf')}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
         <h2 className="mb-4 text-sm font-medium">{t('savingsRateTrend')}</h2>

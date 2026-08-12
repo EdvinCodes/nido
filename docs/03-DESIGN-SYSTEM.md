@@ -12,7 +12,7 @@ pleasure to read, and motion that explains rather than decorates.
 domestic, shared. The visual language leans warm-neutral rather than the cold blue-grey
 every finance app defaults to, which is the single cheapest way to not look like everyone else.
 
-**Logotype.** Wordmark in the display serif, lowercase, tight tracking. The mark is a
+**Logotype.** Wordmark in the display sans (Geist), lowercase, tight tracking. The mark is a
 simplified nest: three overlapping arcs forming a bowl, which also reads as a stacked bar
 chart. Provided as an inline SVG component (`src/components/brand/logo.tsx`) with `mark`,
 `wordmark`, and `lockup` variants, currentColor-driven so it inherits the theme.
@@ -77,11 +77,11 @@ regression. Focus rings are 2 px `--color-primary` with a 2 px offset and are ne
 
 ## 3. Typography
 
-| Role    | Family                    | Notes                                                                                                                                                       |
-| ------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Display | **Instrument Serif**      | Landing headlines, auth panel wordmark, and empty-state headings only. Loaded once on the root layout via CSS variable; never used for app-shell UI chrome. |
-| UI      | **Geist Sans** (variable) | Everything else                                                                                                                                             |
-| Numbers | **Geist Mono** (variable) | All amounts, with `font-variant-numeric: tabular-nums`                                                                                                      |
+| Role    | Family                                    | Notes                                                                                                                                             |
+| ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display | **Geist Sans** (semibold, tight tracking) | Landing headlines, auth panel wordmark, and empty-state headings only. Shares the UI sans via `--font-display`; never a second family for chrome. |
+| UI      | **Geist Sans** (variable)                 | Everything else                                                                                                                                   |
+| Numbers | **Geist Mono** (variable)                 | All amounts, with `font-variant-numeric: tabular-nums`                                                                                            |
 
 Amounts are always tabular. A column of numbers whose digits do not line up is the fastest
 way to make a finance app feel amateur.
@@ -144,7 +144,7 @@ the primitives, these product-specific components are shared across features:
 | `<PeriodPicker>`                             | Presets (this month, last month, last 3 months, this year, custom) with a keyboard-navigable range calendar. State lives in the URL via `nuqs`.                                                                           |
 | `<ProgressRing>` / `<ProgressBar>`           | Budget and goal progress, with the over-limit portion rendered in `--color-danger` beyond 100 %.                                                                                                                          |
 | `<TrendDelta>`                               | "+12 % vs last month" with an arrow, coloured by whether the change is good, which depends on whether it is income or expense.                                                                                            |
-| `<EmptyState>`                               | Display-serif heading, one sentence, one action. Every list has one, and it is written, not generic.                                                                                                                      |
+| `<EmptyState>`                               | Display heading, one sentence, one action. Every list has one, and it is written, not generic.                                                                                                                            |
 | `<QuickAdd>`                                 | The 10-second capture flow: amount, category, done. Everything else is progressive disclosure.                                                                                                                            |
 | `<CommandPalette>`                           | ⌘K / Ctrl+K. Navigate, search transactions, add an expense, switch space.                                                                                                                                                 |
 
@@ -203,7 +203,7 @@ repo want to run it. Server-rendered, near-zero JavaScript, target LCP under 1.2
 
 Sections, in order:
 
-1. **Hero.** Display-serif headline ("Todo el dinero de casa, en un solo nido"), one
+1. **Hero.** Display headline ("Todo el dinero de casa, en un solo nido"), one
    sentence of subhead, two buttons (Start free · View on GitHub), and a real product
    screenshot in a subtly tilted device frame with a soft amber glow behind it. Dark
    background with a very low-contrast noise texture. No stock photography, ever.

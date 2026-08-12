@@ -35,6 +35,9 @@ export function FeatureShowcase({ rows }: { rows: FeatureRow[] }) {
                     src={row.imageSrc}
                     alt={row.imageAlt}
                     fill
+                    priority={index === 0}
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
                     unoptimized
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover object-top"

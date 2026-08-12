@@ -1,7 +1,10 @@
 {
   "metadata": {
     "title": "Nido",
-    "description": "Finanzas del hogar, compartidas. De una persona a toda la casa."
+    "description": "Finanzas del hogar, compartidas. De una persona a toda la casa.",
+    "keywords": "finanzas del hogar, gastos compartidos, presupuestos, splits, dinero familiar, open source",
+    "ogTitle": "Nido — finanzas del hogar, compartidas",
+    "ogDescription": "Gastos compartidos, splits justos, presupuestos e informes. Tus datos, tu base de datos."
   },
   "common": {
     "appName": "Nido",
@@ -174,7 +177,7 @@
         "logoUsage": "Usa el lockup sobre fondos claros u oscuros. La marca sola sirve para favicons e iconos. No estires ni recolores fuera de la paleta de tokens.",
         "colorsTitle": "Tokens de color",
         "typeTitle": "Tipografía",
-        "typeBody": "Instrument Serif para titulares. Geist Sans para UI y cuerpo. Geist Mono para importes y código."
+        "typeBody": "Geist Sans para titulares y UI. Geist Mono para importes y código."
       },
       "docs": {
         "title": "Documentación",
@@ -355,6 +358,10 @@
     "strengthStrong": "Fuerte",
     "panelTitle": "El dinero, compartido con calma",
     "panelBody": "Un nido para tu hogar — divisiones, presupuestos y tranquilidad.",
+    "panelPoint1": "Divisiones justas de gastos compartidos",
+    "panelPoint2": "Presupuestos y metas visibles para toda la casa",
+    "panelPoint3": "Tus datos se quedan en tu base de datos",
+    "panelPreviewLabel": "Vista previa del panel",
     "dev": {
       "badge": "Desarrollo local",
       "hint": "Usuarios demo del seed. Necesitas Supabase local con `pnpm db:reset`.",
@@ -764,6 +771,12 @@
     "loading": "Cargando…",
     "emptyTitle": "Aún no hay tickets",
     "emptyBody": "Adjunta una foto al registrar un gasto, o escanea un ticket para empezar.",
+    "emptyStep1": "Abre el libro y crea o edita un gasto.",
+    "emptyStep2": "Añade una foto o PDF en la franja de adjuntos del movimiento.",
+    "emptyStep3": "Los tickets aparecen aquí agrupados por fecha, listos para reabrir.",
+    "emptyCtaLedger": "Ir al libro",
+    "emptyCtaImport": "Importar extractos",
+    "gallerySubtitle": "Fotos y PDFs adjuntos a los movimientos del hogar.",
     "extracting": "Leyendo tu ticket…",
     "clearSuggestions": "Borrar sugerencias",
     "fabLabelWithScan": "Añadir movimiento. Mantén pulsado para escanear un ticket.",
@@ -977,8 +990,20 @@
       "commit": "Hecho"
     },
     "upload": {
-      "drop": "Arrastra un CSV o XLSX, o haz clic para elegir",
+      "drop": "Suelta aquí un CSV o XLSX",
+      "hint": "Usa un extracto bancario, o prueba el CSV de ejemplo para recorrer el mapeo y la vista previa.",
+      "chooseFile": "Elegir CSV o XLSX",
+      "sampleCsv": "Descargar CSV de ejemplo",
+      "invalidType": "Elige un archivo .csv, .xlsx o .xls.",
+      "failed": "No se pudo leer ese extracto.",
       "meta": "Detectado {encoding}, delimitador “{delimiter}”, {count} filas"
+    },
+    "history": {
+      "title": "Importaciones recientes",
+      "body": "Lotes confirmados y borradores de este espacio.",
+      "empty": "Aún no hay importaciones. Sube un extracto para crear el primero.",
+      "untitled": "Archivo sin nombre",
+      "meta": "{status} · {rows} filas · {imported} importadas"
     },
     "map": {
       "account": "Cuenta destino",
@@ -1061,7 +1086,10 @@
     "savingsRate": "Tasa de ahorro",
     "savingsRateTrend": "Tasa de ahorro en el tiempo",
     "closedPeriods": "Periodos cerrados",
-    "empty": "Aún no hay cierres. Aparecerán tras el primer cierre mensual.",
+    "openPeriods": "Periodos recientes",
+    "thisMonth": "Este mes",
+    "pastMonth": "Mes anterior",
+    "empty": "Aún no hay cierres. Aparecerán tras el primer cierre mensual. Los totales en vivo de arriba ya reflejan tu libro.",
     "exportPdf": "Exportar PDF",
     "exportXlsx": "Exportar Excel",
     "exportCsv": "Exportar CSV",

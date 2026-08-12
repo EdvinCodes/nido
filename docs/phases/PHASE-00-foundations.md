@@ -73,7 +73,7 @@ These are needed by everything and must be correct before any feature exists.
    handling both `,` and `.` as the decimal separator, and `allocate(total, weights)`
    implementing largest-remainder allocation.
 2. `src/lib/dates/`: `periodBounds(period, referenceDate, { timezone, weekStartsOn,
-   monthStartsOn })` returning `{ from, to }` for day, week, month, quarter, and year,
+monthStartsOn })` returning `{ from, to }` for day, week, month, quarter, and year,
    correct across DST boundaries and for custom month starts; `previousPeriod(bounds)`;
    `formatRelativeDate(date, locale, timezone)`.
 3. Unit tests for both, including property-based tests with `fast-check` asserting that
@@ -93,9 +93,9 @@ These are needed by everything and must be correct before any feature exists.
 3. Second migration: `nido.is_member`, `nido.my_participant_id`, and `nido.has_role` helper
    functions exactly as specified, `security definer` with `set search_path = ''`.
 4. Supabase clients in `src/lib/supabase/`: `server.ts` (cookie-based, for RSC and Server
-   Actions), `client.ts` (browser), `middleware.ts` (session refresh), and `admin.ts`
+   Actions), `client.ts` (browser), `middleware.ts` (session helper used by proxy), and `admin.ts`
    (service role, with a runtime guard that throws if it is ever imported into a client bundle).
-5. `src/middleware.ts` refreshing the session on every matched request.
+5. `src/proxy.ts` refreshing the session on every matched request.
 6. `pnpm db:types` wired up and the generated file committed.
 7. pgTAP installed in the local stack, with one smoke test proving the harness works.
 

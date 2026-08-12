@@ -1,10 +1,11 @@
 'use client';
 
 import { decode } from 'blurhash';
-import { FileText } from 'lucide-react';
+import { Camera, FileText, Receipt } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAttachmentSignedUrl } from '@/features/attachments/actions';
 import type { AttachmentDateGroup } from '@/features/attachments/queries';
@@ -108,32 +109,72 @@ export function ReceiptsGallery({
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
-        <p className="font-medium">{t('emptyTitle')}</p>
-        <p className="max-w-sm text-sm text-muted-foreground">{t('emptyBody')}</p>
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-4 px-4 py-16 text-center">
+        <div className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card text-primary">
+          <Receipt className="size-7" aria-hidden />
+        </div>
+        <div className="space-y-2">
+          <p className="font-display text-2xl tracking-tight">{t('emptyTitle')}</p>
+          <p className="text-sm text-balance text-muted-foreground">{t('emptyBody')}</p>
+        </div>
+        <ol className="w-full space-y-3 rounded-xl border border-border bg-card p-4 text-left text-sm">
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+              1
+            </span>
+            <span>{t('emptyStep1')}</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+              2
+            </span>
+            <span>{t('emptyStep2')}</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+              3
+            </span>
+            <span>{t('emptyStep3')}</span>
+          </li>
+        </ol>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button asChild>
+            <Link href={route(`/s/${spaceId}/ledger`)}>
+              <Camera className="size-4" aria-hidden />
+              {t('emptyCtaLedger')}
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={route(`/s/${spaceId}/import`)}>{t('emptyCtaImport')}</Link>
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-8 p-4 lg:p-8">
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight">{t('galleryTitle')}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t('gallerySubtitle')}</p>
+      </div>
       {groups.map((group) => (
         <section key={group.date} className="space-y-3">
-          <h2 className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          <h2 className="text-sm font-medium text-muted-foreground">
             {new Intl.DateTimeFormat(locale, {
-              weekday: 'long',
               day: 'numeric',
               month: 'long',
               year: 'numeric',
-            }).format(new Date(`${group.date}T12:00:00Z`))}
+              timeZone: 'UTC',
+            }).format(new Date(`${group.date}T00:00:00Z`))}
           </h2>
-          <div
-            className={cn('grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5')}
-          >
+          <ul className={cn('grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5')}>
             {group.items.map((item) => (
-              <ReceiptTile key={item.id} spaceId={spaceId} item={item} />
+              <li key={item.id}>
+                <ReceiptTile spaceId={spaceId} item={item} />
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       ))}
     </div>

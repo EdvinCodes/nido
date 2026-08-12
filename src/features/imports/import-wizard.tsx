@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useCallback, useMemo, useRef, useState, useTransition } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -38,6 +38,15 @@ import { cn } from '@/lib/utils';
 
 type AccountOption = { id: string; name: string };
 type CategoryOption = { id: string; name: string };
+type BatchSummary = {
+  id: string;
+  fileName: string | null;
+  status: string;
+  rowCount: number;
+  importedCount: number;
+  createdAt: string;
+  committedAt: string | null;
+};
 
 const NIDO_FIELDS = [
   'date',
@@ -56,12 +65,14 @@ export function ImportWizard({
   accounts,
   categories,
   templates,
+  batches,
   baseCurrency,
 }: {
   spaceId: string;
   accounts: AccountOption[];
   categories: CategoryOption[];
   templates: ImportMappingTemplateRow[];
+  batches: BatchSummary[];
   baseCurrency: string;
 }) {
   const t = useTranslations('import');
@@ -87,46 +98,57 @@ export function ImportWizard({
     [],
   );
   const [rawMatrix, setRawMatrix] = useState<string[][]>([]);
+  const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onFile = useCallback(
     (file: File) => {
+      const lower = file.name.toLowerCase();
+      if (!lower.endsWith('.csv') && !lower.endsWith('.xlsx') && !lower.endsWith('.xls')) {
+        toast.error(t('upload.invalidType'));
+        return;
+      }
       startTransition(async () => {
-        const buf = await file.arrayBuffer();
-        const bytes = new Uint8Array(buf);
-        const base64 = bytesToBase64(bytes);
-        const localParsed = parseStatementFile(bytes, file.name);
-        setRawMatrix(localParsed.rows);
-        setLiveRows(
-          applyMappingToRows(
-            localParsed.headers,
-            localParsed.rows.slice(0, 5),
-            localParsed.suggestedMapping,
-            localParsed.dateFormat,
-          ),
-        );
-        const source = file.name.toLowerCase().endsWith('.xlsx') ? 'xlsx' : 'csv';
-        const result = await uploadImportAction({
-          spaceId,
-          fileName: file.name,
-          source,
-          fileData: base64,
-        });
-        if (!result.ok) {
-          toast.error(result.error.message);
-          return;
+        try {
+          const buf = await file.arrayBuffer();
+          const bytes = new Uint8Array(buf);
+          const base64 = bytesToBase64(bytes);
+          const localParsed = parseStatementFile(bytes, file.name);
+          setRawMatrix(localParsed.rows);
+          setLiveRows(
+            applyMappingToRows(
+              localParsed.headers,
+              localParsed.rows.slice(0, 5),
+              localParsed.suggestedMapping,
+              localParsed.dateFormat,
+            ),
+          );
+          const source = lower.endsWith('.xlsx') || lower.endsWith('.xls') ? 'xlsx' : 'csv';
+          const result = await uploadImportAction({
+            spaceId,
+            fileName: file.name,
+            source,
+            fileData: base64,
+          });
+          if (!result.ok) {
+            toast.error(result.error.message);
+            return;
+          }
+          setBatchId(result.data.batchId);
+          setHeaders(result.data.headers);
+          setMapping(result.data.suggestedMapping);
+          setMeta({
+            encoding: result.data.encoding,
+            delimiter: result.data.delimiter,
+            rowCount: result.data.rowCount,
+          });
+          setStep('map');
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : t('upload.failed'));
         }
-        setBatchId(result.data.batchId);
-        setHeaders(result.data.headers);
-        setMapping(result.data.suggestedMapping);
-        setMeta({
-          encoding: result.data.encoding,
-          delimiter: result.data.delimiter,
-          rowCount: result.data.rowCount,
-        });
-        setStep('map');
       });
     },
-    [spaceId],
+    [spaceId, t],
   );
 
   const refreshLivePreview = useCallback(() => {
@@ -246,67 +268,140 @@ export function ImportWizard({
       </ol>
 
       {step === 'upload' && (
-        <div className="rounded-lg border border-dashed border-border p-8 text-center">
-          <Label htmlFor="import-file" className="cursor-pointer">
-            <span className="text-sm font-medium">{t('upload.drop')}</span>
-            <Input
+        <div className="space-y-6">
+          <div
+            className={cn(
+              'rounded-xl border border-dashed bg-card/40 p-8 text-center transition-colors',
+              dragging ? 'border-primary bg-primary/5' : 'border-border',
+            )}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const file = e.dataTransfer.files[0];
+              if (file) onFile(file);
+            }}
+          >
+            <p className="text-sm font-medium">{t('upload.drop')}</p>
+            <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
+              {t('upload.hint')}
+            </p>
+            <input
+              ref={fileInputRef}
               id="import-file"
               type="file"
-              accept=".csv,.xlsx,.xls,text/csv"
+              accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="sr-only"
               onChange={(e) => {
                 const file = e.target.files?.[0];
+                e.target.value = '';
                 if (file) onFile(file);
               }}
             />
-          </Label>
-          {meta && (
-            <p className="mt-4 text-sm text-muted-foreground">
-              {t('upload.meta', {
-                encoding: meta.encoding,
-                delimiter: meta.delimiter,
-                count: meta.rowCount,
-              })}
-            </p>
-          )}
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => {
-                void exportSpaceAction({ spaceId }).then((res) => {
-                  if (!res.ok) return;
-                  const blob = new Blob([res.data.json], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = res.data.fileName;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                });
-              }}
-            >
-              {t('exportSpace')}
-            </Button>
-            <Label className="inline-flex cursor-pointer items-center rounded-md border px-3 py-2 text-sm">
-              {t('importJson')}
-              <Input
-                type="file"
-                accept="application/json,.json"
-                className="sr-only"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const text = await file.text();
-                  const res = await importSpaceJsonAction({ spaceId, fileData: text });
-                  if (res.ok)
-                    toast.success(t('jsonImported', { count: res.data.importedTransactions }));
-                  else toast.error(res.error.message);
+            {meta && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                {t('upload.meta', {
+                  encoding: meta.encoding,
+                  delimiter: meta.delimiter,
+                  count: meta.rowCount,
+                })}
+              </p>
+            )}
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <Button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  fileInputRef.current?.click();
                 }}
-              />
-            </Label>
+              >
+                {t('upload.chooseFile')}
+              </Button>
+              <Button type="button" variant="outline" asChild>
+                <a href="/samples/bank-statement.csv" download>
+                  {t('upload.sampleCsv')}
+                </a>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={pending}
+                onClick={() => {
+                  void exportSpaceAction({ spaceId }).then((res) => {
+                    if (!res.ok) return;
+                    const blob = new Blob([res.data.json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = res.data.fileName;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  });
+                }}
+              >
+                {t('exportSpace')}
+              </Button>
+              <Label className="inline-flex h-9 cursor-pointer items-center rounded-md border border-input px-3 text-sm">
+                {t('importJson')}
+                <Input
+                  type="file"
+                  accept="application/json,.json"
+                  className="sr-only"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const text = await file.text();
+                    const res = await importSpaceJsonAction({ spaceId, fileData: text });
+                    if (res.ok)
+                      toast.success(t('jsonImported', { count: res.data.importedTransactions }));
+                    else toast.error(res.error.message);
+                  }}
+                />
+              </Label>
+            </div>
           </div>
+
+          <section className="rounded-xl border border-border bg-card p-4">
+            <h2 className="text-sm font-medium">{t('history.title')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('history.body')}</p>
+            {batches.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">{t('history.empty')}</p>
+            ) : (
+              <ul className="mt-4 divide-y divide-border rounded-lg border border-border">
+                {batches.map((batch) => (
+                  <li
+                    key={batch.id}
+                    className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">{batch.fileName ?? t('history.untitled')}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t('history.meta', {
+                          status: batch.status,
+                          rows: batch.rowCount,
+                          imported: batch.importedCount,
+                        })}
+                      </p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {(batch.committedAt ?? batch.createdAt).slice(0, 10)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
       )}
 

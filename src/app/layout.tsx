@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
@@ -19,19 +19,24 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-/** Display only via `.font-display` (landing, auth panel, empty states). See docs/03. */
-const instrumentSerif = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: '400',
-});
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('metadata');
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
   return {
-    title: t('title'),
+    metadataBase: new URL(appUrl),
+    title: {
+      default: t('title'),
+      template: `%s · ${t('title')}`,
+    },
     description: t('description'),
     applicationName: 'Nido',
+    keywords: t('keywords')
+      .split(',')
+      .map((k) => k.trim())
+      .filter(Boolean),
+    authors: [{ name: 'Nido' }],
+    creator: 'Nido',
     manifest: '/manifest.webmanifest',
     appleWebApp: {
       capable: true,
@@ -39,7 +44,29 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Nido',
     },
     icons: {
-      apple: '/icons/apple-touch-icon.png',
+      icon: [
+        { url: '/icons/icon-16.png', sizes: '16x16', type: 'image/png' },
+        { url: '/icons/icon-32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    },
+    openGraph: {
+      type: 'website',
+      siteName: 'Nido',
+      title: t('ogTitle'),
+      description: t('ogDescription'),
+      url: appUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('ogTitle'),
+      description: t('ogDescription'),
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -59,7 +86,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-background pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] text-foreground">

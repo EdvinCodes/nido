@@ -1,7 +1,10 @@
 {
   "metadata": {
     "title": "Nido",
-    "description": "Household finance, shared. From one person to the whole home."
+    "description": "Household finance, shared. From one person to the whole home.",
+    "keywords": "household finance, shared expenses, budgets, splits, family money, open source",
+    "ogTitle": "Nido — household finance, shared",
+    "ogDescription": "Shared expenses, fair splits, budgets, and reports. Your data, your database."
   },
   "common": {
     "appName": "Nido",
@@ -174,7 +177,7 @@
         "logoUsage": "Use the lockup on light or dark backgrounds. The mark alone works for favicons and app icons. Do not stretch or recolour outside the token palette.",
         "colorsTitle": "Colour tokens",
         "typeTitle": "Typography",
-        "typeBody": "Instrument Serif for display headlines. Geist Sans for UI and body. Geist Mono for amounts and code."
+        "typeBody": "Geist Sans for display headlines and UI. Geist Mono for amounts and code."
       },
       "docs": {
         "title": "Documentation",
@@ -355,6 +358,10 @@
     "strengthStrong": "Strong",
     "panelTitle": "Money, shared calmly",
     "panelBody": "One nest for your household — splits, budgets, and peace of mind.",
+    "panelPoint1": "Fair splits for shared expenses",
+    "panelPoint2": "Budgets and goals the whole home can see",
+    "panelPoint3": "Your data stays in your database",
+    "panelPreviewLabel": "Dashboard preview",
     "dev": {
       "badge": "Local development",
       "hint": "Demo users from seed data. Requires local Supabase with `pnpm db:reset`.",
@@ -764,6 +771,12 @@
     "loading": "Loading…",
     "emptyTitle": "No receipts yet",
     "emptyBody": "Attach a photo when recording an expense, or scan a receipt to get started.",
+    "emptyStep1": "Open the ledger and create or edit an expense.",
+    "emptyStep2": "Add a photo or PDF from the attachment strip on the transaction.",
+    "emptyStep3": "Receipts appear here grouped by date, ready to reopen anytime.",
+    "emptyCtaLedger": "Go to ledger",
+    "emptyCtaImport": "Import statements",
+    "gallerySubtitle": "Photos and PDFs attached to household transactions.",
     "extracting": "Reading your receipt…",
     "clearSuggestions": "Clear suggestions",
     "fabLabelWithScan": "Add transaction. Long-press to scan a receipt.",
@@ -977,8 +990,20 @@
       "commit": "Done"
     },
     "upload": {
-      "drop": "Drop a CSV or XLSX file, or click to browse",
+      "drop": "Drop a CSV or XLSX file here",
+      "hint": "Use a bank statement export, or try the sample CSV to walk through mapping and preview.",
+      "chooseFile": "Choose CSV or XLSX",
+      "sampleCsv": "Download sample CSV",
+      "invalidType": "Choose a .csv, .xlsx, or .xls file.",
+      "failed": "Could not read that statement file.",
       "meta": "Detected {encoding}, delimiter “{delimiter}”, {count} rows"
+    },
+    "history": {
+      "title": "Recent imports",
+      "body": "Committed and draft batches for this space.",
+      "empty": "No imports yet. Upload a statement to create the first batch.",
+      "untitled": "Untitled file",
+      "meta": "{status} · {rows} rows · {imported} imported"
     },
     "map": {
       "account": "Target account",
@@ -1061,7 +1086,10 @@
     "savingsRate": "Savings rate",
     "savingsRateTrend": "Savings rate over time",
     "closedPeriods": "Closed periods",
-    "empty": "No closed periods yet. They appear after the first monthly close.",
+    "openPeriods": "Recent periods",
+    "thisMonth": "This month",
+    "pastMonth": "Past month",
+    "empty": "No closed periods yet. They appear after the first monthly close. Live totals above still reflect your ledger.",
     "exportPdf": "Export PDF",
     "exportXlsx": "Export Excel",
     "exportCsv": "Export CSV",

@@ -4,7 +4,7 @@
  * signed-in user's JWT and RLS applies exactly as it would for that user's own requests.
  *
  * Server Components cannot write cookies (Next.js throws), so `setAll` is wrapped in a
- * try/catch: the write is a no-op there, which is safe because `src/middleware.ts` already
+ * try/catch: the write is a no-op there, which is safe because `src/proxy.ts` already
  * refreshes the session cookie on every matched request. See docs/01-ARCHITECTURE.md §5.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Session refresh plus route protection for `src/middleware.ts`. Runs on every matched
+ * Session refresh plus route protection for `src/proxy.ts`. Runs on every matched
  * request so an expiring access token is rotated before a Server Component ever sees a
  * stale JWT, and so signed-out visitors never reach the authenticated app shell or
  * onboarding, while signed-in visitors are bounced away from the auth pages.

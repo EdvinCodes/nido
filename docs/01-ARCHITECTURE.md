@@ -49,41 +49,41 @@ Pin exact versions in `package.json`. These are the targets at the time of writi
 executing agent must install `@latest` within the same major and record what it actually
 installed.
 
-| Concern | Choice | Notes |
-| --- | --- | --- |
-| Framework | **Next.js 16.3+** | App Router, RSC, Server Actions, Turbopack, `next/after` |
-| Language | **TypeScript 5.9+** | `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax` |
-| Runtime | **Node 22 LTS** | Set in `.nvmrc` and in CI |
-| Package manager | **pnpm 10+** | `packageManager` field pinned; lockfile committed |
-| UI library | **React 19** | Server Components, `useActionState`, `useOptimistic` |
-| Styling | **Tailwind CSS v4** | CSS-first config via `@theme` in `globals.css`, OKLCH colors |
-| Components | **shadcn/ui** (new-york) | Copied into `src/components/ui`, owned by us, freely edited |
-| Icons | **lucide-react** | One icon set only |
-| Motion | **Motion** (`motion/react`) | Springs and layout animations; respects `prefers-reduced-motion` |
-| Charts | **Recharts** via shadcn charts | Wrapped in our own `<Chart*>` primitives |
-| Tables | **TanStack Table v8** | Virtualized ledger with `@tanstack/react-virtual` |
-| Client cache | **TanStack Query v5** | Only for client-side and realtime data; RSC handles first paint |
-| URL state | **nuqs** | Filters, date ranges, and tabs live in the URL and are shareable |
-| Forms | **react-hook-form** + **Zod 4** | One schema shared by the form and the Server Action |
-| Dates | **date-fns v4** + `@date-fns/tz` | Timezone-aware period math |
-| i18n | **next-intl** | `es` and `en`, `es` default |
-| Toasts | **sonner** | shadcn's `toast` is deprecated |
-| Command palette | **cmdk** | ⌘K for navigation and quick add |
-| Backend | **Supabase** | Cloud free tier or self-hosted Docker |
-| Database | **Postgres 17** | Migrations in `supabase/migrations`, SQL is the source of truth |
-| Types | `supabase gen types typescript` | Generated, committed, never hand-edited |
-| AI | **AI SDK** (`ai` v7) | `ToolLoopAgent`, typed tools, streaming, provider-agnostic |
-| Files | **browser-image-compression** | Client-side receipt compression before upload |
-| Spreadsheets | **SheetJS (xlsx)** + **PapaParse** | Import and export |
-| PDF | **@react-pdf/renderer** | Server-rendered report PDFs |
-| Push | **web-push** (VAPID) | No Firebase dependency |
-| Unit tests | **Vitest** + **Testing Library** | |
-| DB tests | **pgTAP** | RLS policies, triggers, and SQL functions |
-| E2E | **Playwright** | Chromium desktop + mobile viewport projects |
-| Lint | **ESLint 9** flat config + **Prettier** | Plus `eslint-plugin-security` and a11y rules |
-| Hooks | **Husky** + **lint-staged** | Format and lint on commit, `pnpm verify` on push |
-| CI | **GitHub Actions** | Lint, typecheck, unit, db, e2e, build |
-| Errors | **Sentry** (optional, off by default) | Self-hostable; disabled unless a DSN is set |
+| Concern         | Choice                                  | Notes                                                            |
+| --------------- | --------------------------------------- | ---------------------------------------------------------------- |
+| Framework       | **Next.js 16.3+**                       | App Router, RSC, Server Actions, Turbopack, `next/after`         |
+| Language        | **TypeScript 5.9+**                     | `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`     |
+| Runtime         | **Node 22 LTS**                         | Set in `.nvmrc` and in CI                                        |
+| Package manager | **pnpm 10+**                            | `packageManager` field pinned; lockfile committed                |
+| UI library      | **React 19**                            | Server Components, `useActionState`, `useOptimistic`             |
+| Styling         | **Tailwind CSS v4**                     | CSS-first config via `@theme` in `globals.css`, OKLCH colors     |
+| Components      | **shadcn/ui** (new-york)                | Copied into `src/components/ui`, owned by us, freely edited      |
+| Icons           | **lucide-react**                        | One icon set only                                                |
+| Motion          | **Motion** (`motion/react`)             | Springs and layout animations; respects `prefers-reduced-motion` |
+| Charts          | **Recharts** via shadcn charts          | Wrapped in our own `<Chart*>` primitives                         |
+| Tables          | **TanStack Table v8**                   | Virtualized ledger with `@tanstack/react-virtual`                |
+| Client cache    | **TanStack Query v5**                   | Only for client-side and realtime data; RSC handles first paint  |
+| URL state       | **nuqs**                                | Filters, date ranges, and tabs live in the URL and are shareable |
+| Forms           | **react-hook-form** + **Zod 4**         | One schema shared by the form and the Server Action              |
+| Dates           | **date-fns v4** + `@date-fns/tz`        | Timezone-aware period math                                       |
+| i18n            | **next-intl**                           | `es` and `en`, `es` default                                      |
+| Toasts          | **sonner**                              | shadcn's `toast` is deprecated                                   |
+| Command palette | **cmdk**                                | ⌘K for navigation and quick add                                  |
+| Backend         | **Supabase**                            | Cloud free tier or self-hosted Docker                            |
+| Database        | **Postgres 17**                         | Migrations in `supabase/migrations`, SQL is the source of truth  |
+| Types           | `supabase gen types typescript`         | Generated, committed, never hand-edited                          |
+| AI              | **AI SDK** (`ai` v7)                    | `ToolLoopAgent`, typed tools, streaming, provider-agnostic       |
+| Files           | **browser-image-compression**           | Client-side receipt compression before upload                    |
+| Spreadsheets    | **SheetJS (xlsx)** + **PapaParse**      | Import and export                                                |
+| PDF             | **@react-pdf/renderer**                 | Server-rendered report PDFs                                      |
+| Push            | **web-push** (VAPID)                    | No Firebase dependency                                           |
+| Unit tests      | **Vitest** + **Testing Library**        |                                                                  |
+| DB tests        | **pgTAP**                               | RLS policies, triggers, and SQL functions                        |
+| E2E             | **Playwright**                          | Chromium desktop + mobile viewport projects                      |
+| Lint            | **ESLint 9** flat config + **Prettier** | Plus `eslint-plugin-security` and a11y rules                     |
+| Hooks           | **Husky** + **lint-staged**             | Format and lint on commit, `pnpm verify` on push                 |
+| CI              | **GitHub Actions**                      | Lint, typecheck, unit, db, e2e, build                            |
+| Errors          | **Sentry** (optional, off by default)   | Self-hostable; disabled unless a DSN is set                      |
 
 ### Deliberately not used
 
@@ -143,14 +143,14 @@ nido/
 │  │  ├─ notifications/
 │  │  └─ assistant/
 │  ├─ lib/
-│  │  ├─ supabase/             server.ts, client.ts, middleware.ts, database.types.ts
+│  │  ├─ supabase/             server.ts, client.ts, middleware.ts (session helper), database.types.ts
 │  │  ├─ money/                Money type, formatting, allocation, FX
 │  │  ├─ dates/                period boundaries in a given timezone
 │  │  ├─ auth/                 authedAction wrapper, membership resolution
 │  │  ├─ ai/                   provider registry, tool definitions
 │  │  └─ utils/
 │  ├─ i18n/                    messages/es.json, messages/en.json, routing
-│  └─ middleware.ts            session refresh + route protection
+│  └─ proxy.ts                 session refresh + route protection (Node runtime)
 ├─ AGENTS.md
 ├─ README.md
 └─ package.json
@@ -187,8 +187,10 @@ JavaScript loops over thousands of rows.
 ```ts
 export const createTransaction = authedAction
   .schema(createTransactionSchema)
-  .space(({ input }) => input.spaceId)   // resolves membership, throws if not a member
-  .action(async ({ input, ctx }) => { /* ... */ });
+  .space(({ input }) => input.spaceId) // resolves membership, throws if not a member
+  .action(async ({ input, ctx }) => {
+    /* ... */
+  });
 ```
 
 The wrapper resolves the session, loads the membership and role, validates input with Zod,
@@ -207,17 +209,17 @@ rate refresh (daily), bank sync (every 6 h when enabled), and a monthly close sn
 ## 5. Authentication and authorization
 
 Supabase Auth with email + password, magic link, and Google OAuth. Sessions are cookie-based
-and refreshed in `src/middleware.ts` on every request so Server Components always see a
+and refreshed in `src/proxy.ts` on every request so Server Components always see a
 valid JWT.
 
 Roles inside a space:
 
-| Role | Can |
-| --- | --- |
-| `owner` | Everything, including deleting the space and transferring ownership |
-| `admin` | Manage members, categories, budgets, accounts; edit any transaction |
+| Role     | Can                                                                          |
+| -------- | ---------------------------------------------------------------------------- |
+| `owner`  | Everything, including deleting the space and transferring ownership          |
+| `admin`  | Manage members, categories, budgets, accounts; edit any transaction          |
 | `member` | Create transactions; edit and delete their own; read everything in the space |
-| `viewer` | Read-only. Useful for a parent or an accountant. |
+| `viewer` | Read-only. Useful for a parent or an accountant.                             |
 
 Role checks live in one place: SQL helper functions (`nido.has_role(space_id, roles[])`)
 used by RLS policies, mirrored by a TypeScript `can()` helper used to hide UI affordances.
@@ -261,14 +263,14 @@ commitments:
 
 ## 8. Performance budget
 
-| Metric | Target |
-| --- | --- |
-| LCP, landing, mobile 4G | < 1.2 s |
-| LCP, dashboard, mobile 4G | < 1.5 s |
-| INP | < 200 ms |
-| CLS | < 0.05 |
-| Initial JS on the dashboard route | < 180 KB gzipped |
-| Ledger scroll with 10 000 rows | 60 fps (virtualized) |
+| Metric                            | Target               |
+| --------------------------------- | -------------------- |
+| LCP, landing, mobile 4G           | < 1.2 s              |
+| LCP, dashboard, mobile 4G         | < 1.5 s              |
+| INP                               | < 200 ms             |
+| CLS                               | < 0.05               |
+| Initial JS on the dashboard route | < 180 KB gzipped     |
+| Ledger scroll with 10 000 rows    | 60 fps (virtualized) |
 
 Techniques: Server Components for anything static, `next/dynamic` for charts and the
 assistant panel, `next/font` with `display: swap` and subsetting, aggregation pushed into
@@ -279,23 +281,23 @@ analytics so they never block a response.
 
 Everything documented here must exist in `.env.example` with a placeholder.
 
-| Variable | Where | Required | Purpose |
-| --- | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | client + server | yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | yes | Anon key; safe to expose, RLS protects data |
-| `SUPABASE_SERVICE_ROLE_KEY` | server only | yes | Edge Functions and admin scripts. Never imported into a client bundle. |
-| `NEXT_PUBLIC_APP_URL` | client + server | yes | Absolute URL for OAuth redirects, emails, OG tags |
-| `AI_PROVIDER` | server | no | `openai` \| `anthropic` \| `google` \| `ollama`. Unset disables the assistant. |
-| `AI_MODEL` | server | no | Model id for the chosen provider |
-| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_GENERATIVE_AI_API_KEY` | server | no | Whichever provider is selected |
-| `OLLAMA_BASE_URL` | server | no | Defaults to `http://localhost:11434` |
-| `FX_API_URL` | server | no | Exchange rate source; defaults to the free Frankfurter endpoint |
-| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | server | no | Web push. Generated with `pnpm push:keys`. |
-| `BANK_PROVIDER` | server | no | `enablebanking` \| `none` |
-| `BANK_APP_ID` / `BANK_PRIVATE_KEY` | server | no | PSD2 provider credentials |
-| `RESEND_API_KEY` | server | no | Transactional email; falls back to Supabase's built-in SMTP |
-| `SENTRY_DSN` | server | no | Error reporting; disabled when unset |
-| `CRON_SECRET` | server | yes in prod | Shared secret asserted by every Edge Function entry point |
+| Variable                                                                | Where           | Required    | Purpose                                                                        |
+| ----------------------------------------------------------------------- | --------------- | ----------- | ------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`                                              | client + server | yes         | Supabase project URL                                                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`                                         | client + server | yes         | Anon key; safe to expose, RLS protects data                                    |
+| `SUPABASE_SERVICE_ROLE_KEY`                                             | server only     | yes         | Edge Functions and admin scripts. Never imported into a client bundle.         |
+| `NEXT_PUBLIC_APP_URL`                                                   | client + server | yes         | Absolute URL for OAuth redirects, emails, OG tags                              |
+| `AI_PROVIDER`                                                           | server          | no          | `openai` \| `anthropic` \| `google` \| `ollama`. Unset disables the assistant. |
+| `AI_MODEL`                                                              | server          | no          | Model id for the chosen provider                                               |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_GENERATIVE_AI_API_KEY` | server          | no          | Whichever provider is selected                                                 |
+| `OLLAMA_BASE_URL`                                                       | server          | no          | Defaults to `http://localhost:11434`                                           |
+| `FX_API_URL`                                                            | server          | no          | Exchange rate source; defaults to the free Frankfurter endpoint                |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`              | server          | no          | Web push. Generated with `pnpm push:keys`.                                     |
+| `BANK_PROVIDER`                                                         | server          | no          | `enablebanking` \| `none`                                                      |
+| `BANK_APP_ID` / `BANK_PRIVATE_KEY`                                      | server          | no          | PSD2 provider credentials                                                      |
+| `RESEND_API_KEY`                                                        | server          | no          | Transactional email; falls back to Supabase's built-in SMTP                    |
+| `SENTRY_DSN`                                                            | server          | no          | Error reporting; disabled when unset                                           |
+| `CRON_SECRET`                                                           | server          | yes in prod | Shared secret asserted by every Edge Function entry point                      |
 
 Any feature whose variables are unset must degrade gracefully: the UI hides the entry point
 and the settings page explains what to configure. Nothing crashes because an optional
@@ -333,14 +335,14 @@ sends nothing anywhere.
 
 ## 12. Threat model (what we actually defend against)
 
-| Threat | Mitigation |
-| --- | --- |
-| Leaked anon key | RLS. The anon key alone grants access to nothing. |
-| Member of space A reading space B | RLS policies plus pgTAP tests asserting the negative case. |
-| Direct object reference on an attachment | Private bucket, path-scoped policy, signed URLs with short TTL. |
-| Malicious upload | MIME sniffing plus extension allowlist plus size cap; images re-encoded to WebP server-side, stripping EXIF including GPS. |
+| Threat                                           | Mitigation                                                                                                                                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Leaked anon key                                  | RLS. The anon key alone grants access to nothing.                                                                                                                                                       |
+| Member of space A reading space B                | RLS policies plus pgTAP tests asserting the negative case.                                                                                                                                              |
+| Direct object reference on an attachment         | Private bucket, path-scoped policy, signed URLs with short TTL.                                                                                                                                         |
+| Malicious upload                                 | MIME sniffing plus extension allowlist plus size cap; images re-encoded to WebP server-side, stripping EXIF including GPS.                                                                              |
 | Prompt injection through a merchant name or note | The assistant's tools are read-only and parameterized. The model never emits SQL. Free text from the database is delivered inside a clearly delimited data block with instructions to treat it as data. |
-| Data exfiltration via the assistant | Opt-in per space, user-supplied key, explicit consent screen listing exactly what is sent, and a local-model option that sends nothing. |
-| CSRF | Server Actions' built-in origin checks plus `SameSite=Lax` cookies. |
-| Enumeration of invitation tokens | 256-bit tokens stored hashed, constant-time comparison, rate limited. |
-| Brute force on sign-in | Supabase Auth rate limits plus a per-IP limiter in middleware. |
+| Data exfiltration via the assistant              | Opt-in per space, user-supplied key, explicit consent screen listing exactly what is sent, and a local-model option that sends nothing.                                                                 |
+| CSRF                                             | Server Actions' built-in origin checks plus `SameSite=Lax` cookies.                                                                                                                                     |
+| Enumeration of invitation tokens                 | 256-bit tokens stored hashed, constant-time comparison, rate limited.                                                                                                                                   |
+| Brute force on sign-in                           | Supabase Auth rate limits plus a per-IP limiter in middleware.                                                                                                                                          |

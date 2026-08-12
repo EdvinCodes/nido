@@ -947,6 +947,96 @@ begin
   raise notice
     'Seeded space % ("Casa de Alex y Sam") with % transactions (% expenses, % incomes, % transfers), 2 budgets, 2 goals, 4 subscriptions.',
     v_space_id, v_n_transactions, v_n_expenses, v_n_incomes, v_n_transfers;
+
+  -- -------------------------------------------------------------------------------------
+  -- Closed period snapshots (reports) + a sample committed import batch (import history).
+  -- -------------------------------------------------------------------------------------
+  declare
+    v_from date;
+    v_to date;
+    v_batch_id uuid := '00000000-0000-4000-8000-0000000000f1';
+    v_month int;
+  begin
+    for v_month in 1..3 loop
+      v_from := (date_trunc('month', current_date) - make_interval(months => v_month))::date;
+      v_to := (date_trunc('month', current_date) - make_interval(months => v_month - 1) - interval '1 day')::date;
+      insert into nido.period_snapshots (space_id, period_from, period_to, payload)
+      values (
+        v_space_id,
+        v_from,
+        v_to,
+        nido.period_snapshot(v_space_id, v_from, v_to)
+      )
+      on conflict (space_id, period_from, period_to) do update
+        set payload = excluded.payload, created_at = now();
+    end loop;
+
+    insert into nido.import_batches (
+      id, space_id, source, file_name, account_id, mapping, status,
+      row_count, imported_count, skipped_count, created_by, committed_at
+    ) values (
+      v_batch_id,
+      v_space_id,
+      'csv',
+      'demo-bank-statement.csv',
+      v_account_checking,
+      jsonb_build_object(
+        'date', 'Date',
+        'description', 'Description',
+        'amount', 'Amount',
+        'merchant', 'Merchant'
+      ),
+      'committed',
+      3,
+      3,
+      0,
+      v_alex_id,
+      now() - interval '2 days'
+    );
+
+    insert into nido.import_rows (
+      batch_id, space_id, raw, parsed, fingerprint, decision
+    ) values
+      (
+        v_batch_id, v_space_id,
+        jsonb_build_object('Date', '2026-05-02', 'Description', 'Mercadona', 'Amount', '-42.35', 'Merchant', 'Mercadona'),
+        jsonb_build_object(
+          'booked_on', '2026-05-02',
+          'description', 'Mercadona',
+          'merchant', 'Mercadona',
+          'amount_minor', 4235,
+          'currency', 'EUR'
+        ),
+        'seed-import-fp-1',
+        'import'
+      ),
+      (
+        v_batch_id, v_space_id,
+        jsonb_build_object('Date', '2026-05-05', 'Description', 'Salary', 'Amount', '2400.00', 'Merchant', 'Employer'),
+        jsonb_build_object(
+          'booked_on', '2026-05-05',
+          'description', 'Salary',
+          'merchant', 'Employer',
+          'amount_minor', -240000,
+          'currency', 'EUR'
+        ),
+        'seed-import-fp-2',
+        'import'
+      ),
+      (
+        v_batch_id, v_space_id,
+        jsonb_build_object('Date', '2026-05-08', 'Description', 'Netflix', 'Amount', '-15.99', 'Merchant', 'Netflix'),
+        jsonb_build_object(
+          'booked_on', '2026-05-08',
+          'description', 'Netflix',
+          'merchant', 'Netflix',
+          'amount_minor', 1599,
+          'currency', 'EUR'
+        ),
+        'seed-import-fp-3',
+        'import'
+      );
+  end;
 end $$;
 
 commit;

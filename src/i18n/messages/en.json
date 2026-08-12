@@ -528,6 +528,9 @@
   },
   "transactions": {
     "addTitle": "Add transaction",
+    "editTitle": "Edit transaction",
+    "updated": "Transaction updated",
+    "editRequiresOnline": "Editing requires a connection.",
     "amount": "Amount",
     "category": "Category",
     "categoryPlaceholder": "Choose a category",

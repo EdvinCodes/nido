@@ -138,7 +138,7 @@ values (
 );
 select set_config('test.third_participant', '10000000-0000-0000-0000-0000000000d3', true);
 
-select plan(17);
+select plan(20);
 
 -- 1. Equal split of 1000 across three participants sums exactly.
 select lives_ok(
@@ -424,6 +424,117 @@ select isnt_empty(
     current_setting('test.ledger_space')
   ),
   'member can select transactions'
+);
+
+-- 14–16. update_transaction can change amount without mid-mutation split imbalance.
+select lives_ok(
+  format(
+    $fmt$
+      select nido.update_transaction(
+        (nido.create_transaction(jsonb_build_object(
+          'space_id', %L::uuid,
+          'kind', 'expense',
+          'booked_on', '2026-06-01',
+          'amount_minor', 1000,
+          'currency', 'EUR',
+          'category_id', %L::uuid,
+          'payer_participant_id', %L::uuid,
+          'split_mode', 'equal',
+          'participants', jsonb_build_array(
+            jsonb_build_object('participant_id', %L::uuid, 'weight', 1),
+            jsonb_build_object('participant_id', %L::uuid, 'weight', 1)
+          )
+        )) ->> 'id')::uuid,
+        jsonb_build_object(
+          'request_id', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1'::uuid,
+          'kind', 'expense',
+          'booked_on', '2026-06-01',
+          'amount_minor', 2500,
+          'currency', 'EUR',
+          'category_id', %L::uuid,
+          'payer_participant_id', %L::uuid,
+          'split_mode', 'equal',
+          'participants', jsonb_build_array(
+            jsonb_build_object('participant_id', %L::uuid, 'weight', 1),
+            jsonb_build_object('participant_id', %L::uuid, 'weight', 1)
+          )
+        )
+      )
+    $fmt$,
+    current_setting('test.ledger_space'),
+    current_setting('test.category'),
+    current_setting('test.alice_participant'),
+    current_setting('test.alice_participant'),
+    current_setting('test.ghost_participant'),
+    current_setting('test.category'),
+    current_setting('test.alice_participant'),
+    current_setting('test.alice_participant'),
+    current_setting('test.ghost_participant')
+  ),
+  'update_transaction can change amount and rebalance equal splits'
+);
+
+select is(
+  (
+    select t.amount_minor
+    from nido.transactions t
+    where t.booked_on = '2026-06-01'
+      and t.amount_minor = 2500
+      and t.deleted_at is null
+    order by t.created_at desc
+    limit 1
+  ),
+  2500::bigint,
+  'updated transaction persists the new amount'
+);
+
+select throws_ok(
+  format(
+    $fmt$
+      select nido.update_transaction(
+        (nido.create_transaction(jsonb_build_object(
+          'space_id', %L::uuid,
+          'kind', 'expense',
+          'booked_on', '2026-06-03',
+          'amount_minor', 1000,
+          'currency', 'EUR',
+          'category_id', %L::uuid,
+          'payer_participant_id', %L::uuid,
+          'split_mode', 'exact',
+          'participants', jsonb_build_array(
+            jsonb_build_object('participant_id', %L::uuid, 'owed_minor', 600),
+            jsonb_build_object('participant_id', %L::uuid, 'owed_minor', 400)
+          )
+        )) ->> 'id')::uuid,
+        jsonb_build_object(
+          'request_id', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2'::uuid,
+          'kind', 'expense',
+          'booked_on', '2026-06-03',
+          'amount_minor', 1000,
+          'currency', 'EUR',
+          'category_id', %L::uuid,
+          'payer_participant_id', %L::uuid,
+          'split_mode', 'exact',
+          'participants', jsonb_build_array(
+            jsonb_build_object('participant_id', %L::uuid, 'owed_minor', 700),
+            jsonb_build_object('participant_id', %L::uuid, 'owed_minor', 200)
+          )
+        )
+      )
+    $fmt$,
+    current_setting('test.ledger_space'),
+    current_setting('test.category'),
+    current_setting('test.alice_participant'),
+    current_setting('test.alice_participant'),
+    current_setting('test.ghost_participant'),
+    current_setting('test.category'),
+    current_setting('test.alice_participant'),
+    current_setting('test.alice_participant'),
+    current_setting('test.ghost_participant')
+  ),
+  'P0001',
+  null,
+  'update_transaction still rejects unbalanced exact splits'
 );
 
 select * from finish();

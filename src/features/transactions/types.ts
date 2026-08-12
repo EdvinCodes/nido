@@ -45,6 +45,7 @@ export type TransactionView = {
   currency: string;
   base_amount_minor: number;
   base_rate: number;
+  base_rate_manual?: boolean;
   description: string;
   merchant: string | null;
   notes: string | null;

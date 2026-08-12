@@ -528,6 +528,9 @@
   },
   "transactions": {
     "addTitle": "Añadir movimiento",
+    "editTitle": "Editar movimiento",
+    "updated": "Movimiento actualizado",
+    "editRequiresOnline": "Para editar hace falta conexión.",
     "amount": "Importe",
     "category": "Categoría",
     "categoryPlaceholder": "Elige una categoría",

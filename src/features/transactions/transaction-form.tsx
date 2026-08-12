@@ -26,7 +26,7 @@ import { invokeReceiptExtract } from '@/features/attachments/lib/invoke-extract'
 import { pollReceiptExtraction } from '@/features/attachments/lib/poll-ocr';
 import { enqueuePendingTransaction } from '@/features/offline/db';
 import { useOfflineOptional } from '@/features/offline/offline-provider';
-import { createTransaction } from '@/features/transactions/actions';
+import { createTransaction, updateTransaction } from '@/features/transactions/actions';
 import { useTransactionComposer } from '@/features/transactions/composer-context';
 import { buildOptimisticTransaction } from '@/features/transactions/lib/build-optimistic-transaction';
 import { SplitEditor, type SplitEditorParticipant } from '@/features/transactions/split-editor';
@@ -35,7 +35,7 @@ import type { SplitMode } from '@/features/transactions/lib/compute-splits';
 import { validateSplit } from '@/features/transactions/lib/validate-split';
 import { useSpaceContext } from '@/features/spaces/space-context';
 import { useMediaQuery } from '@/lib/use-media-query';
-import type { AccountRow } from '@/features/transactions/types';
+import type { AccountRow, TransactionView } from '@/features/transactions/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { transactionsQueryKey } from '@/features/transactions/hooks';
 import { cn } from '@/lib/utils';
@@ -83,13 +83,15 @@ export function TransactionComposerHost({
   recentCurrencies: string[];
   isAiConfigured: boolean;
 }) {
-  const { mode, close } = useTransactionComposer();
-  const open = mode === 'create' || mode === 'scan';
+  const { mode, close, editTarget } = useTransactionComposer();
+  const open = mode === 'create' || mode === 'scan' || mode === 'edit';
   const scanMode = mode === 'scan';
+  const editMode = mode === 'edit';
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   const form = (
     <TransactionForm
+      key={editTarget?.id ?? (scanMode ? 'scan' : 'create')}
       categories={categories}
       accounts={accounts}
       participants={participants}
@@ -97,6 +99,7 @@ export function TransactionComposerHost({
       onDone={close}
       scanMode={scanMode}
       isAiConfigured={isAiConfigured}
+      initial={editMode ? editTarget : null}
     />
   );
 
@@ -111,7 +114,7 @@ export function TransactionComposerHost({
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              <ComposerTitle scanMode={scanMode} />
+              <ComposerTitle scanMode={scanMode} editMode={editMode} />
             </DialogTitle>
           </DialogHeader>
           {form}
@@ -130,7 +133,7 @@ export function TransactionComposerHost({
       <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-xl">
         <SheetHeader>
           <SheetTitle>
-            <ComposerTitle scanMode={scanMode} />
+            <ComposerTitle scanMode={scanMode} editMode={editMode} />
           </SheetTitle>
         </SheetHeader>
         <KeyboardAwareScroll>
@@ -141,10 +144,12 @@ export function TransactionComposerHost({
   );
 }
 
-function ComposerTitle({ scanMode }: { scanMode: boolean }) {
+function ComposerTitle({ scanMode, editMode }: { scanMode: boolean; editMode: boolean }) {
   const t = useTranslations('transactions');
   const tAttachments = useTranslations('attachments');
-  return <>{scanMode ? tAttachments('scanTitle') : t('addTitle')}</>;
+  if (editMode) return <>{t('editTitle')}</>;
+  if (scanMode) return <>{tAttachments('scanTitle')}</>;
+  return <>{t('addTitle')}</>;
 }
 
 function SuggestedLabel({ children, suggested }: { children: ReactNode; suggested?: boolean }) {
@@ -165,6 +170,7 @@ function TransactionForm({
   onDone,
   scanMode = false,
   isAiConfigured = false,
+  initial = null,
 }: {
   categories: CategoryOption[];
   accounts: AccountRow[];
@@ -173,6 +179,7 @@ function TransactionForm({
   onDone: () => void;
   scanMode?: boolean;
   isAiConfigured?: boolean;
+  initial?: TransactionView | null;
 }) {
   const t = useTranslations('transactions');
   const tAttachments = useTranslations('attachments');
@@ -184,6 +191,7 @@ function TransactionForm({
   const queryClient = useQueryClient();
   const [pending, startTransition] = useTransition();
   const pickerRef = useRef<AttachmentPickerHandle>(null);
+  const editingId = initial?.id ?? null;
 
   const defaultSplit: SplitMode = space.kind === 'solo' ? 'personal' : 'equal';
   const defaultSelected: SplitParticipantInput[] =
@@ -195,22 +203,36 @@ function TransactionForm({
           position: p.position,
         }));
 
-  const [kind, setKind] = useState<'expense' | 'income' | 'transfer'>('expense');
-  const [amountMinor, setAmountMinor] = useState<number | null>(null);
-  const [currency, setCurrency] = useState(space.base_currency);
-  const [manualRate, setManualRate] = useState('');
-  const [useManualRate, setUseManualRate] = useState(false);
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [bookedOn, setBookedOn] = useState(() => todayIso(space.timezone));
-  const [description, setDescription] = useState('');
-  const [merchant, setMerchant] = useState('');
-  const [notes, setNotes] = useState('');
-  const [accountId, setAccountId] = useState(accounts[0]?.id ?? '');
-  const [toAccountId, setToAccountId] = useState(accounts[1]?.id ?? '');
-  const [payerId, setPayerId] = useState(participantId);
-  const [splitMode, setSplitMode] = useState<SplitMode>(defaultSplit);
-  const [selected, setSelected] = useState<SplitParticipantInput[]>(defaultSelected);
-  const [advanced, setAdvanced] = useState(scanMode);
+  const initialSelected: SplitParticipantInput[] =
+    initial && initial.kind !== 'transfer' && initial.splits.length > 0
+      ? initial.splits.map((s, index) => ({
+          participantId: s.participant_id,
+          weight: s.weight,
+          owedMinor: BigInt(s.owed_minor),
+          position: index,
+        }))
+      : defaultSelected;
+
+  const [kind, setKind] = useState<'expense' | 'income' | 'transfer'>(initial?.kind ?? 'expense');
+  const [amountMinor, setAmountMinor] = useState<number | null>(initial?.amount_minor ?? null);
+  const [currency, setCurrency] = useState(initial?.currency ?? space.base_currency);
+  const [manualRate, setManualRate] = useState(
+    initial?.base_rate_manual ? String(initial.base_rate) : '',
+  );
+  const [useManualRate, setUseManualRate] = useState(Boolean(initial?.base_rate_manual));
+  const [categoryId, setCategoryId] = useState<string>(initial?.category_id ?? '');
+  const [bookedOn, setBookedOn] = useState(() => initial?.booked_on ?? todayIso(space.timezone));
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const [merchant, setMerchant] = useState(initial?.merchant ?? '');
+  const [notes, setNotes] = useState(initial?.notes ?? '');
+  const [accountId, setAccountId] = useState(initial?.account_id ?? accounts[0]?.id ?? '');
+  const [toAccountId, setToAccountId] = useState(initial?.to_account_id ?? accounts[1]?.id ?? '');
+  const [payerId, setPayerId] = useState(initial?.payer_participant_id ?? participantId);
+  const [splitMode, setSplitMode] = useState<SplitMode>(
+    initial?.kind === 'transfer' ? 'personal' : (initial?.split_mode ?? defaultSplit),
+  );
+  const [selected, setSelected] = useState<SplitParticipantInput[]>(initialSelected);
+  const [advanced, setAdvanced] = useState(scanMode || Boolean(initial));
   const [extracting, setExtracting] = useState(false);
   const [hasSuggestions, setHasSuggestions] = useState(false);
   const [suggestedFields, setSuggestedFields] = useState({
@@ -361,6 +383,10 @@ function TransactionForm({
     };
 
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      if (editingId) {
+        toast.error(t('editRequiresOnline'));
+        return;
+      }
       insertOptimistic({ ...optimisticTx, sync_status: 'pending' });
       void (async () => {
         await enqueuePendingTransaction({
@@ -380,10 +406,14 @@ function TransactionForm({
       return;
     }
 
-    insertOptimistic(optimisticTx);
+    if (!editingId) {
+      insertOptimistic(optimisticTx);
+    }
 
     startTransition(async () => {
-      const result = await createTransaction(input);
+      const result = editingId
+        ? await updateTransaction({ ...input, transactionId: editingId })
+        : await createTransaction(input);
 
       clearOptimistic();
 
@@ -393,10 +423,12 @@ function TransactionForm({
       }
 
       const txId = result.data.id;
-      await pickerRef.current?.linkToTransaction(txId);
+      if (!editingId) {
+        await pickerRef.current?.linkToTransaction(txId);
+      }
 
       hapticSuccess();
-      toast.success(t('created'));
+      toast.success(editingId ? t('updated') : t('created'));
       await queryClient.invalidateQueries({ queryKey: transactionsQueryKey(space.id, {}) });
       onDone();
     });

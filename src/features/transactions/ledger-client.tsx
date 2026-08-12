@@ -730,7 +730,7 @@ export function LedgerClient({
                           onDelete(item.tx);
                         }}
                         onSwipeEdit={() => {
-                          setDetail(item.tx);
+                          composer?.openEdit(item.tx);
                         }}
                       />
                     )}
@@ -839,6 +839,18 @@ export function LedgerClient({
                     attachments={detailAttachments}
                   />
                   <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => {
+                        const tx = detail;
+                        setDetail(null);
+                        composer?.openEdit(tx);
+                      }}
+                    >
+                      {tTx('edit')}
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"

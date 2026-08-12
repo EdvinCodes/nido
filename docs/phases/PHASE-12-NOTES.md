@@ -45,10 +45,14 @@ Phase gate still requires **100% numeric accuracy**. Prefer Anthropic/OpenAI for
 
 ## Remaining before Done
 
-**Parked 2026-08-12** (product polish of shipped UX takes priority). Resume when a
-tool-capable cloud key is available or a stronger local model is acceptable.
+**Parked 2026-08-12** for product polish; ledger edit + `update_transaction` fix landed the same day.
+Resume Phase 12 when a **tool-capable cloud key** is available (preferred) or a stronger
+local model than `llama3.2:3b`.
 
-1. Full eval 30/30 with a tool-capable cloud model (or a stronger local model than 3B).
+Current local `.env.local`: `AI_PROVIDER=ollama`, `AI_MODEL=llama3.2:3b` — good for smoke,
+not for the 30/30 numeric gate.
+
+1. Full eval 30/30 with Anthropic or OpenAI (or a stronger local tool model).
 2. Confirm Ollama stays on loopback when used.
 3. Green `pnpm test:e2e` on a machine with ≥6GB Docker RAM (or re-run the 2 failed specs).
 4. Mark Done + `chore(phase): complete phase 12 — AI assistant`.

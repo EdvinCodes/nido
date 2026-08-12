@@ -11,8 +11,13 @@ test.describe('budgets', () => {
     ).toBeVisible();
     await expect(page.getByText(/compra semanal|salir a comer/i).first()).toBeVisible();
 
-    await page.getByRole('link', { name: /salir a comer/i }).click();
-    await expect(page).toHaveURL(new RegExp(`/s/${spaceId}/budgets/[0-9a-f-]{36}$`));
+    await page
+      .getByRole('link', { name: /salir a comer/i })
+      .first()
+      .click();
+    await expect(page).toHaveURL(new RegExp(`/s/${spaceId}/budgets/[0-9a-f-]{36}$`), {
+      timeout: 15_000,
+    });
     await expect(
       page.getByRole('main').getByRole('heading', { name: /salir a comer/i }),
     ).toBeVisible();

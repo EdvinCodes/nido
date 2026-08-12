@@ -83,23 +83,40 @@ function monthBounds(timezone: string, offsetMonths: number): { from: string; to
 
 function extractMinorsFromText(text: string): number[] {
   const found = new Set<number>();
-  const re = /(?:€|EUR|\$)?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})|\d+)/gi;
+
+  // Explicit verifiable tags from the system prompt.
+  for (const match of text.matchAll(/\(minor:\s*(-?\d+)\)/gi)) {
+    const n = Number.parseInt(match[1] ?? '', 10);
+    if (Number.isFinite(n)) found.add(n);
+  }
+
+  // Currency-like amounts, including negatives and EU/US separators.
+  const re = /(?:€|EUR|\$)?\s*(-?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})|-?\d+)/gi;
   let match: RegExpExecArray | null;
   while ((match = re.exec(text)) !== null) {
     const raw = match[1] ?? '';
-    const normalized =
-      raw.includes(',') && raw.includes('.')
-        ? raw.replace(/,/g, '')
-        : raw.includes(',') && /^\d+,\d{2}$/.test(raw)
-          ? raw.replace(',', '.')
-          : raw.replace(/,/g, '');
+    const negative = raw.startsWith('-');
+    const body = negative ? raw.slice(1) : raw;
+    let normalized: string;
+    if (body.includes(',') && body.includes('.')) {
+      // US 1,234.56 vs EU 1.234,56 — last separator wins as decimal.
+      const lastComma = body.lastIndexOf(',');
+      const lastDot = body.lastIndexOf('.');
+      normalized =
+        lastComma > lastDot ? body.replace(/\./g, '').replace(',', '.') : body.replace(/,/g, '');
+    } else if (/^\d+,\d{2}$/.test(body)) {
+      normalized = body.replace(',', '.');
+    } else {
+      normalized = body.replace(/,/g, '');
+    }
     const asFloat = Number.parseFloat(normalized);
     if (!Number.isFinite(asFloat)) continue;
-    if (/\.\d{2}$/.test(normalized) || /,\d{2}$/.test(raw)) {
-      found.add(Math.round(asFloat * 100));
+    const signed = negative ? -asFloat : asFloat;
+    if (/\.\d{2}$/.test(normalized) || /,\d{2}$/.test(body)) {
+      found.add(Math.round(signed * 100));
     } else {
-      found.add(Math.round(asFloat));
-      found.add(Math.round(asFloat * 100));
+      found.add(Math.round(signed));
+      found.add(Math.round(signed * 100));
     }
   }
   return [...found];
@@ -112,6 +129,13 @@ function minorsPresent(expected: number[], found: number[]): boolean {
     if (minor % 100 === 0 && found.includes(minor / 100)) return true;
     return false;
   });
+}
+
+function parseLimitArg(argv: string[]): number | null {
+  const flag = argv.find((a) => a.startsWith('--limit='));
+  if (!flag) return null;
+  const n = Number.parseInt(flag.slice('--limit='.length), 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 async function main(): Promise<void> {
@@ -134,9 +158,12 @@ async function main(): Promise<void> {
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY');
   }
 
-  const questions = JSON.parse(
+  const questionsAll = JSON.parse(
     readFileSync(resolve(process.cwd(), 'e2e/ai-eval/questions.json'), 'utf8'),
   ) as Question[];
+  const limit = parseLimitArg(process.argv);
+  const questions = limit ? questionsAll.slice(0, limit) : questionsAll;
+  if (limit) console.log(`Running first ${questions.length} of ${questionsAll.length} questions`);
 
   const supabase = createClient(supabaseUrl, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },

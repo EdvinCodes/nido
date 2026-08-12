@@ -14,31 +14,38 @@
   ghost subscription, three-period budget overrun, declining savings rate. Edge Function
   polishes copy with the model when a cloud provider is configured.
 - Eval harness: `e2e/ai-eval/run.ts` + 30 questions with runtime goldens from `space_summary`.
+  Supports `--limit=N` for smoke runs. Default Ollama model is `llama3.2:3b` (tool-capable;
+  plain `llama3` does **not** support tools).
+
+## Verified locally (2026-08-12)
+
+- Docker Desktop capped via `%USERPROFILE%\.wslconfig` (4GB / 2 CPUs) for multitasking.
+- `pnpm db:reset` — OK (includes `20260812090000_ai_insight_detectors_v2.sql`).
+- `pnpm test:db` — OK (201 tests, including `150_ai_assistant.sql`).
+- `pnpm typecheck` / `lint` / `test` / `build` — OK on the hardening commit.
+- `pnpm test:e2e` under the RAM cap: 73 passed, 2 failed (timeouts / aborted streams —
+  pressure-related), 2 flaky. Not treated as product regressions yet; re-run with more headroom.
 
 ## Eval results
 
-Run manually (not CI):
-
 ```bash
-AI_PROVIDER=ollama pnpm tsx e2e/ai-eval/run.ts
-AI_PROVIDER=anthropic pnpm tsx e2e/ai-eval/run.ts
+AI_PROVIDER=ollama AI_MODEL=llama3.2:3b pnpm dlx tsx e2e/ai-eval/run.ts --limit=5
+AI_PROVIDER=ollama AI_MODEL=llama3.2:3b pnpm dlx tsx e2e/ai-eval/run.ts
+AI_PROVIDER=anthropic pnpm dlx tsx e2e/ai-eval/run.ts
 ```
 
-Results are written to `e2e/ai-eval/last-results.json`. Phase gate requires **100% numeric
-accuracy** on questions that declare expected minors.
+| Provider  | Model       | Numeric     | Date       | Notes                                          |
+| --------- | ----------- | ----------- | ---------- | ---------------------------------------------- |
+| ollama    | llama3 (8B) | 0/30        | 2026-08-12 | Does not support tools — unusable              |
+| ollama    | llama3.2:3b | in progress | 2026-08-12 | Tool calls work; numeric copy still weak on 3B |
+| anthropic | —           | —           | —          | Preferred for the 100% numeric gate            |
 
-Record the latest successful run here when available:
-
-| Provider  | Model                 | Numeric | Date | Notes                                           |
-| --------- | --------------------- | ------- | ---- | ----------------------------------------------- |
-| ollama    | _(pending local run)_ | —       | —    | Verify no outbound traffic with a local monitor |
-| anthropic | _(pending)_           | —       | —    | Optional cloud cross-check                      |
+Phase gate still requires **100% numeric accuracy**. Prefer Anthropic/OpenAI for the full
+30-question run; keep Ollama for privacy/smoke.
 
 ## Remaining before Done
 
-1. Start Docker Desktop, then `pnpm db:reset && pnpm test:db`.
-2. Configure `AI_PROVIDER=ollama` (or anthropic), grant consent in the demo space, run
-   `pnpm tsx e2e/ai-eval/run.ts` until numeric accuracy is **30/30**.
-3. Record provider results in the table above; confirm Ollama stays on loopback.
-4. `pnpm test:e2e` with the local stack up.
-5. Then mark the phase Done and commit `chore(phase): complete phase 12 — AI assistant`.
+1. Full eval 30/30 with a tool-capable cloud model (or a stronger local model than 3B).
+2. Confirm Ollama stays on loopback when used.
+3. Green `pnpm test:e2e` on a machine with ≥6GB Docker RAM (or re-run the 2 failed specs).
+4. Mark Done + `chore(phase): complete phase 12 — AI assistant`.

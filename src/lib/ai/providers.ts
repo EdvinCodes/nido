@@ -10,7 +10,7 @@ const DEFAULT_MODELS: Record<AiProviderName, string> = {
   openai: 'gpt-4o-mini',
   anthropic: 'claude-sonnet-4-20250514',
   google: 'gemini-2.0-flash',
-  ollama: 'llama3.2',
+  ollama: 'llama3.2:3b',
 };
 
 export function getConfiguredProvider(): AiProviderName | null {

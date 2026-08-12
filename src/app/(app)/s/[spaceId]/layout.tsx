@@ -116,6 +116,7 @@ export default async function SpaceLayout({
               unreadCount={unreadCount}
               isAiConfigured={aiReady}
               assistantNavReady={assistantNavReady}
+              assistantConfigured={assistantConfigured}
             >
               {children}
             </AppShell>

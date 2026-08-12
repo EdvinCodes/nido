@@ -1,7 +1,16 @@
-import { ToolLoopAgent, createAgentUIStreamResponse, stepCountIs, type UIMessage } from 'ai';
+import {
+  ToolLoopAgent,
+  createAgentUIStreamResponse,
+  getToolName,
+  isToolUIPart,
+  stepCountIs,
+  type UIMessage,
+} from 'ai';
 import { getLocale } from 'next-intl/server';
 import { createAssistantTools } from '@/features/assistant/tools';
 import { buildSystemPrompt } from '@/features/assistant/lib/system-prompt';
+import { prepareHistoryForModel } from '@/features/assistant/lib/history';
+import { mapProviderError } from '@/features/assistant/lib/provider-errors';
 import { createUserUiMessage, dbMessagesToUi } from '@/features/assistant/lib/message-mapper';
 import { chatRequestSchema } from '@/features/assistant/schemas';
 import {
@@ -124,7 +133,7 @@ export async function POST(req: Request): Promise<Response> {
   });
 
   const historyRows = await loadConversationMessages(convId);
-  const historyUi = dbMessagesToUi(historyRows);
+  const historyUi = prepareHistoryForModel(dbMessagesToUi(historyRows));
   const uiMessages: UIMessage[] = [...historyUi];
   if (
     !historyUi.some(
@@ -167,29 +176,61 @@ export async function POST(req: Request): Promise<Response> {
     stopWhen: stepCountIs(8),
   });
 
-  const uiMessagesForAgent: UIMessage[] = uiMessages;
-
   const modelLabel = getModelLabel();
   const activeConvId = convId;
+  let inputTokens = 0;
+  let outputTokens = 0;
 
-  return createAgentUIStreamResponse({
-    agent,
-    uiMessages: uiMessagesForAgent,
-    headers: { 'X-Conversation-Id': activeConvId },
-    onFinish: async ({ messages }) => {
-      const last = messages.at(-1);
-      if (!last || last.role !== 'assistant') return;
-      await supabase.from('ai_messages').insert({
-        conversation_id: activeConvId,
-        space_id: spaceId,
-        role: 'assistant',
-        content: JSON.parse(JSON.stringify({ parts: last.parts, model: modelLabel })),
-        token_usage: null,
-      });
-      await supabase
-        .from('ai_conversations')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', activeConvId);
-    },
-  });
+  try {
+    return await createAgentUIStreamResponse({
+      agent,
+      uiMessages,
+      headers: { 'X-Conversation-Id': activeConvId },
+      onError: (error) => mapProviderError(error).message,
+      onStepEnd: ({ usage }) => {
+        inputTokens += usage.inputTokens ?? 0;
+        outputTokens += usage.outputTokens ?? 0;
+      },
+      onFinish: async ({ messages }) => {
+        const last = messages.at(-1);
+        if (!last || last.role !== 'assistant') return;
+
+        const toolCalls = last.parts
+          .filter((part) => isToolUIPart(part))
+          .map((part) => {
+            if (!isToolUIPart(part)) return null;
+            return {
+              toolCallId: part.toolCallId,
+              toolName: getToolName(part),
+              state: part.state,
+              input: 'input' in part ? part.input : undefined,
+            };
+          })
+          .filter((row): row is NonNullable<typeof row> => row !== null);
+
+        await supabase.from('ai_messages').insert({
+          conversation_id: activeConvId,
+          space_id: spaceId,
+          role: 'assistant',
+          content: JSON.parse(JSON.stringify({ parts: last.parts, model: modelLabel })),
+          tool_calls: toolCalls.length ? JSON.parse(JSON.stringify(toolCalls)) : null,
+          token_usage: {
+            inputTokens,
+            outputTokens,
+            totalTokens: inputTokens + outputTokens,
+            model: modelLabel,
+          },
+        });
+        await supabase
+          .from('ai_conversations')
+          .update({ updated_at: new Date().toISOString() })
+          .eq('id', activeConvId);
+      },
+    });
+  } catch (error) {
+    const mapped = mapProviderError(error);
+    return new Response(JSON.stringify({ error: mapped.code, message: mapped.message }), {
+      status: mapped.status,
+    });
+  }
 }

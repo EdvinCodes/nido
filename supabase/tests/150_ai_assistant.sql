@@ -78,7 +78,7 @@ begin
 end;
 $$;
 
-select plan(8);
+select plan(10);
 
 select tests.create_user('ai_owner');
 select tests.create_user('ai_member');
@@ -246,6 +246,36 @@ select throws_ok(
   '42501',
   null,
   'non-admin cannot insert consent'
+);
+
+-- Insights: members can read; outsiders cannot
+select set_config('role', 'service_role', true);
+insert into nido.ai_insights (
+  space_id, kind, title, body, severity, evidence
+) values (
+  current_setting('test.ai_space')::uuid,
+  'duplicate_charge',
+  'Duplicate charge',
+  'Test insight body',
+  'warning',
+  '{"transaction_ids":[]}'::jsonb
+);
+
+select tests.authenticate_as('ai_owner');
+select ok(
+  (
+    select count(*)::int
+    from nido.ai_insights
+    where space_id = current_setting('test.ai_space')::uuid
+  ) = 1,
+  'owner can read space insights'
+);
+
+select tests.authenticate_as('ai_outsider');
+select is_empty(
+  $$ select 1 from nido.ai_insights
+     where space_id = current_setting('test.ai_space')::uuid $$,
+  'outsider cannot read insights'
 );
 
 select * from finish();

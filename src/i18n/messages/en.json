@@ -764,13 +764,19 @@
       "unknownModel": "Unknown model",
       "consentProvider": "Consent recorded for {provider}.",
       "ollamaHint": "Recommended: local Ollama so nothing leaves your machine.",
+      "ollamaSetup": "Install Ollama, run `ollama pull llama3.2`, then set AI_PROVIDER=ollama and OLLAMA_BASE_URL=http://localhost:11434.",
       "retention": "Conversation retention (days)",
       "realNames": "Use real participant names in answers",
       "consentBody": "Aggregated figures, category names, merchants, and up to 50 transactions per question will be sent to your configured provider.",
       "grant": "Enable assistant",
       "revoke": "Revoke consent and delete conversations",
+      "savePreferences": "Save preferences",
       "saved": "Saved",
-      "adminOnly": "Only a space admin can change consent."
+      "adminOnly": "Only a space admin can change consent.",
+      "usageTitle": "Usage this month",
+      "usageBody": "{messages} assistant replies · {tokens} tokens",
+      "usageCost": "Estimated cloud cost ≈ ${amount}",
+      "usageLocal": "Local / unknown provider — no cloud cost estimate."
     },
     "panel": {
       "title": "Assistant",

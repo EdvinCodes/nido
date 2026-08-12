@@ -11,6 +11,7 @@ import {
   exportConversationSchema,
   renameConversationSchema,
   revokeConsentSchema,
+  updateAiPreferencesSchema,
 } from './schemas';
 import { loadConversationMessages } from './queries';
 
@@ -57,6 +58,22 @@ export const revokeAiConsentAction = authedAction()
     const { error } = await ctx.supabase.rpc('ai_revoke_consent', { p_space_id: input.spaceId });
     if (error) return { ok: false, error: { code: 'db_error', message: error.message } };
     return { ok: true, data: { revoked: true } };
+  });
+
+export const updateAiPreferencesAction = authedAction()
+  .schema(updateAiPreferencesSchema)
+  .space(({ input }) => input.spaceId, { action: 'space.update' })
+  .action(async ({ input, ctx }) => {
+    const { error } = await ctx.supabase
+      .from('ai_consent')
+      .update({
+        use_real_names: input.useRealNames,
+        retention_days: input.retentionDays,
+      })
+      .eq('space_id', input.spaceId)
+      .is('revoked_at', null);
+    if (error) return { ok: false, error: { code: 'db_error', message: error.message } };
+    return { ok: true, data: { updated: true } };
   });
 
 export const renameConversationAction = authedAction()

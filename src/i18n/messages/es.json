@@ -764,13 +764,19 @@
       "unknownModel": "Modelo desconocido",
       "consentProvider": "Consentimiento registrado para {provider}.",
       "ollamaHint": "Recomendado: Ollama en local para que nada salga de tu máquina.",
+      "ollamaSetup": "Instala Ollama, ejecuta `ollama pull llama3.2` y configura AI_PROVIDER=ollama y OLLAMA_BASE_URL=http://localhost:11434.",
       "retention": "Retención de conversaciones (días)",
       "realNames": "Usar nombres reales de participantes en las respuestas",
       "consentBody": "Se enviarán cifras agregadas, nombres de categorías, comercios y hasta 50 movimientos por pregunta al proveedor configurado.",
       "grant": "Activar asistente",
       "revoke": "Revocar consentimiento y borrar conversaciones",
+      "savePreferences": "Guardar preferencias",
       "saved": "Guardado",
-      "adminOnly": "Solo un administrador del espacio puede cambiar el consentimiento."
+      "adminOnly": "Solo un administrador del espacio puede cambiar el consentimiento.",
+      "usageTitle": "Uso este mes",
+      "usageBody": "{messages} respuestas del asistente · {tokens} tokens",
+      "usageCost": "Coste estimado en la nube ≈ ${amount}",
+      "usageLocal": "Proveedor local / desconocido — sin estimación de coste en la nube."
     },
     "panel": {
       "title": "Asistente",

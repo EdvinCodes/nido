@@ -1,7 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { rpcJson } from '@/features/transactions/db';
-import { formatToolMoney, type ToolContext } from '../lib/tool-context';
+import { formatToolMoney, wrapUserData, type ToolContext } from '../lib/tool-context';
 
 type FilterRow = {
   id: string;
@@ -54,8 +54,8 @@ export function createGetTransactionsTool(ctx: ToolContext) {
           bookedOn: row.booked_on,
           kind: row.kind,
           amount: formatToolMoney(row.amount_minor, row.currency, ctx.locale),
-          merchant: row.merchant ?? '',
-          description: row.description ?? '',
+          merchant: wrapUserData(row.merchant),
+          description: wrapUserData(row.description),
           categoryId: row.category_id,
           categoryName: row.category_name ?? '',
           payerParticipantId: row.payer_participant_id,

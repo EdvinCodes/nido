@@ -47,6 +47,7 @@ export function AppSidebar({
   spaceKind,
   headerAction,
   assistantNavReady = false,
+  assistantConfigured = false,
 }: {
   activePath: string;
   spaceId: string;
@@ -56,12 +57,15 @@ export function AppSidebar({
   spaceKind: string;
   headerAction?: ReactNode;
   assistantNavReady?: boolean;
+  /** When false, the assistant nav item is hidden entirely (no broken AI surface). */
+  assistantConfigured?: boolean;
 }) {
   const t = useTranslations('nav');
   void spaceName;
   const items = NAV_ITEMS.map((item) =>
-    item.key === 'assistant' ? { ...item, ready: assistantNavReady } : item,
+    item.key === 'assistant' ? { ...item, ready: assistantNavReady || assistantConfigured } : item,
   ).filter((item) => {
+    if (item.key === 'assistant' && !assistantConfigured) return false;
     if (spaceKind !== 'solo') return true;
     return item.key !== 'balances';
   });
@@ -76,9 +80,15 @@ export function AppSidebar({
       </div>
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Primary">
         {items.map(({ key, href, icon: Icon, ready }) => {
-          const fullHref = `/s/${spaceId}${href}`;
+          const fullHref =
+            key === 'assistant' && !assistantNavReady
+              ? `/s/${spaceId}/settings/ai`
+              : `/s/${spaceId}${href}`;
           const active =
-            href === '' ? activePath === `/s/${spaceId}` : activePath.startsWith(fullHref);
+            href === ''
+              ? activePath === `/s/${spaceId}`
+              : activePath.startsWith(`/s/${spaceId}${href}`) ||
+                (key === 'assistant' && activePath.includes('/settings/ai'));
           if (!ready) {
             return (
               <span

@@ -44,6 +44,7 @@ export function AppShell({
   unreadCount,
   isAiConfigured = false,
   assistantNavReady = false,
+  assistantConfigured = false,
 }: {
   children: ReactNode;
   spaceId: string;
@@ -55,6 +56,7 @@ export function AppShell({
   unreadCount: number;
   isAiConfigured?: boolean;
   assistantNavReady?: boolean;
+  assistantConfigured?: boolean;
 }) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
@@ -79,6 +81,7 @@ export function AppShell({
         spaceKind={spaceKind}
         headerAction={isDesktop ? bell : null}
         assistantNavReady={assistantNavReady}
+        assistantConfigured={assistantConfigured}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 lg:hidden">

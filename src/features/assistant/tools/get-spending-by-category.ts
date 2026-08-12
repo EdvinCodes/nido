@@ -24,33 +24,39 @@ export function createGetSpendingByCategoryTool(ctx: ToolContext) {
       if (error) throw new Error(error.message);
       const summary = data as SpaceSummary;
 
-      const categories = summary.categories.expense.slice(0, limit).map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-        amount: formatToolMoney(cat.total_minor, ctx.baseCurrency, ctx.locale),
-        share: cat.share,
-        count: cat.count,
-        change: formatToolMoney(cat.change_minor, ctx.baseCurrency, ctx.locale),
-      }));
-
-      const { data: txIds, error: idError } = await rpcJson(
-        ctx.supabase,
-        'ai_period_transaction_ids',
-        {
-          p_space_id: ctx.spaceId,
-          p_from: from,
-          p_to: to,
-          p_participant_id: participantId ?? null,
-          p_kind: 'expense',
-        },
+      const top = summary.categories.expense.slice(0, limit);
+      const categories = await Promise.all(
+        top.map(async (cat) => {
+          let transactionIds: string[] = [];
+          if (cat.id) {
+            const { data: txIds } = await rpcJson(ctx.supabase, 'ai_period_transaction_ids', {
+              p_space_id: ctx.spaceId,
+              p_from: from,
+              p_to: to,
+              p_participant_id: participantId ?? null,
+              p_category_id: cat.id,
+              p_kind: 'expense',
+              p_limit: 50,
+            });
+            transactionIds = (txIds as string[] | null) ?? [];
+          }
+          return {
+            id: cat.id,
+            name: cat.name,
+            amount: formatToolMoney(cat.total_minor, ctx.baseCurrency, ctx.locale),
+            share: cat.share,
+            count: cat.count,
+            change: formatToolMoney(cat.change_minor, ctx.baseCurrency, ctx.locale),
+            transactionIds,
+          };
+        }),
       );
-      if (idError) throw new Error(idError.message);
 
       return {
         from,
         to,
         categories,
-        transactionIds: txIds as string[],
+        transactionIds: [...new Set(categories.flatMap((c) => c.transactionIds))],
       };
     },
   });

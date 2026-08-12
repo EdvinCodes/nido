@@ -36,3 +36,9 @@ export const dismissInsightSchema = z.object({
   spaceId: z.uuid(),
   insightId: z.uuid(),
 });
+
+export const updateAiPreferencesSchema = z.object({
+  spaceId: z.uuid(),
+  useRealNames: z.boolean(),
+  retentionDays: z.number().int().min(7).max(365),
+});

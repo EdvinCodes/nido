@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { grantAiConsentAction, revokeAiConsentAction } from '@/features/assistant/actions';
-import { getAiConsent, isConsentActive } from '@/features/assistant/queries';
+import {
+  grantAiConsentAction,
+  revokeAiConsentAction,
+  updateAiPreferencesAction,
+} from '@/features/assistant/actions';
+import { getAiConsent, getMonthlyTokenUsage, isConsentActive } from '@/features/assistant/queries';
 import { AiSettingsClient } from '@/features/assistant/ai-settings-client';
 import { isAssistantConfigured } from '@/lib/ai/assistant-enabled';
-import { getModelLabel } from '@/lib/ai/providers';
+import { getConfiguredProvider, getModelLabel } from '@/lib/ai/providers';
 import { route } from '@/lib/routes';
 import { createClient } from '@/lib/supabase/server';
 import { can } from '@/lib/auth';
@@ -15,6 +19,7 @@ export default async function AiSettingsPage({ params }: { params: Promise<{ spa
   const configured = isAssistantConfigured();
   const modelLabel = getModelLabel();
   const consent = await getAiConsent(spaceId);
+  const activeProvider = getConfiguredProvider();
 
   const supabase = await createClient();
   const {
@@ -31,6 +36,16 @@ export default async function AiSettingsPage({ params }: { params: Promise<{ spa
     : { data: null };
 
   const canManage = membership ? can(membership.role, 'space.update') : false;
+  const usage =
+    user != null
+      ? await getMonthlyTokenUsage(spaceId, user.id, consent?.provider ?? activeProvider)
+      : {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          messageCount: 0,
+          estimatedCostUsd: null,
+        };
 
   return (
     <div className="space-y-6 p-4 lg:p-8">
@@ -42,6 +57,7 @@ export default async function AiSettingsPage({ params }: { params: Promise<{ spa
       {!configured ? (
         <div className="rounded-xl border border-border bg-surface p-4 text-sm">
           <p>{t('notConfigured')}</p>
+          <p className="mt-2 text-muted-foreground">{t('ollamaSetup')}</p>
           <p className="mt-2">
             <Link
               href={route('/docs')}
@@ -59,9 +75,11 @@ export default async function AiSettingsPage({ params }: { params: Promise<{ spa
           consentActive={isConsentActive(consent)}
           useRealNames={consent?.use_real_names ?? false}
           retentionDays={consent?.retention_days ?? 90}
-          provider={consent?.provider ?? null}
+          provider={consent?.provider ?? activeProvider}
+          usage={usage}
           onGrant={grantAiConsentAction}
           onRevoke={revokeAiConsentAction}
+          onUpdatePreferences={updateAiPreferencesAction}
         />
       )}
     </div>

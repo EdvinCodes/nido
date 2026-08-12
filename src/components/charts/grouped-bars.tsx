@@ -1,6 +1,7 @@
 'use client';
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { chartAxisStyle, chartColors, chartTooltipStyle } from './tokens';
 
@@ -21,15 +22,16 @@ export function GroupedBars({
   title: string;
   valueFormatter: (value: number) => string;
 }) {
+  const t = useTranslations('charts.columns');
   return (
     <ChartShell
       title={title}
       loading={loading}
       empty={data.length === 0}
       columns={[
-        { key: 'label', label: 'Period' },
-        { key: 'income', label: 'Income', align: 'right' },
-        { key: 'expense', label: 'Expense', align: 'right' },
+        { key: 'label', label: t('period') },
+        { key: 'income', label: t('income'), align: 'right' },
+        { key: 'expense', label: t('expense'), align: 'right' },
       ]}
       rows={data.map((point) => ({
         label: point.label,

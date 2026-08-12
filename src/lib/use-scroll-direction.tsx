@@ -29,6 +29,8 @@ export function ScrollHide({ children, hidden }: { children: ReactNode; hidden: 
     <div
       className="transition-transform duration-300 ease-out"
       style={{ transform: hidden ? 'translateY(calc(100% + 1rem))' : 'translateY(0)' }}
+      aria-hidden={hidden || undefined}
+      inert={hidden || undefined}
     >
       {children}
     </div>

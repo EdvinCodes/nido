@@ -64,7 +64,7 @@ function ReceiptTile({
 
   return (
     <Link
-      href={route(`/s/${spaceId}/ledger?tx=${item.transaction_id}`)}
+      href={route(`/s/${spaceId}/ledger?ids=${item.transaction_id}`)}
       className="block transition-opacity hover:opacity-90"
       data-testid={`receipt-tile-${item.id}`}
     >

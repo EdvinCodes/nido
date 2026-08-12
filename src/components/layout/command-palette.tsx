@@ -4,7 +4,9 @@ import { Command } from 'cmdk';
 import {
   ArrowLeftRight,
   Camera,
+  Flag,
   LayoutDashboard,
+  PiggyBank,
   Plus,
   Receipt,
   Scale,
@@ -209,6 +211,26 @@ export function CommandPalette({
               >
                 <Receipt className="size-4 shrink-0" aria-hidden />
                 {tNav('receipts')}
+              </Command.Item>
+              <Command.Item
+                value={tNav('budgets')}
+                onSelect={() => {
+                  go(`/s/${spaceId}/budgets`);
+                }}
+                className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground aria-selected:bg-surface-raised"
+              >
+                <PiggyBank className="size-4 shrink-0" aria-hidden />
+                {tNav('budgets')}
+              </Command.Item>
+              <Command.Item
+                value={tNav('goals')}
+                onSelect={() => {
+                  go(`/s/${spaceId}/goals`);
+                }}
+                className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-foreground aria-selected:bg-surface-raised"
+              >
+                <Flag className="size-4 shrink-0" aria-hidden />
+                {tNav('goals')}
               </Command.Item>
               {space.kind !== 'solo' ? (
                 <Command.Item

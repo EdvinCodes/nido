@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { Amount } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -159,7 +160,12 @@ export function BalancesClient({
         from: from || null,
         to: to || null,
       });
-      if (result.ok) setBreakdownRows(result.data.rows);
+      if (result.ok) {
+        setBreakdownRows(result.data.rows);
+        return;
+      }
+      toast.error(result.error.message);
+      setBreakdownRows([]);
     });
   }
 
@@ -222,7 +228,7 @@ export function BalancesClient({
                         const major = confirmAmountMajor[s.id] ?? String(s.amountMinor / 100);
                         const amountMinor = Math.round(Number(major.replace(',', '.')) * 100);
                         startTransition(async () => {
-                          await confirmSettlement({
+                          const result = await confirmSettlement({
                             spaceId,
                             settlementId: s.id,
                             amountMinor:
@@ -230,6 +236,10 @@ export function BalancesClient({
                                 ? amountMinor
                                 : undefined,
                           });
+                          if (!result.ok) {
+                            toast.error(result.error.message);
+                            return;
+                          }
                           await reloadModel();
                         });
                       }}
@@ -448,7 +458,14 @@ export function BalancesClient({
                         disabled={pending}
                         onClick={() => {
                           startTransition(async () => {
-                            await reverseSettlement({ spaceId, settlementId: s.id });
+                            const result = await reverseSettlement({
+                              spaceId,
+                              settlementId: s.id,
+                            });
+                            if (!result.ok) {
+                              toast.error(result.error.message);
+                              return;
+                            }
                             await reloadModel();
                           });
                         }}
@@ -673,11 +690,15 @@ export function BalancesClient({
               onClick={() => {
                 if (!disputeId) return;
                 startTransition(async () => {
-                  await disputeSettlement({
+                  const result = await disputeSettlement({
                     spaceId,
                     settlementId: disputeId,
                     note: disputeNote.trim(),
                   });
+                  if (!result.ok) {
+                    toast.error(result.error.message);
+                    return;
+                  }
                   setDisputeId(null);
                   await reloadModel();
                 });

@@ -8,6 +8,7 @@
     "loading": "Cargando…",
     "retry": "Reintentar",
     "goHome": "Ir al inicio",
+    "skipToContent": "Saltar al contenido",
     "save": "Guardar",
     "cancel": "Cancelar",
     "continue": "Continuar",
@@ -247,7 +248,18 @@
   "charts": {
     "empty": "Nada que graficar en este periodo",
     "showTable": "Mostrar tabla",
-    "hideTable": "Ocultar tabla"
+    "hideTable": "Ocultar tabla",
+    "columns": {
+      "date": "Fecha",
+      "value": "Valor",
+      "previous": "Anterior",
+      "period": "Periodo",
+      "income": "Ingresos",
+      "expense": "Gastos",
+      "category": "Categoría",
+      "amount": "Importe",
+      "name": "Nombre"
+    }
   },
   "period": {
     "from": "Desde",
@@ -285,7 +297,9 @@
     "categories": {
       "title": "A dónde va",
       "ranked": "Top categorías",
-      "total": "Total"
+      "total": "Total",
+      "empty": "No hay gastos en este periodo.",
+      "emptyCta": "Abrir movimientos"
     },
     "participants": {
       "title": "Por persona",
@@ -300,10 +314,13 @@
       "alerts": "Presupuestos a vigilar",
       "alertsSoon": "Las alertas de presupuesto llegan en la siguiente fase.",
       "alertsEmpty": "Todos los presupuestos van bien por ahora.",
+      "alertsNone": "Aún no hay presupuestos.",
+      "alertsNoneCta": "Crear presupuesto",
       "upcoming": "Cargos próximos",
       "upcomingEmpty": "Nada en las próximas dos semanas.",
       "goals": "Progreso de metas",
       "goalsEmpty": "Aún no hay metas activas.",
+      "goalsEmptyCta": "Añadir meta",
       "balances": "Saldos",
       "balancesEmpty": "Estáis en paz.",
       "settleLink": "Liquidar"
@@ -502,6 +519,10 @@
     "selectedCount": "{count} seleccionados",
     "clearSelection": "Limpiar",
     "bulkDeleted": "Se eliminaron {count} movimientos",
+    "bulkRestored": "Se restauraron {count} movimientos",
+    "linkedCount": "{count} enlazados",
+    "emptyFilteredTitle": "Ningún movimiento coincide",
+    "emptyFilteredBody": "Prueba a limpiar los filtros o a ajustar fechas e importes.",
     "pendingSync": "Pendiente de sync",
     "pendingCount": "{count} pendientes de sincronizar"
   },
@@ -577,6 +598,7 @@
 
   "budgets": {
     "title": "Presupuestos",
+    "back": "Todos los presupuestos",
     "create": "Nuevo presupuesto",
     "edit": "Editar",
     "archive": "Archivar",

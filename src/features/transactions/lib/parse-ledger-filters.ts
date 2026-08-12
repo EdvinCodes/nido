@@ -69,7 +69,7 @@ export function parseLedgerFiltersFromSearchParams(
 
   const amountMin = parseMinorParam(sp.min);
   const amountMax = parseMinorParam(sp.max);
-  const idsParam = sp.ids;
+  const idsParam = sp.ids ?? sp.tx;
   const transactionIds =
     typeof idsParam === 'string'
       ? idsParam.split(',').filter(Boolean)

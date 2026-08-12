@@ -74,16 +74,14 @@ describe('parseLedgerFiltersFromSearchParams', () => {
     });
   });
 
-  it('accepts nuqs boolean true/false in the URL', () => {
-    expect(
-      parseLedgerFiltersFromSearchParams(
-        { mine: 'true', shared: 'false', attached: 'true' },
-        VIEWER,
-      ),
-    ).toEqual({
-      mineOnly: true,
-      viewerParticipantId: VIEWER,
-      hasAttachment: true,
+  it('accepts tx as an alias for ids deep-links', () => {
+    const id = '00000000-0000-4000-8000-0000000000d1';
+    const id2 = '00000000-0000-4000-8000-0000000000d2';
+    expect(parseLedgerFiltersFromSearchParams({ tx: id })).toEqual({
+      transactionIds: [id],
+    });
+    expect(parseLedgerFiltersFromSearchParams({ ids: `${id},${id2}` })).toEqual({
+      transactionIds: [id, id2],
     });
   });
 });

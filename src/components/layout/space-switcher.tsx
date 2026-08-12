@@ -28,7 +28,12 @@ export function SpaceSwitcher({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="max-w-full justify-start">
+        <Button
+          variant="outline"
+          size="sm"
+          className="max-w-full justify-start"
+          aria-label={t('switchSpace')}
+        >
           <span className="truncate">{current?.space.name ?? t('spacePlaceholder')}</span>
         </Button>
       </DropdownMenuTrigger>

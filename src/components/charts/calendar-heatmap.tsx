@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ export function CalendarHeatmap({
   title: string;
   valueFormatter: (value: number) => string;
 }) {
+  const t = useTranslations('charts.columns');
   const max = Math.max(0, ...data.map((cell) => cell.value));
 
   return (
@@ -29,8 +31,8 @@ export function CalendarHeatmap({
       loading={loading}
       empty={data.length === 0}
       columns={[
-        { key: 'date', label: 'Date' },
-        { key: 'value', label: 'Amount', align: 'right' },
+        { key: 'date', label: t('date') },
+        { key: 'value', label: t('amount'), align: 'right' },
       ]}
       rows={data.map((cell) => ({
         date: cell.label,

@@ -20,6 +20,7 @@ import { isContributor, type MemberRole } from '@/lib/auth';
 import { formatMoney, money } from '@/lib/money';
 import { route } from '@/lib/routes';
 import { contributeToGoal } from './actions';
+import { GoalFormSheet } from './goal-form-sheet';
 import { goalProgressRatio, remainingMinor } from './lib/pace';
 import type { GoalDetailModel } from './types';
 
@@ -40,6 +41,7 @@ export function GoalDetailClient({
   const locale = useLocale();
   const canEdit = isContributor(role);
   const [contributeOpen, setContributeOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const ratio = goalProgressRatio(detail.savedMinor, detail.targetMinor);
   const left = remainingMinor(detail.targetMinor, detail.savedMinor);
   const maxCumulative = Math.max(
@@ -74,15 +76,27 @@ export function GoalDetailClient({
             </p>
           </div>
           {canEdit ? (
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => {
-                setContributeOpen(true);
-              }}
-            >
-              {t('contribute')}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setFormOpen(true);
+                }}
+              >
+                {t('edit')}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  setContributeOpen(true);
+                }}
+              >
+                {t('contribute')}
+              </Button>
+            </div>
           ) : null}
         </div>
         <ProgressBar value={ratio} label={detail.name} />
@@ -172,6 +186,14 @@ export function GoalDetailClient({
         accounts={accounts}
         linkedAccountId={detail.accountId}
       />
+      <GoalFormSheet
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        spaceId={spaceId}
+        currency={detail.currency}
+        accounts={accounts}
+        initial={detail}
+      />
     </div>
   );
 }
@@ -194,15 +216,56 @@ function ContributeSheet({
   linkedAccountId: string | null;
 }) {
   const t = useTranslations('goals');
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="flex flex-col gap-4 sm:max-w-md">
+        <SheetHeader>
+          <SheetTitle>{t('contribute')}</SheetTitle>
+        </SheetHeader>
+        {open ? (
+          <ContributeFields
+            key={`${goalId}-contribute-open`}
+            spaceId={spaceId}
+            goalId={goalId}
+            participants={participants}
+            accounts={accounts}
+            linkedAccountId={linkedAccountId}
+            onDone={() => {
+              onOpenChange(false);
+            }}
+          />
+        ) : null}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function ContributeFields({
+  spaceId,
+  goalId,
+  participants,
+  accounts,
+  linkedAccountId,
+  onDone,
+}: {
+  spaceId: string;
+  goalId: string;
+  participants: Array<{ id: string; displayName: string }>;
+  accounts: Array<{ id: string; name: string }>;
+  linkedAccountId: string | null;
+  onDone: () => void;
+}) {
+  const t = useTranslations('goals');
   const tCommon = useTranslations('common');
   const [pending, startTransition] = useTransition();
-  const [amountMajor, setAmountMajor] = useState('50');
+  const [amountMajor, setAmountMajor] = useState('');
   const [withdrawal, setWithdrawal] = useState(false);
   const [participantId, setParticipantId] = useState(participants[0]?.id ?? '');
   const [contributedOn, setContributedOn] = useState(new Date().toISOString().slice(0, 10));
   const [note, setNote] = useState('');
   const [asTransfer, setAsTransfer] = useState(false);
-  const [fromAccountId] = useState(accounts[0]?.id ?? '');
+  const fromAccountId = accounts[0]?.id ?? '';
   const [error, setError] = useState<string | null>(null);
 
   function submit() {
@@ -234,91 +297,86 @@ function ContributeSheet({
         setError(result.error.message);
         return;
       }
-      onOpenChange(false);
+      onDone();
     });
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col gap-4 sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{withdrawal ? t('withdraw') : t('contribute')}</SheetTitle>
-        </SheetHeader>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label>{t('fields.amount')}</Label>
-            <Input
-              inputMode="decimal"
-              value={amountMajor}
-              onChange={(e) => {
-                setAmountMajor(e.target.value);
-              }}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t('fields.participant')}</Label>
-            <Select value={participantId} onValueChange={setParticipantId}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {participants.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.displayName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t('fields.date')}</Label>
-            <Input
-              type="date"
-              value={contributedOn}
-              onChange={(e) => {
-                setContributedOn(e.target.value);
-              }}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t('fields.note')}</Label>
-            <Input
-              value={note}
-              onChange={(e) => {
-                setNote(e.target.value);
-              }}
-            />
-          </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={withdrawal}
-              onChange={(e) => {
-                setWithdrawal(e.target.checked);
-                if (e.target.checked) setAsTransfer(false);
-              }}
-            />
-            {t('fields.withdrawal')}
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={asTransfer}
-              disabled={withdrawal || !linkedAccountId}
-              onChange={(e) => {
-                setAsTransfer(e.target.checked);
-              }}
-            />
-            {t('fields.asTransfer')}
-          </label>
-          {error ? <p className="text-sm text-danger">{error}</p> : null}
+    <>
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <Label>{t('fields.amount')}</Label>
+          <Input
+            inputMode="decimal"
+            value={amountMajor}
+            onChange={(e) => {
+              setAmountMajor(e.target.value);
+            }}
+          />
         </div>
-        <SheetFooter>
-          <Button type="button" disabled={pending} onClick={submit}>
-            {tCommon('save')}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        <div className="space-y-1.5">
+          <Label>{t('fields.participant')}</Label>
+          <Select value={participantId} onValueChange={setParticipantId}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {participants.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.displayName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>{t('fields.date')}</Label>
+          <Input
+            type="date"
+            value={contributedOn}
+            onChange={(e) => {
+              setContributedOn(e.target.value);
+            }}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>{t('fields.note')}</Label>
+          <Input
+            value={note}
+            onChange={(e) => {
+              setNote(e.target.value);
+            }}
+          />
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={withdrawal}
+            onChange={(e) => {
+              setWithdrawal(e.target.checked);
+              if (e.target.checked) setAsTransfer(false);
+            }}
+          />
+          {t('fields.withdrawal')}
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={asTransfer}
+            disabled={withdrawal || !linkedAccountId}
+            onChange={(e) => {
+              setAsTransfer(e.target.checked);
+            }}
+          />
+          {t('fields.asTransfer')}
+        </label>
+        {error ? <p className="text-sm text-danger">{error}</p> : null}
+      </div>
+      <SheetFooter>
+        <Button type="button" disabled={pending} onClick={submit}>
+          {withdrawal ? t('withdraw') : tCommon('save')}
+        </Button>
+      </SheetFooter>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { chartAxisStyle, chartColors, chartLegendStyle, chartTooltipStyle } from './tokens';
 
@@ -31,13 +32,14 @@ export function StackedBars({
   title: string;
   valueFormatter: (value: number) => string;
 }) {
+  const t = useTranslations('charts.columns');
   return (
     <ChartShell
       title={title}
       loading={loading}
       empty={data.length === 0 || series.length === 0}
       columns={[
-        { key: 'label', label: 'Period' },
+        { key: 'label', label: t('period') },
         ...series.map((item) => ({
           key: item.key,
           label: item.label,

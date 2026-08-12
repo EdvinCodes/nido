@@ -1,11 +1,11 @@
 'use client';
 
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
-import { ChartShell } from './chart-shell';
 import { chartColors } from './tokens';
 
 export type SparklinePoint = { label: string; value: number };
 
+/** Compact decorative trend — no ChartShell table toggle (safe inside links). */
 export function Sparkline({
   data,
   loading,
@@ -24,21 +24,16 @@ export function Sparkline({
         ? chartColors.expense
         : chartColors.primary;
 
+  if (loading) {
+    return <div className="h-10 w-full animate-pulse rounded-md bg-muted" aria-hidden />;
+  }
+
+  if (data.length === 0) {
+    return <div className="h-10 w-full" aria-hidden />;
+  }
+
   return (
-    <ChartShell
-      title={title}
-      heightClassName="h-10"
-      loading={loading}
-      empty={data.length === 0}
-      columns={[
-        { key: 'label', label: 'Period' },
-        { key: 'value', label: 'Value', align: 'right' },
-      ]}
-      rows={data.map((point) => ({
-        label: point.label,
-        value: String(point.value),
-      }))}
-    >
+    <div className="h-10 w-full" aria-hidden title={title}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
           <Area
@@ -53,6 +48,6 @@ export function Sparkline({
           />
         </AreaChart>
       </ResponsiveContainer>
-    </ChartShell>
+    </div>
   );
 }

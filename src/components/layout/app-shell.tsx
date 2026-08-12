@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { KeyboardShortcuts } from '@/components/layout/keyboard-shortcuts';
@@ -60,6 +61,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
+  const t = useTranslations('common');
   const assistant = useAssistantPanelOptional();
   const bell =
     isDesktop === null ? null : (
@@ -72,6 +74,12 @@ export function AppShell({
 
   return (
     <div className="flex min-h-full min-w-0 flex-1">
+      <a
+        href="#main-content"
+        className="sr-only bg-primary text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:px-3 focus:py-2 focus:ring-2 focus:ring-ring"
+      >
+        {t('skipToContent')}
+      </a>
       <AppSidebar
         activePath={pathname}
         spaceId={spaceId}
@@ -88,8 +96,19 @@ export function AppShell({
           <SpaceSwitcher spaces={spaces} currentSpaceId={spaceId} />
           {isDesktop === false ? bell : null}
         </div>
-        {children}
-        <MobileTabBar activePath={pathname} spaceId={spaceId} isAiConfigured={isAiConfigured} />
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-h-0 min-w-0 flex-1 flex-col outline-none"
+        >
+          {children}
+        </div>
+        <MobileTabBar
+          activePath={pathname}
+          spaceId={spaceId}
+          spaceKind={spaceKind}
+          isAiConfigured={isAiConfigured}
+        />
         <CommandPalette spaceId={spaceId} isAiConfigured={isAiConfigured} />
         <KeyboardShortcuts
           spaceId={spaceId}

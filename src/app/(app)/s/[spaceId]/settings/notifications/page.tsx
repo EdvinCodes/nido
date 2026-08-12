@@ -27,7 +27,7 @@ export default async function NotificationsSettingsPage({
     ]);
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <NotificationsSettings
         spaceId={spaceId}
         preferences={preferences}
@@ -36,6 +36,6 @@ export default async function NotificationsSettingsPage({
         pushConfigured={pushConfigured}
         vapidPublicKey={vapidPublicKey}
       />
-    </main>
+    </div>
   );
 }

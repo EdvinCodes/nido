@@ -1,7 +1,11 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAttentionBudgets, getCategoryBudgetProgress } from '@/features/budgets/queries';
+import {
+  getAttentionBudgets,
+  getCategoryBudgetProgress,
+  listBudgetCards,
+} from '@/features/budgets/queries';
 import { AiInsightsRail } from '@/features/assistant/ai-insights-rail';
 import { listActiveInsights } from '@/features/assistant/queries';
 import { DashboardView } from '@/features/dashboard/dashboard-view';
@@ -125,6 +129,7 @@ async function DashboardLoaded({
     summary,
     attentionBudgets,
     categoryBudgetProgress,
+    budgetCards,
     upcomingCharges,
     goalProgress,
     balanceRail,
@@ -133,6 +138,7 @@ async function DashboardLoaded({
     getSpaceSummary({ spaceId, from, to }),
     getAttentionBudgets(spaceId),
     getCategoryBudgetProgress(spaceId),
+    listBudgetCards(spaceId),
     getUpcomingCharges(spaceId, 14),
     getActiveGoalProgress(spaceId),
     spaceKind === 'solo'
@@ -172,6 +178,7 @@ async function DashboardLoaded({
         series={toCumulativeSeries(previousSeries)}
         isEmptySpace={false}
         attentionBudgets={attentionBudgets}
+        hasBudgets={budgetCards.length > 0}
         categoryBudgetProgress={categoryBudgetProgress}
         upcomingCharges={upcomingCharges}
         goalProgress={goalProgress}
@@ -193,15 +200,28 @@ function toCumulativeSeries(
 
 function DashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 px-4 py-6 lg:px-8">
-      <Skeleton className="h-8 w-40" />
-      <Skeleton className="h-10 w-full max-w-xl" />
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-36 rounded-xl" />
-        ))}
+    <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
+      <div className="flex min-w-0 flex-col gap-6">
+        <div className="space-y-3">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-10 w-full max-w-xl" />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-36 rounded-xl" />
+          ))}
+        </div>
+        <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Skeleton className="h-72 w-full rounded-xl" />
+          <Skeleton className="h-72 w-full rounded-xl" />
+        </div>
       </div>
-      <Skeleton className="h-64 w-full rounded-xl" />
+      <aside className="flex flex-col gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-32 w-full rounded-xl" />
+        ))}
+      </aside>
     </div>
   );
 }

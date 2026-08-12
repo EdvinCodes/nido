@@ -125,7 +125,36 @@ export function LedgerClient({
     mine: parseAsBoolean.withDefault(false),
     attached: parseAsBoolean.withDefault(false),
     ids: parseAsArrayOf(parseAsString).withDefault([]),
+    /** Legacy deep-link from receipts; migrated to `ids` on mount. */
+    tx: parseAsString,
   });
+
+  const [searchDraft, setSearchDraft] = useState(urlState.q);
+  const [minDraft, setMinDraft] = useState('');
+  const [maxDraft, setMaxDraft] = useState('');
+
+  useEffect(() => {
+    setSearchDraft(urlState.q);
+  }, [urlState.q]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      if (searchDraft === urlState.q) return;
+      void setUrlState({ q: searchDraft });
+    }, 300);
+    return () => {
+      window.clearTimeout(handle);
+    };
+  }, [searchDraft, setUrlState, urlState.q]);
+
+  useEffect(() => {
+    if (!urlState.tx) return;
+    if (urlState.ids.length > 0) {
+      void setUrlState({ tx: null });
+      return;
+    }
+    void setUrlState({ ids: [urlState.tx], tx: null });
+  }, [setUrlState, urlState.ids.length, urlState.tx]);
 
   const filters: TransactionFilters = useMemo(
     () =>
@@ -142,7 +171,7 @@ export function LedgerClient({
           shared: urlState.shared,
           mine: urlState.mine,
           hasAttachment: urlState.attached,
-          transactionIds: urlState.ids,
+          transactionIds: urlState.ids.length > 0 ? urlState.ids : urlState.tx ? [urlState.tx] : [],
         },
         participantId,
       ),
@@ -217,6 +246,9 @@ export function LedgerClient({
   }, [query]);
 
   function clearFilters(): void {
+    setSearchDraft('');
+    setMinDraft('');
+    setMaxDraft('');
     void setUrlState({
       q: '',
       kind: '',
@@ -229,6 +261,8 @@ export function LedgerClient({
       shared: false,
       mine: false,
       attached: false,
+      ids: [],
+      tx: null,
     });
   }
 
@@ -303,8 +337,33 @@ export function LedgerClient({
         toast.error(result.error.message);
         return;
       }
-      toast.success(t('bulkDeleted', { count: ids.length }));
       clearSelection();
+      toast(t('bulkDeleted', { count: ids.length }), {
+        duration: 8000,
+        action: {
+          label: tTx('undo'),
+          onClick: () => {
+            void Promise.all(
+              ids.map((transactionId) =>
+                restoreTransaction({
+                  spaceId,
+                  requestId: crypto.randomUUID(),
+                  transactionId,
+                }),
+              ),
+            ).then((results) => {
+              for (const result of results) {
+                if (!result.ok) {
+                  toast.error(result.error.message);
+                  return;
+                }
+              }
+              toast.success(t('bulkRestored', { count: ids.length }));
+              void query.refetch();
+            });
+          },
+        },
+      });
       void query.refetch();
     });
   }
@@ -320,12 +379,13 @@ export function LedgerClient({
     filters.amountMax != null ||
     filters.sharedOnly ||
     filters.mineOnly ||
-    filters.hasAttachment,
+    filters.hasAttachment ||
+    filters.transactionIds?.length,
   );
 
   function majorToMinorInput(value: string): number | null {
     const parsed = parseMoney(value, { locale, currency: space.base_currency });
-    if (!parsed.ok) return parsed.error === 'empty' ? null : null;
+    if (!parsed.ok) return null;
     return Number(parsed.value.minor);
   }
 
@@ -337,6 +397,13 @@ export function LedgerClient({
     });
   }
 
+  useEffect(() => {
+    setMinDraft(minorToMajorInput(urlState.min));
+    setMaxDraft(minorToMajorInput(urlState.max));
+    // Sync drafts when URL amounts change (clear filters / deep-link), not on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional URL→draft sync only
+  }, [urlState.min, urlState.max, locale, space.base_currency]);
+
   const filterChipClass = (active: boolean) =>
     cn(
       'h-9 rounded-md border px-3 text-sm transition-colors',
@@ -347,6 +414,7 @@ export function LedgerClient({
 
   return (
     <PullToRefresh
+      scrollRef={parentRef}
       onRefresh={async () => {
         await query.refetch();
       }}
@@ -417,18 +485,18 @@ export function LedgerClient({
               {t('pendingCount', { count: offline?.pending.length ?? 0 })}
             </p>
           ) : null}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex [scrollbar-width:none] flex-nowrap items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
             <Input
-              value={urlState.q}
+              value={searchDraft}
               onChange={(e) => {
-                void setUrlState({ q: e.target.value });
+                setSearchDraft(e.target.value);
               }}
               placeholder={t('searchPlaceholder')}
-              className="max-w-xs"
+              className="max-w-xs min-w-[12rem] shrink-0"
               aria-label={t('searchPlaceholder')}
             />
             <select
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              className="h-9 shrink-0 rounded-md border border-input bg-background px-2 text-sm"
               value={urlState.kind || 'all'}
               onChange={(e) => {
                 void setUrlState({
@@ -449,7 +517,7 @@ export function LedgerClient({
                 void setUrlState({ from: e.target.value });
               }}
               aria-label={t('dateFrom')}
-              className="w-auto"
+              className="w-auto shrink-0"
             />
             <Input
               type="date"
@@ -458,11 +526,11 @@ export function LedgerClient({
                 void setUrlState({ to: e.target.value });
               }}
               aria-label={t('dateTo')}
-              className="w-auto"
+              className="w-auto shrink-0"
             />
             {tags.length > 0 ? (
               <select
-                className="h-9 max-w-[10rem] rounded-md border border-input bg-background px-2 text-sm"
+                className="h-9 max-w-[10rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
                 value={urlState.tags[0] ?? ''}
                 onChange={(e) => {
                   const id = e.target.value;
@@ -482,30 +550,43 @@ export function LedgerClient({
               type="text"
               inputMode="decimal"
               placeholder={t('amountMin')}
-              value={minorToMajorInput(urlState.min)}
+              value={minDraft}
               onChange={(e) => {
-                void setUrlState({ min: majorToMinorInput(e.target.value) });
+                setMinDraft(e.target.value);
+              }}
+              onBlur={() => {
+                const next = minDraft.trim() === '' ? null : majorToMinorInput(minDraft);
+                void setUrlState({ min: next });
+                setMinDraft(minorToMajorInput(next));
               }}
               aria-label={t('amountMin')}
-              className="w-24"
+              className="w-24 shrink-0"
             />
             <Input
               type="text"
               inputMode="decimal"
               placeholder={t('amountMax')}
-              value={minorToMajorInput(urlState.max)}
+              value={maxDraft}
               onChange={(e) => {
-                void setUrlState({ max: majorToMinorInput(e.target.value) });
+                setMaxDraft(e.target.value);
+              }}
+              onBlur={() => {
+                const next = maxDraft.trim() === '' ? null : majorToMinorInput(maxDraft);
+                void setUrlState({ max: next });
+                setMaxDraft(minorToMajorInput(next));
               }}
               aria-label={t('amountMax')}
-              className="w-24"
+              className="w-24 shrink-0"
             />
             <button
               type="button"
               aria-pressed={urlState.shared}
-              className={filterChipClass(urlState.shared)}
+              className={cn(filterChipClass(urlState.shared), 'shrink-0')}
               onClick={() => {
-                void setUrlState({ shared: !urlState.shared });
+                void setUrlState({
+                  shared: !urlState.shared,
+                  mine: false,
+                });
               }}
             >
               {t('sharedOnly')}
@@ -513,9 +594,12 @@ export function LedgerClient({
             <button
               type="button"
               aria-pressed={urlState.mine}
-              className={filterChipClass(urlState.mine)}
+              className={cn(filterChipClass(urlState.mine), 'shrink-0')}
               onClick={() => {
-                void setUrlState({ mine: !urlState.mine });
+                void setUrlState({
+                  mine: !urlState.mine,
+                  shared: false,
+                });
               }}
             >
               {t('mineOnly')}
@@ -524,15 +608,29 @@ export function LedgerClient({
               type="button"
               aria-pressed={urlState.attached}
               data-testid="filter-has-attachment"
-              className={filterChipClass(urlState.attached)}
+              className={cn(filterChipClass(urlState.attached), 'shrink-0')}
               onClick={() => {
                 void setUrlState({ attached: !urlState.attached });
               }}
             >
               {t('hasAttachment')}
             </button>
+            {filters.transactionIds?.length ? (
+              <span
+                className={cn(filterChipClass(true), 'shrink-0')}
+                data-testid="filter-linked-transactions"
+              >
+                {t('linkedCount', { count: filters.transactionIds.length })}
+              </span>
+            ) : null}
             {hasFilters ? (
-              <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="shrink-0"
+                onClick={clearFilters}
+              >
                 {t('clearFilters')}
               </Button>
             ) : null}
@@ -563,9 +661,16 @@ export function LedgerClient({
         ) : null}
 
         {query.status === 'success' && rows.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
-            <p className="font-medium">{t('emptyTitle')}</p>
-            <p className="max-w-sm text-sm text-muted-foreground">{t('emptyBody')}</p>
+          <div className="flex flex-col items-center gap-3 px-4 py-16 text-center">
+            <p className="font-medium">{hasFilters ? t('emptyFilteredTitle') : t('emptyTitle')}</p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              {hasFilters ? t('emptyFilteredBody') : t('emptyBody')}
+            </p>
+            {hasFilters ? (
+              <Button type="button" variant="outline" onClick={clearFilters}>
+                {t('clearFilters')}
+              </Button>
+            ) : null}
           </div>
         ) : null}
 

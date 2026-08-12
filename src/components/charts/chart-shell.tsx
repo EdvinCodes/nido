@@ -66,7 +66,9 @@ export function ChartShell({
 
   return (
     <div className={cn('flex min-w-0 flex-col gap-2 overflow-hidden', className)}>
-      <div className={cn('w-full min-w-0', heightClassName)}>{children}</div>
+      <div className={cn('w-full min-w-0', heightClassName)} aria-hidden="true">
+        {children}
+      </div>
       <div className="flex justify-end">
         <Button
           type="button"

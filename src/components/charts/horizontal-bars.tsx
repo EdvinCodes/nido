@@ -1,6 +1,7 @@
 'use client';
 
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { chartAxisStyle, chartColors, chartTooltipStyle } from './tokens';
 
@@ -24,6 +25,7 @@ export function HorizontalBars({
   valueFormatter: (value: number) => string;
   onBarClick?: (point: HorizontalBarPoint) => void;
 }) {
+  const t = useTranslations('charts.columns');
   return (
     <ChartShell
       title={title}
@@ -31,8 +33,8 @@ export function HorizontalBars({
       loading={loading}
       empty={data.length === 0}
       columns={[
-        { key: 'label', label: 'Name' },
-        { key: 'value', label: 'Amount', align: 'right' },
+        { key: 'label', label: t('name') },
+        { key: 'value', label: t('amount'), align: 'right' },
       ]}
       rows={data.map((point) => ({
         label: point.label,

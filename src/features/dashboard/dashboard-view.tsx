@@ -58,6 +58,7 @@ export function DashboardView({
   series,
   isEmptySpace,
   attentionBudgets = [],
+  hasBudgets = false,
   categoryBudgetProgress = {},
   upcomingCharges = [],
   goalProgress = [],
@@ -73,6 +74,7 @@ export function DashboardView({
   series: SpaceSeriesPoint[];
   isEmptySpace: boolean;
   attentionBudgets?: AttentionBudget[];
+  hasBudgets?: boolean;
   categoryBudgetProgress?: Record<string, { ratio: number; budgetId: string }>;
   upcomingCharges?: Array<{
     ruleId: string;
@@ -234,19 +236,25 @@ export function DashboardView({
                 ratio={null}
                 goodWhenUp
                 deltaLabel={t('acrossAccounts')}
-                spark={netSpark}
+                spark={[]}
                 sparkTone="neutral"
                 sparkTitle={t('cards.balance')}
                 tone="auto"
+                showSpark={false}
               />
             </section>
 
             <section className="rounded-xl border border-border bg-surface/40 p-4">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-medium tracking-tight">{t('evolution.title')}</h2>
-                <div className="flex gap-1 rounded-md border border-border p-0.5">
+                <div
+                  className="flex gap-1 rounded-md border border-border p-0.5"
+                  role="group"
+                  aria-label={t('evolution.title')}
+                >
                   <button
                     type="button"
+                    aria-pressed={evolutionMode === 'area'}
                     className={`h-7 rounded px-2 text-xs ${evolutionMode === 'area' ? 'bg-primary/15' : 'text-muted-foreground'}`}
                     onClick={() => {
                       setEvolutionMode('area');
@@ -256,6 +264,7 @@ export function DashboardView({
                   </button>
                   <button
                     type="button"
+                    aria-pressed={evolutionMode === 'bars'}
                     className={`h-7 rounded px-2 text-xs ${evolutionMode === 'bars' ? 'bg-primary/15' : 'text-muted-foreground'}`}
                     onClick={() => {
                       setEvolutionMode('bars');
@@ -318,66 +327,83 @@ export function DashboardView({
                 <h2 className="mb-3 text-sm font-medium tracking-tight">
                   {t('categories.ranked')}
                 </h2>
-                <ul className="space-y-2">
-                  {topCategories.map((category) => (
-                    <li key={`${category.id ?? 'none'}-${category.name}`}>
-                      <Link
-                        href={ledgerHref({
-                          spaceId,
-                          from: summary.from,
-                          to: summary.to,
-                          kind: 'expense',
-                          categoryId: category.id,
-                        })}
-                        className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-surface-raised"
-                      >
-                        <span
-                          className="size-2.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: category.color }}
-                          aria-hidden
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium">
-                            {category.name}
-                          </span>
-                          <span className="block text-xs text-muted-foreground">
-                            {Math.round(category.share * 100)}% ·{' '}
-                            <TrendDelta
-                              ratio={deltaRatio(
-                                category.total_minor,
-                                category.total_minor - category.change_minor,
-                              )}
-                              goodWhenUp={false}
-                              label={t('vsPrevious')}
-                            />
-                          </span>
-                          {category.id && categoryBudgetProgress[category.id] ? (
-                            <ProgressBar
-                              className="mt-1"
-                              value={categoryBudgetProgress[category.id]?.ratio ?? 0}
-                              label={category.name}
-                            />
-                          ) : (
-                            <span
-                              className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
-                              aria-hidden
-                            >
-                              <span
-                                className="block h-full rounded-full bg-primary"
-                                style={{ width: `${Math.min(100, category.share * 100)}%` }}
+                {topCategories.length === 0 ? (
+                  <div className="flex flex-col gap-2 py-4">
+                    <p className="text-sm text-muted-foreground">{t('categories.empty')}</p>
+                    <Link
+                      href={ledgerHref({
+                        spaceId,
+                        from: summary.from,
+                        to: summary.to,
+                        kind: 'expense',
+                      })}
+                      className="text-sm font-medium text-primary hover:underline"
+                    >
+                      {t('categories.emptyCta')}
+                    </Link>
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {topCategories.map((category) => (
+                      <li key={`${category.id ?? 'none'}-${category.name}`}>
+                        <Link
+                          href={ledgerHref({
+                            spaceId,
+                            from: summary.from,
+                            to: summary.to,
+                            kind: 'expense',
+                            categoryId: category.id,
+                          })}
+                          className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-surface-raised"
+                        >
+                          <span
+                            className="size-2.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: category.color }}
+                            aria-hidden
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-medium">
+                              {category.name}
+                            </span>
+                            <span className="block text-xs text-muted-foreground">
+                              {Math.round(category.share * 100)}% ·{' '}
+                              <TrendDelta
+                                ratio={deltaRatio(
+                                  category.total_minor,
+                                  category.total_minor - category.change_minor,
+                                )}
+                                goodWhenUp={false}
+                                label={t('vsPrevious')}
                               />
                             </span>
-                          )}
-                        </span>
-                        <Amount
-                          minor={category.total_minor}
-                          currency={currency}
-                          className="text-sm"
-                        />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                            {category.id && categoryBudgetProgress[category.id] ? (
+                              <ProgressBar
+                                className="mt-1"
+                                value={categoryBudgetProgress[category.id]?.ratio ?? 0}
+                                label={category.name}
+                              />
+                            ) : (
+                              <span
+                                className="mt-1 block h-1.5 overflow-hidden rounded-full bg-border"
+                                aria-hidden
+                              >
+                                <span
+                                  className="block h-full rounded-full bg-primary"
+                                  style={{ width: `${Math.min(100, category.share * 100)}%` }}
+                                />
+                              </span>
+                            )}
+                          </span>
+                          <Amount
+                            minor={category.total_minor}
+                            currency={currency}
+                            className="text-sm"
+                          />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </section>
 
@@ -464,7 +490,19 @@ export function DashboardView({
             <section className="rounded-xl border border-border bg-surface/40 p-4">
               <h2 className="text-sm font-medium tracking-tight">{t('rail.alerts')}</h2>
               {attentionBudgets.length === 0 ? (
-                <p className="mt-2 text-xs text-muted-foreground">{t('rail.alertsEmpty')}</p>
+                <div className="mt-2 flex flex-col gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {hasBudgets ? t('rail.alertsEmpty') : t('rail.alertsNone')}
+                  </p>
+                  {!hasBudgets ? (
+                    <Link
+                      href={route(`/s/${spaceId}/budgets`)}
+                      className="text-xs font-medium text-primary hover:underline"
+                    >
+                      {t('rail.alertsNoneCta')}
+                    </Link>
+                  ) : null}
+                </div>
               ) : (
                 <ul className="mt-3 space-y-2">
                   {attentionBudgets.map((budget) => (
@@ -522,7 +560,15 @@ export function DashboardView({
             <section className="rounded-xl border border-border bg-surface/40 p-4">
               <h2 className="text-sm font-medium tracking-tight">{t('rail.goals')}</h2>
               {goalProgress.length === 0 ? (
-                <p className="mt-2 text-xs text-muted-foreground">{t('rail.goalsEmpty')}</p>
+                <div className="mt-2 flex flex-col gap-2">
+                  <p className="text-xs text-muted-foreground">{t('rail.goalsEmpty')}</p>
+                  <Link
+                    href={route(`/s/${spaceId}/goals`)}
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    {t('rail.goalsEmptyCta')}
+                  </Link>
+                </div>
               ) : (
                 <ul className="mt-3 space-y-2">
                   {goalProgress.map((goal) => (
@@ -598,6 +644,7 @@ function SummaryCard({
   sparkTone,
   sparkTitle,
   tone = 'none',
+  showSpark = true,
 }: {
   href: Route;
   label: string;
@@ -610,6 +657,7 @@ function SummaryCard({
   sparkTone: 'income' | 'expense' | 'neutral';
   sparkTitle: string;
   tone?: 'expense' | 'income' | 'transfer' | 'auto' | 'none';
+  showSpark?: boolean;
 }) {
   const amountTone =
     tone === 'auto' ? (amount < 0 ? 'expense' : amount > 0 ? 'income' : 'none') : tone;
@@ -629,7 +677,7 @@ function SummaryCard({
         className="text-xl font-semibold tracking-tight"
       />
       <TrendDelta ratio={ratio} goodWhenUp={goodWhenUp} label={deltaLabel} />
-      <Sparkline data={spark} title={sparkTitle} tone={sparkTone} />
+      {showSpark ? <Sparkline data={spark} title={sparkTitle} tone={sparkTone} /> : null}
     </Link>
   );
 }

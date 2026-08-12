@@ -1,6 +1,7 @@
 'use client';
 
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { chartTooltipStyle } from './tokens';
 
@@ -27,6 +28,7 @@ export function CategoryDonut({
   valueFormatter: (value: number) => string;
   onSliceClick?: (slice: CategoryDonutSlice) => void;
 }) {
+  const t = useTranslations('charts.columns');
   const total = data.reduce((sum, slice) => sum + slice.value, 0);
 
   return (
@@ -36,8 +38,8 @@ export function CategoryDonut({
       loading={loading}
       empty={data.length === 0 || total === 0}
       columns={[
-        { key: 'name', label: 'Category' },
-        { key: 'value', label: 'Amount', align: 'right' },
+        { key: 'name', label: t('category') },
+        { key: 'value', label: t('amount'), align: 'right' },
       ]}
       rows={data.map((slice) => ({
         name: slice.name,

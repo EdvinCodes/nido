@@ -8,6 +8,7 @@
     "loading": "Loading…",
     "retry": "Retry",
     "goHome": "Go home",
+    "skipToContent": "Skip to content",
     "save": "Save",
     "cancel": "Cancel",
     "continue": "Continue",
@@ -247,7 +248,18 @@
   "charts": {
     "empty": "Nothing to chart in this period",
     "showTable": "Show data table",
-    "hideTable": "Hide data table"
+    "hideTable": "Hide data table",
+    "columns": {
+      "date": "Date",
+      "value": "Value",
+      "previous": "Previous",
+      "period": "Period",
+      "income": "Income",
+      "expense": "Expense",
+      "category": "Category",
+      "amount": "Amount",
+      "name": "Name"
+    }
   },
   "period": {
     "from": "From",
@@ -285,7 +297,9 @@
     "categories": {
       "title": "Where it goes",
       "ranked": "Top categories",
-      "total": "Total"
+      "total": "Total",
+      "empty": "No expenses in this period.",
+      "emptyCta": "Open ledger"
     },
     "participants": {
       "title": "By person",
@@ -300,10 +314,13 @@
       "alerts": "Budgets needing attention",
       "alertsSoon": "Budget alerts arrive in the next phase.",
       "alertsEmpty": "All budgets look healthy right now.",
+      "alertsNone": "No budgets yet.",
+      "alertsNoneCta": "Create a budget",
       "upcoming": "Upcoming charges",
       "upcomingEmpty": "Nothing due in the next two weeks.",
       "goals": "Goal progress",
       "goalsEmpty": "No active goals yet.",
+      "goalsEmptyCta": "Add a goal",
       "balances": "Balances",
       "balancesEmpty": "Everyone is square.",
       "settleLink": "Settle up"
@@ -502,6 +519,10 @@
     "selectedCount": "{count} selected",
     "clearSelection": "Clear",
     "bulkDeleted": "Deleted {count} transactions",
+    "bulkRestored": "Restored {count} transactions",
+    "linkedCount": "{count} linked",
+    "emptyFilteredTitle": "No matching transactions",
+    "emptyFilteredBody": "Try clearing filters or adjusting the date range and amounts.",
     "pendingSync": "Pending sync",
     "pendingCount": "{count} pending to sync"
   },
@@ -577,6 +598,7 @@
 
   "budgets": {
     "title": "Budgets",
+    "back": "All budgets",
     "create": "New budget",
     "edit": "Edit",
     "archive": "Archive",

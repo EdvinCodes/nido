@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { ChartShell } from './chart-shell';
 import { chartAxisStyle, chartColors, chartTooltipStyle } from './tokens';
 
@@ -29,15 +30,16 @@ export function AreaTrend({
   title: string;
   valueFormatter: (value: number) => string;
 }) {
+  const t = useTranslations('charts.columns');
   return (
     <ChartShell
       title={title}
       loading={loading}
       empty={data.length === 0}
       columns={[
-        { key: 'label', label: 'Date' },
-        { key: 'value', label: 'Value', align: 'right' },
-        { key: 'previous', label: 'Previous', align: 'right' },
+        { key: 'label', label: t('date') },
+        { key: 'value', label: t('value'), align: 'right' },
+        { key: 'previous', label: t('previous'), align: 'right' },
       ]}
       rows={data.map((point) => ({
         label: point.label,

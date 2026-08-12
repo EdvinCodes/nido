@@ -15,8 +15,8 @@ export default async function StorageSettingsPage({
   const usage = await getStorageUsage(spaceId);
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <StorageSettings usage={usage} />
-    </main>
+    </div>
   );
 }

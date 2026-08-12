@@ -2,11 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Amount } from '@/components/money/amount';
+import { Button } from '@/components/ui/button';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { Skeleton } from '@/components/ui/skeleton';
+import { isContributor, type MemberRole } from '@/lib/auth';
 import { route } from '@/lib/routes';
+import { BudgetFormSheet } from './budget-form-sheet';
 import type { BudgetCardModel } from './types';
 import type { BudgetPeriodRow } from './types';
 
@@ -17,11 +21,17 @@ const Sparkline = dynamic(() => import('@/components/charts/sparkline').then((m)
 
 export function BudgetDetailClient({
   spaceId,
+  role,
+  currency,
   card,
   periods,
   transactions,
+  categories,
+  participants,
 }: {
   spaceId: string;
+  role: MemberRole;
+  currency: string;
   card: BudgetCardModel;
   periods: BudgetPeriodRow[];
   transactions: Array<{
@@ -32,20 +42,38 @@ export function BudgetDetailClient({
     base_amount_minor: number;
     currency: string;
   }>;
+  categories: Array<{ id: string; name: string; color: string }>;
+  participants: Array<{ id: string; displayName: string }>;
 }) {
   const t = useTranslations('budgets');
+  const canEdit = isContributor(role);
+  const [formOpen, setFormOpen] = useState(false);
   const limit = card.currentPeriod?.limitMinor ?? 0;
   const spent = card.currentPeriod?.spentMinor ?? 0;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/90 px-4 py-4 backdrop-blur-md lg:px-8">
-        <Link
-          href={route(`/s/${spaceId}/budgets`)}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          ← {t('title')}
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link
+            href={route(`/s/${spaceId}/budgets`)}
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            ← {t('back')}
+          </Link>
+          {canEdit ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setFormOpen(true);
+              }}
+            >
+              {t('edit')}
+            </Button>
+          ) : null}
+        </div>
         <div className="mt-3 flex items-center gap-4">
           <ProgressRing value={card.ratio} size={80} label={card.name} />
           <div>
@@ -82,21 +110,37 @@ export function BudgetDetailClient({
           ) : (
             <ul className="divide-y divide-border rounded-xl border border-border">
               {transactions.map((tx) => (
-                <li
-                  key={tx.id}
-                  className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate">{tx.merchant || tx.description || t('untitledTx')}</p>
-                    <p className="text-xs text-muted-foreground">{tx.booked_on}</p>
-                  </div>
-                  <Amount minor={tx.base_amount_minor} currency={tx.currency} className="text-sm" />
+                <li key={tx.id}>
+                  <Link
+                    href={route(`/s/${spaceId}/ledger?ids=${tx.id}`)}
+                    className="flex items-center justify-between gap-3 px-3 py-2 text-sm hover:bg-surface-raised"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate">{tx.merchant || tx.description || t('untitledTx')}</p>
+                      <p className="text-xs text-muted-foreground">{tx.booked_on}</p>
+                    </div>
+                    <Amount
+                      minor={tx.base_amount_minor}
+                      currency={tx.currency}
+                      className="text-sm"
+                    />
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
         </section>
       </div>
+
+      <BudgetFormSheet
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        spaceId={spaceId}
+        currency={currency}
+        categories={categories}
+        participants={participants}
+        initial={card}
+      />
     </div>
   );
 }

@@ -13,7 +13,9 @@ export default async function SettingsLayout({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
       <SettingsNav spaceId={spaceId} />
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">{children}</div>
+      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto" id="main-content">
+        {children}
+      </main>
     </div>
   );
 }

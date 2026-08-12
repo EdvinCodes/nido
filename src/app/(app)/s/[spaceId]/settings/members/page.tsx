@@ -23,7 +23,7 @@ export default async function MembersSettingsPage({
   ]);
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <MembersManager
         spaceId={spaceId}
         role={membership.role}
@@ -46,6 +46,6 @@ export default async function MembersSettingsPage({
         invitations={invitations}
         ghosts={ghosts}
       />
-    </main>
+    </div>
   );
 }

@@ -77,6 +77,11 @@ export function LedgerRow({
         )}
         onPointerDown={(e) => {
           if (selectionMode) return;
+          // Swipe actions are touch-only — mouse drag must not soft-delete.
+          if (e.pointerType !== 'touch') {
+            didLongPress.current = false;
+            return;
+          }
           pointerStartX.current = e.clientX;
           didLongPress.current = false;
           clearLongPress();
@@ -87,12 +92,14 @@ export function LedgerRow({
         }}
         onPointerMove={(e) => {
           if (selectionMode || pointerStartX.current == null) return;
+          if (e.pointerType !== 'touch') return;
           const delta = e.clientX - pointerStartX.current;
           if (Math.abs(delta) > 8) clearLongPress();
           setTranslate(Math.max(-112, Math.min(112, delta)));
         }}
         onPointerUp={() => {
           clearLongPress();
+          if (pointerStartX.current == null) return;
           const delta = dragX.current;
           pointerStartX.current = null;
           setTranslate(0);
@@ -181,6 +188,7 @@ export function LedgerRow({
               tone={toneForKind(tx.kind)}
               className="text-sm font-medium"
             />
+            <span className="sr-only">{tTx(`kind.${tx.kind}`)}</span>
           </span>
         </button>
       </div>

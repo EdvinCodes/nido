@@ -12,6 +12,8 @@ promote an item into a phase file first.
 
 ## Open
 
+- [ ] Phase 12 AI eval gate (30/30 numeric + Ollama outbound proof + full e2e green) — parked 2026-08-12 to focus on product polish of shipped surfaces; `llama3` lacks tools, `llama3.2:3b` too weak for the accuracy gate. Target: Phase 12 resume / cloud provider eval.
+- [ ] Product polish pass on shipped app (empty/loading/error consistency, a11y, mobile budgets/ledger friction) — started after parking Phase 12 eval. Target: post-phase UX / continuous.
 - [ ] Perf seed of 10k transactions for ledger virtualization FPS checks — deferred from Phase 02 because seeding 10k via `create_transaction` on every `db:reset` is too slow; demo seed keeps ~150 realistic rows. Target: tooling / Phase 02 follow-up.
 - [x] Wire `hasAttachment` ledger filter to real attachment rows — done in Phase 07.
 - [ ] Re-run Lighthouse (perf ≥ 95, a11y 100) on a production `pnpm start` build of the seeded dashboard — deferred from Phase 03 because local `pnpm dev` is not a valid perf baseline; axe e2e already covers a11y. Target: Phase 03 follow-up / CI.

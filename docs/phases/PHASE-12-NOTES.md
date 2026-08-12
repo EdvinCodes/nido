@@ -45,6 +45,9 @@ Phase gate still requires **100% numeric accuracy**. Prefer Anthropic/OpenAI for
 
 ## Remaining before Done
 
+**Parked 2026-08-12** (product polish of shipped UX takes priority). Resume when a
+tool-capable cloud key is available or a stronger local model is acceptable.
+
 1. Full eval 30/30 with a tool-capable cloud model (or a stronger local model than 3B).
 2. Confirm Ollama stays on loopback when used.
 3. Green `pnpm test:e2e` on a machine with ≥6GB Docker RAM (or re-run the 2 failed specs).

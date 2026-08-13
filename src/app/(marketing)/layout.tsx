@@ -17,7 +17,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(appUrl),
     alternates: {
       canonical: '/',
-      languages: Object.fromEntries(locales.map((loc) => [loc, `/${loc === locale ? '' : ''}`])),
+      languages: {
+        'x-default': '/',
+        ...Object.fromEntries(locales.map((loc) => [loc, '/'])),
+      },
     },
     openGraph: {
       type: 'website',
@@ -29,7 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MarketingLayout({ children }: { children: ReactNode }) {
+export default async function MarketingLayout({ children }: { children: ReactNode }) {
+  const t = await getTranslations('metadata');
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -37,8 +41,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-    description:
-      'Collaborative household finance — shared expenses, fair splits, budgets, and reports.',
+    description: t('description'),
     url: appUrl,
     license: 'https://opensource.org/licenses/MIT',
   };

@@ -167,7 +167,8 @@
         "title": "Changelog",
         "description": "Release history from git tags.",
         "subtitle": "Annotated tags from the repository.",
-        "empty": "No release tags yet. Follow main for the latest work."
+        "fromCommits": "No tagged releases yet. This is recent work on main.",
+        "empty": "No release tags or git history available."
       },
       "brand": {
         "title": "Brand",
@@ -177,12 +178,23 @@
         "logoUsage": "Use the lockup on light or dark backgrounds. The mark alone works for favicons and app icons. Do not stretch or recolour outside the token palette.",
         "colorsTitle": "Colour tokens",
         "typeTitle": "Typography",
-        "typeBody": "Geist Sans for display headlines and UI. Geist Mono for amounts and code."
+        "typeBody": "Geist Sans for display headlines and UI. Geist Mono for amounts and code.",
+        "typeSample": "Geist Sans — body and UI",
+        "palette": {
+          "primary": "Primary",
+          "background": "Background",
+          "surface": "Surface",
+          "income": "Income",
+          "expense": "Expense",
+          "warning": "Warning"
+        }
       },
       "docs": {
         "title": "Documentation",
         "description": "Project specification and architecture.",
-        "subtitle": "The same docs shipped in the repository, rendered here for browsing."
+        "subtitle": "The same docs shipped in the repository, rendered here for browsing.",
+        "searchLabel": "Search docs",
+        "searchPlaceholder": "Search…"
       }
     }
   },
@@ -464,6 +476,7 @@
   "categories": {
     "title": "Categories",
     "add": "Add category",
+    "reorderHandle": "Reorder {name}",
     "addSub": "Add subcategory",
     "rename": "Rename",
     "archive": "Archive",
@@ -512,6 +525,7 @@
     "clearFilters": "Clear filters",
     "emptyTitle": "No transactions yet",
     "emptyBody": "Tap add to record your first expense. It only takes a few seconds.",
+    "emptyCta": "Add transaction",
     "error": "Could not load the ledger.",
     "retry": "Retry",
     "loadingMore": "Loading more…",
@@ -594,6 +608,7 @@
   "accounts": {
     "title": "Accounts",
     "add": "Add account",
+    "reorderHandle": "Reorder {name}",
     "archive": "Archive",
     "newAccount": "New account",
     "kind": {
@@ -724,6 +739,7 @@
     "calendar": "This month",
     "emptyTitle": "No subscriptions yet",
     "emptyBody": "Track streaming, bills, and other repeating charges so price hikes stop sneaking up.",
+    "emptyCta": "New subscription",
     "next": "Next {date}",
     "paidToDate": "{amount} paid to date",
     "priceTrend": "Price trend",
@@ -865,10 +881,13 @@
     "transferLine": "{from} pays {to} {amount}",
     "noTransfers": "No outstanding transfers.",
     "history": "Settlement history",
-    "historyEmpty": "No settlements yet.",
+    "historyEmptyTitle": "No settlements yet",
+    "historyEmpty": "When someone marks a debt as paid, it will show up here.",
+    "historyEmptyCta": "Go to ledger",
     "historyLine": "{from} → {to} · {amount} · {date} · {method}",
     "breakdownTitle": "What built {name}'s balance",
     "breakdownPaidOwed": "Paid {paid} · owed {owed}",
+    "breakdownEmptyTitle": "Nothing in this period",
     "breakdownEmpty": "No contributing transactions in this period.",
     "applyPeriod": "Apply",
     "status": {
@@ -1002,6 +1021,8 @@
       "title": "Recent imports",
       "body": "Committed and draft batches for this space.",
       "empty": "No imports yet. Upload a statement to create the first batch.",
+      "emptyTitle": "No imports yet",
+      "emptyCta": "Choose a file",
       "untitled": "Untitled file",
       "meta": "{status} · {rows} rows · {imported} imported"
     },
@@ -1041,6 +1062,8 @@
     "rules": {
       "title": "Categorization rules",
       "description": "Rules run in priority order during import preview.",
+      "emptyTitle": "No rules yet",
+      "emptyBody": "Add a rule to categorise a merchant automatically on every import.",
       "addRule": "Add rule",
       "pattern": "Pattern",
       "category": "Category",
@@ -1057,6 +1080,7 @@
       "title": "Bank connections",
       "disabledDescription": "Automatic bank sync is optional. CSV import works with every bank.",
       "enabledDescription": "Connect accounts to sync transactions every six hours.",
+      "notReadyDescription": "The provider is selected in the environment, but live bank sessions are not wired yet. Use Import to upload statements.",
       "connect": "Connect a bank",
       "howToEnable": "Enable bank sync",
       "enableStep1": "Set BANK_PROVIDER=enablebanking in your environment",
@@ -1089,7 +1113,9 @@
     "openPeriods": "Recent periods",
     "thisMonth": "This month",
     "pastMonth": "Past month",
+    "emptyTitle": "No closed periods yet",
     "empty": "No closed periods yet. They appear after the first monthly close. Live totals above still reflect your ledger.",
+    "emptyCta": "View dashboard",
     "exportPdf": "Export PDF",
     "exportXlsx": "Export Excel",
     "exportCsv": "Export CSV",

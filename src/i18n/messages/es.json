@@ -167,7 +167,8 @@
         "title": "Cambios",
         "description": "Historial de versiones desde etiquetas git.",
         "subtitle": "Etiquetas anotadas del repositorio.",
-        "empty": "Aún no hay etiquetas de release. Sigue main para lo último."
+        "fromCommits": "Aún no hay releases etiquetados. Esto es el trabajo reciente en main.",
+        "empty": "Aún no hay etiquetas de release ni historial git disponible."
       },
       "brand": {
         "title": "Marca",
@@ -177,12 +178,23 @@
         "logoUsage": "Usa el lockup sobre fondos claros u oscuros. La marca sola sirve para favicons e iconos. No estires ni recolores fuera de la paleta de tokens.",
         "colorsTitle": "Tokens de color",
         "typeTitle": "Tipografía",
-        "typeBody": "Geist Sans para titulares y UI. Geist Mono para importes y código."
+        "typeBody": "Geist Sans para titulares y UI. Geist Mono para importes y código.",
+        "typeSample": "Geist Sans — cuerpo e interfaz",
+        "palette": {
+          "primary": "Primario",
+          "background": "Fondo",
+          "surface": "Superficie",
+          "income": "Ingreso",
+          "expense": "Gasto",
+          "warning": "Aviso"
+        }
       },
       "docs": {
         "title": "Documentación",
         "description": "Especificación y arquitectura del proyecto.",
-        "subtitle": "Los mismos docs del repositorio, renderizados aquí para consulta."
+        "subtitle": "Los mismos docs del repositorio, renderizados aquí para consulta.",
+        "searchLabel": "Buscar en la documentación",
+        "searchPlaceholder": "Buscar…"
       }
     }
   },
@@ -464,6 +476,7 @@
   "categories": {
     "title": "Categorías",
     "add": "Añadir categoría",
+    "reorderHandle": "Reordenar {name}",
     "addSub": "Añadir subcategoría",
     "rename": "Renombrar",
     "archive": "Archivar",
@@ -512,6 +525,7 @@
     "clearFilters": "Limpiar filtros",
     "emptyTitle": "Aún no hay movimientos",
     "emptyBody": "Pulsa añadir para registrar tu primer gasto. Solo lleva unos segundos.",
+    "emptyCta": "Añadir movimiento",
     "error": "No se pudo cargar el libro.",
     "retry": "Reintentar",
     "loadingMore": "Cargando más…",
@@ -594,6 +608,7 @@
   "accounts": {
     "title": "Cuentas",
     "add": "Añadir cuenta",
+    "reorderHandle": "Reordenar {name}",
     "archive": "Archivar",
     "newAccount": "Nueva cuenta",
     "kind": {
@@ -724,6 +739,7 @@
     "calendar": "Este mes",
     "emptyTitle": "Aún no hay suscripciones",
     "emptyBody": "Controla streaming, facturas y otros cargos repetidos para que las subidas de precio no pasen desapercibidas.",
+    "emptyCta": "Nueva suscripción",
     "next": "Próximo {date}",
     "paidToDate": "{amount} pagados hasta ahora",
     "priceTrend": "Tendencia de precio",
@@ -865,10 +881,13 @@
     "transferLine": "{from} paga a {to} {amount}",
     "noTransfers": "No hay transferencias pendientes.",
     "history": "Historial de liquidaciones",
-    "historyEmpty": "Aún no hay liquidaciones.",
+    "historyEmptyTitle": "Aún no hay liquidaciones",
+    "historyEmpty": "Cuando alguien marque una deuda como pagada, aparecerá aquí.",
+    "historyEmptyCta": "Ir al libro",
     "historyLine": "{from} → {to} · {amount} · {date} · {method}",
     "breakdownTitle": "Qué compone el saldo de {name}",
     "breakdownPaidOwed": "Pagó {paid} · adeudó {owed}",
+    "breakdownEmptyTitle": "Nada en este periodo",
     "breakdownEmpty": "No hay movimientos en este periodo.",
     "applyPeriod": "Aplicar",
     "status": {
@@ -1002,6 +1021,8 @@
       "title": "Importaciones recientes",
       "body": "Lotes confirmados y borradores de este espacio.",
       "empty": "Aún no hay importaciones. Sube un extracto para crear el primero.",
+      "emptyTitle": "Aún no hay importaciones",
+      "emptyCta": "Elegir archivo",
       "untitled": "Archivo sin nombre",
       "meta": "{status} · {rows} filas · {imported} importadas"
     },
@@ -1041,6 +1062,8 @@
     "rules": {
       "title": "Reglas de categorización",
       "description": "Las reglas se aplican por prioridad durante la vista previa.",
+      "emptyTitle": "Aún no hay reglas",
+      "emptyBody": "Crea una regla para categorizar un comercio automáticamente en cada importación.",
       "addRule": "Añadir regla",
       "pattern": "Patrón",
       "category": "Categoría",
@@ -1057,6 +1080,7 @@
       "title": "Conexiones bancarias",
       "disabledDescription": "La sync automática es opcional. La importación CSV funciona con cualquier banco.",
       "enabledDescription": "Conecta cuentas para sincronizar cada seis horas.",
+      "notReadyDescription": "El proveedor está seleccionado en el entorno, pero la conexión en vivo aún no está cableada. Usa Importar para subir extractos.",
       "connect": "Conectar banco",
       "howToEnable": "Activar sync bancaria",
       "enableStep1": "Configura BANK_PROVIDER=enablebanking en el entorno",
@@ -1089,7 +1113,9 @@
     "openPeriods": "Periodos recientes",
     "thisMonth": "Este mes",
     "pastMonth": "Mes anterior",
+    "emptyTitle": "Aún no hay cierres",
     "empty": "Aún no hay cierres. Aparecerán tras el primer cierre mensual. Los totales en vivo de arriba ya reflejan tu libro.",
+    "emptyCta": "Ver el panel",
     "exportPdf": "Exportar PDF",
     "exportXlsx": "Exportar Excel",
     "exportCsv": "Exportar CSV",

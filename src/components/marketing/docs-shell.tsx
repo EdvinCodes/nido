@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { DocEntry } from '@/lib/marketing/docs';
 import { route } from '@/lib/routes';
 
@@ -15,6 +16,7 @@ export function DocsShell({
   activeSlug: string | null;
   children: ReactNode;
 }) {
+  const t = useTranslations('marketing.pages.docs');
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -26,7 +28,7 @@ export function DocsShell({
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-12 lg:flex-row lg:gap-12">
       <aside className="lg:w-64 lg:shrink-0">
         <label htmlFor="docs-search" className="sr-only">
-          Search docs
+          {t('searchLabel')}
         </label>
         <input
           id="docs-search"
@@ -35,7 +37,7 @@ export function DocsShell({
           onChange={(event) => {
             setQuery(event.target.value);
           }}
-          placeholder="Search…"
+          placeholder={t('searchPlaceholder')}
           className="mb-4 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
         <nav aria-label="Documentation">

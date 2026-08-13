@@ -8,13 +8,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const palette = [
-  { name: 'Primary', token: '--primary', className: 'bg-primary' },
-  { name: 'Background', token: '--background', className: 'bg-background border border-border' },
-  { name: 'Surface', token: '--surface', className: 'bg-surface border border-border' },
-  { name: 'Income', token: '--income', className: 'bg-income' },
-  { name: 'Expense', token: '--expense', className: 'bg-expense' },
-  { name: 'Warning', token: '--warning', className: 'bg-warning' },
-];
+  { nameKey: 'palette.primary', token: '--primary', className: 'bg-primary' },
+  {
+    nameKey: 'palette.background',
+    token: '--background',
+    className: 'bg-background border border-border',
+  },
+  { nameKey: 'palette.surface', token: '--surface', className: 'bg-surface border border-border' },
+  { nameKey: 'palette.income', token: '--income', className: 'bg-income' },
+  { nameKey: 'palette.expense', token: '--expense', className: 'bg-expense' },
+  { nameKey: 'palette.warning', token: '--warning', className: 'bg-warning' },
+] as const;
 
 export default async function BrandPage() {
   const t = await getTranslations('marketing.pages.brand');
@@ -44,7 +48,7 @@ export default async function BrandPage() {
             >
               <span className={`size-10 shrink-0 rounded-md ${swatch.className}`} aria-hidden />
               <span>
-                <span className="block text-sm font-medium">{swatch.name}</span>
+                <span className="block text-sm font-medium">{t(swatch.nameKey)}</span>
                 <span className="font-mono text-xs text-muted-foreground">{swatch.token}</span>
               </span>
             </li>
@@ -56,7 +60,7 @@ export default async function BrandPage() {
         <h2 className="text-lg font-medium">{t('typeTitle')}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t('typeBody')}</p>
         <p className="mt-6 font-display text-5xl tracking-tight">nido</p>
-        <p className="mt-4 text-base">Geist Sans — body and UI</p>
+        <p className="mt-4 text-base">{t('typeSample')}</p>
       </section>
     </div>
   );

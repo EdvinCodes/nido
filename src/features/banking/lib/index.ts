@@ -23,6 +23,11 @@ export function isBankSyncEnabled(): boolean {
   return process.env.BANK_PROVIDER === 'enablebanking' && Boolean(process.env.BANK_APP_ID);
 }
 
+/** Live PSD2 sessions are not wired; env flags only select the stub provider. */
+export function isBankConnectReady(): boolean {
+  return false;
+}
+
 export function getBankProvider(): BankProvider {
   if (process.env.BANK_PROVIDER === 'enablebanking' && process.env.BANK_APP_ID) {
     return enableBankingProvider;

@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import type { TransactionView } from '@/features/transactions/types';
 import { formatMoney, money } from '@/lib/money';
 
@@ -38,7 +37,8 @@ export function exportLedgerCsv(rows: TransactionView[]): Uint8Array {
   return new TextEncoder().encode(lines.join('\n'));
 }
 
-export function exportLedgerXlsx(rows: TransactionView[]): Uint8Array {
+export async function exportLedgerXlsx(rows: TransactionView[]): Promise<Uint8Array> {
+  const XLSX = await import('xlsx');
   const data = rows.map((tx) => ({
     booked_on: tx.booked_on,
     kind: tx.kind,

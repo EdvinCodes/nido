@@ -51,13 +51,13 @@ const BANKS: Array<{ name: string; mapping: ColumnMapping }> = [
 
 describe('bank statement fixtures', () => {
   for (const bank of BANKS) {
-    it(`parses ${bank.name} fixture`, () => {
+    it(`parses ${bank.name} fixture`, async () => {
       const csvPath = join(FIXTURES_DIR, `${bank.name}.csv`);
       const expectedPath = join(FIXTURES_DIR, `${bank.name}.expected.json`);
       const bytes = new Uint8Array(readFileSync(csvPath));
       const expected = JSON.parse(readFileSync(expectedPath, 'utf8')) as ExpectedFixture;
 
-      const parsed = parseStatementFile(bytes, `${bank.name}.csv`);
+      const parsed = await parseStatementFile(bytes, `${bank.name}.csv`);
       expect(parsed.encoding).toBe(expected.encoding);
       expect(parsed.delimiter).toBe(expected.delimiter);
       expect(parsed.headerRowIndex).toBe(expected.headerRowIndex);

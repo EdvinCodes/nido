@@ -325,3 +325,38 @@
 @utility animate-ledger-highlight {
   animation: ledger-highlight 1.2s var(--ease-emphasized) forwards;
 }
+
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes nido-vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nido-vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+::view-transition-old(root) {
+  animation: 180ms ease-out both nido-vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 180ms ease-in both nido-vt-fade-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

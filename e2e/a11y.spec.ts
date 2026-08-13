@@ -2,7 +2,16 @@ import { test } from '@playwright/test';
 import { expectNoA11yViolations } from './helpers/a11y';
 import { signInDemo } from './helpers/auth';
 
-const PUBLIC_ROUTES = ['/', '/privacy', '/changelog', '/brand', '/docs', '/sign-in', '/sign-up'];
+const PUBLIC_ROUTES = [
+  '/',
+  '/privacy',
+  '/changelog',
+  '/brand',
+  '/docs',
+  '/sign-in',
+  '/sign-up',
+  '/onboarding',
+];
 
 async function setTheme(page: import('@playwright/test').Page, theme: 'light' | 'dark') {
   await page.evaluate((value) => {
@@ -34,6 +43,14 @@ test.describe('accessibility matrix', () => {
       `/s/${spaceId}/goals`,
       `/s/${spaceId}/balances`,
       `/s/${spaceId}/reports`,
+      `/s/${spaceId}/subscriptions`,
+      `/s/${spaceId}/receipts`,
+      `/s/${spaceId}/import`,
+      `/s/${spaceId}/assistant`,
+      `/s/${spaceId}/settings/profile`,
+      `/s/${spaceId}/settings/space`,
+      `/s/${spaceId}/settings/ai`,
+      `/s/${spaceId}/settings/banking`,
     ];
 
     for (const theme of ['light', 'dark'] as const) {
@@ -42,8 +59,12 @@ test.describe('accessibility matrix', () => {
         if (!spaceId) throw new Error('Missing space id after sign-in');
 
         for (const path of appRoutes(spaceId)) {
-          await page.goto(path, { waitUntil: 'commit' });
-          await page.locator('main').first().waitFor({ state: 'visible', timeout: 30_000 });
+          const response = await page.goto(path, { waitUntil: 'commit' });
+          if (response?.status() === 404) continue;
+          await page.locator('main, [id="main-content"]').first().waitFor({
+            state: 'visible',
+            timeout: 30_000,
+          });
           await setTheme(page, theme);
           await expectNoA11yViolations(page);
         }

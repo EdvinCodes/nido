@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PullToRefresh } from '@/components/mobile/pull-to-refresh';
 import { Amount } from '@/components/money/amount';
+import { AnimatedAmount } from '@/components/money/animated-amount';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { ProgressBar } from '@/components/ui/progress-bar';
@@ -670,7 +671,7 @@ function SummaryCard({
       <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </span>
-      <Amount
+      <AnimatedAmount
         minor={amount}
         currency={currency}
         tone={amountTone}

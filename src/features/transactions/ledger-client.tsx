@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { Amount, toneForKind } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -31,6 +32,7 @@ import type { TransactionsPage } from '@/features/transactions/queries';
 import type { TransactionFilters } from '@/features/transactions/schemas';
 import type { TagRow, TransactionView } from '@/features/transactions/types';
 import { parseLedgerFilters } from '@/features/transactions/lib/parse-ledger-filters';
+import { ledgerScrollStorageKey } from '@/features/transactions/lib/ledger-scroll';
 import { LedgerRow } from '@/features/transactions/ledger-row';
 import { useLedgerRealtime } from '@/features/transactions/use-ledger-realtime';
 import { useOfflineOptional } from '@/features/offline/offline-provider';
@@ -218,6 +220,7 @@ export function LedgerClient({
   const items = useMemo(() => groupRows(rows), [rows]);
 
   const parentRef = useRef<HTMLDivElement>(null);
+  const restoredScroll = useRef(false);
   // TanStack Virtual returns unstable function identities; React Compiler skips this hook.
   // eslint-disable-next-line react-hooks/incompatible-library -- required for 10k-row ledger
   const virtualizer = useVirtualizer({
@@ -226,6 +229,31 @@ export function LedgerClient({
     estimateSize: (index) => (items[index]?.type === 'header' ? 40 : 64),
     overscan: 12,
   });
+
+  useEffect(() => {
+    if (query.status !== 'success') return;
+    const node = parentRef.current;
+    if (!node) return;
+
+    if (!restoredScroll.current) {
+      const raw = sessionStorage.getItem(ledgerScrollStorageKey(spaceId));
+      const offset = raw ? Number(raw) : Number.NaN;
+      if (Number.isFinite(offset) && offset > 0) {
+        node.scrollTop = offset;
+      }
+      restoredScroll.current = true;
+    }
+
+    const persist = (): void => {
+      sessionStorage.setItem(ledgerScrollStorageKey(spaceId), String(node.scrollTop));
+    };
+
+    node.addEventListener('scroll', persist, { passive: true });
+    return () => {
+      persist();
+      node.removeEventListener('scroll', persist);
+    };
+  }, [query.status, spaceId]);
 
   useEffect(() => {
     const [last] = virtualizer.getVirtualItems().slice(-1);
@@ -661,17 +689,26 @@ export function LedgerClient({
         ) : null}
 
         {query.status === 'success' && rows.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-4 py-16 text-center">
-            <p className="font-medium">{hasFilters ? t('emptyFilteredTitle') : t('emptyTitle')}</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              {hasFilters ? t('emptyFilteredBody') : t('emptyBody')}
-            </p>
-            {hasFilters ? (
-              <Button type="button" variant="outline" onClick={clearFilters}>
-                {t('clearFilters')}
-              </Button>
-            ) : null}
-          </div>
+          <EmptyState
+            title={hasFilters ? t('emptyFilteredTitle') : t('emptyTitle')}
+            body={hasFilters ? t('emptyFilteredBody') : t('emptyBody')}
+            action={
+              hasFilters ? (
+                <Button type="button" variant="outline" onClick={clearFilters}>
+                  {t('clearFilters')}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    composer?.openCreate();
+                  }}
+                >
+                  {t('emptyCta')}
+                </Button>
+              )
+            }
+          />
         ) : null}
 
         {rows.length > 0 ? (

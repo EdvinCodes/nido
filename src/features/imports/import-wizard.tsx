@@ -5,6 +5,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -113,7 +114,7 @@ export function ImportWizard({
           const buf = await file.arrayBuffer();
           const bytes = new Uint8Array(buf);
           const base64 = bytesToBase64(bytes);
-          const localParsed = parseStatementFile(bytes, file.name);
+          const localParsed = await parseStatementFile(bytes, file.name);
           setRawMatrix(localParsed.rows);
           setLiveRows(
             applyMappingToRows(
@@ -376,7 +377,23 @@ export function ImportWizard({
             <h2 className="text-sm font-medium">{t('history.title')}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t('history.body')}</p>
             {batches.length === 0 ? (
-              <p className="mt-4 text-sm text-muted-foreground">{t('history.empty')}</p>
+              <EmptyState
+                size="compact"
+                title={t('history.emptyTitle')}
+                body={t('history.empty')}
+                action={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                  >
+                    {t('history.emptyCta')}
+                  </Button>
+                }
+              />
             ) : (
               <ul className="mt-4 divide-y divide-border rounded-lg border border-border">
                 {batches.map((batch) => (

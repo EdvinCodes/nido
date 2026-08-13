@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Amount } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -18,6 +20,7 @@ import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { isContributor, type MemberRole } from '@/lib/auth';
 import { formatMoney, money } from '@/lib/money';
+import { route } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   confirmSettlement,
@@ -409,7 +412,16 @@ export function BalancesClient({
         <section>
           <h2 className="text-sm font-medium tracking-tight">{t('history')}</h2>
           {model.settlements.length === 0 ? (
-            <p className="mt-2 text-sm text-muted-foreground">{t('historyEmpty')}</p>
+            <EmptyState
+              size="compact"
+              title={t('historyEmptyTitle')}
+              body={t('historyEmpty')}
+              action={
+                <Button asChild variant="outline" size="sm">
+                  <Link href={route(`/s/${spaceId}/ledger`)}>{t('historyEmptyCta')}</Link>
+                </Button>
+              }
+            />
           ) : (
             <ul className="mt-3 space-y-2">
               {model.settlements.map((s) => {
@@ -655,7 +667,11 @@ export function BalancesClient({
                   </li>
                 ))}
                 {breakdownRows.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{t('breakdownEmpty')}</p>
+                  <EmptyState
+                    size="compact"
+                    title={t('breakdownEmptyTitle')}
+                    body={t('breakdownEmpty')}
+                  />
                 ) : null}
               </ul>
             </>

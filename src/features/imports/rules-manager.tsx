@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -129,88 +130,94 @@ export function RulesManager({
         </div>
       )}
 
-      <ul className="divide-y rounded-lg border">
-        {rules.map((rule, index) => {
-          const cat = categories.find((c) => c.id === rule.category_id);
-          return (
-            <li key={rule.id} className="flex flex-wrap items-center gap-3 p-4 text-sm">
-              <span className="font-mono text-xs text-muted-foreground">#{index + 1}</span>
-              <span className="flex-1">
-                {t('ruleLine', {
-                  match: rule.match_type,
-                  pattern: rule.pattern,
-                  category: cat?.name ?? '—',
-                })}
-              </span>
-              <span className="text-muted-foreground">{t('hits', { count: rule.hit_count })}</span>
-              {canEdit && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      moveRule(rule.id, -1);
-                    }}
-                  >
-                    ↑
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      moveRule(rule.id, 1);
-                    }}
-                  >
-                    ↓
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      startTransition(async () => {
-                        const res = await testCategorizationRuleAction({
-                          spaceId,
-                          ruleId: rule.id,
+      {rules.length === 0 ? (
+        <EmptyState size="compact" title={t('emptyTitle')} body={t('emptyBody')} />
+      ) : (
+        <ul className="divide-y rounded-lg border">
+          {rules.map((rule, index) => {
+            const cat = categories.find((c) => c.id === rule.category_id);
+            return (
+              <li key={rule.id} className="flex flex-wrap items-center gap-3 p-4 text-sm">
+                <span className="font-mono text-xs text-muted-foreground">#{index + 1}</span>
+                <span className="flex-1">
+                  {t('ruleLine', {
+                    match: rule.match_type,
+                    pattern: rule.pattern,
+                    category: cat?.name ?? '—',
+                  })}
+                </span>
+                <span className="text-muted-foreground">
+                  {t('hits', { count: rule.hit_count })}
+                </span>
+                {canEdit && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        moveRule(rule.id, -1);
+                      }}
+                    >
+                      ↑
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        moveRule(rule.id, 1);
+                      }}
+                    >
+                      ↓
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        startTransition(async () => {
+                          const res = await testCategorizationRuleAction({
+                            spaceId,
+                            ruleId: rule.id,
+                          });
+                          if (res.ok) setTestResult({ count: res.data.count });
                         });
-                        if (res.ok) setTestResult({ count: res.data.count });
-                      });
-                    }}
-                  >
-                    {t('test')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      startTransition(async () => {
-                        const res = await applyCategorizationRuleAction({
-                          spaceId,
-                          ruleId: rule.id,
+                      }}
+                    >
+                      {t('test')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        startTransition(async () => {
+                          const res = await applyCategorizationRuleAction({
+                            spaceId,
+                            ruleId: rule.id,
+                          });
+                          if (res.ok) toast.success(t('applied', { count: res.data.updated }));
                         });
-                        if (res.ok) toast.success(t('applied', { count: res.data.updated }));
-                      });
-                    }}
-                  >
-                    {t('apply')}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      startTransition(async () => {
-                        await deleteCategorizationRuleAction({ spaceId, ruleId: rule.id });
-                        setRules((r) => r.filter((x) => x.id !== rule.id));
-                      });
-                    }}
-                  >
-                    {t('delete')}
-                  </Button>
-                </>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+                      }}
+                    >
+                      {t('apply')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        startTransition(async () => {
+                          await deleteCategorizationRuleAction({ spaceId, ruleId: rule.id });
+                          setRules((r) => r.filter((x) => x.id !== rule.id));
+                        });
+                      }}
+                    >
+                      {t('delete')}
+                    </Button>
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {testResult && (
         <p className="text-sm text-muted-foreground">

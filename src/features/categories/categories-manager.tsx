@@ -66,10 +66,11 @@ function SortableRow({
         <button
           type="button"
           className="cursor-grab text-muted-foreground"
+          aria-label={t('reorderHandle', { name: cat.name })}
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="size-4" />
+          <GripVertical className="size-4" aria-hidden />
         </button>
       ) : null}
       <span className="size-3 rounded-full" style={{ backgroundColor: cat.color }} aria-hidden />

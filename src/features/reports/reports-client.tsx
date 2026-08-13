@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { Amount } from '@/components/money/amount';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { exportReportAction } from '@/features/reports/actions';
 import { formatSavingsRate } from '@/features/reports/lib/savings-rate';
 import type { PeriodSnapshotPayload, PeriodSnapshotRow } from '@/features/reports/types';
@@ -219,7 +220,16 @@ export function ReportsClient({
       <section>
         <h2 className="mb-3 text-sm font-medium">{t('closedPeriods')}</h2>
         {snapshots.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t('empty')}</p>
+          <EmptyState
+            size="compact"
+            title={t('emptyTitle')}
+            body={t('empty')}
+            action={
+              <Button asChild variant="outline">
+                <Link href={route(`/s/${spaceId}`)}>{t('emptyCta')}</Link>
+              </Button>
+            }
+          />
         ) : (
           <ul className="divide-y divide-border rounded-xl border border-border bg-card">
             {snapshots.map((snap) => (

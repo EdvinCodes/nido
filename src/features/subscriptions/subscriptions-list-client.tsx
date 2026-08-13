@@ -279,7 +279,22 @@ export function SubscriptionsListClient({
         </section>
 
         {active.length === 0 ? (
-          <EmptyState title={t('emptyTitle')} body={t('emptyBody')} />
+          <EmptyState
+            title={t('emptyTitle')}
+            body={t('emptyBody')}
+            action={
+              canEdit ? (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setFormOpen(true);
+                  }}
+                >
+                  {t('emptyCta')}
+                </Button>
+              ) : undefined
+            }
+          />
         ) : (
           grouped.map(([cycle, cards]) => (
             <section key={cycle} className="space-y-2">

@@ -201,7 +201,7 @@ export const uploadImportAction = authedAction()
   .space(({ input }) => input.spaceId, { action: 'transactions.create' })
   .action(async ({ input, ctx }) => {
     const bytes = decodeBase64(input.fileData);
-    const parsed = parseStatementFile(bytes, input.fileName, {
+    const parsed = await parseStatementFile(bytes, input.fileName, {
       ...(input.dateOrder ? { dateOrder: input.dateOrder } : {}),
     });
 
@@ -591,7 +591,7 @@ export const exportLedgerAction = authedAction()
   .action(async ({ input }) => {
     const page = await listTransactions({ spaceId: input.spaceId, filters: {}, limit: 10_000 });
     const buffer =
-      input.format === 'csv' ? exportLedgerCsv(page.rows) : exportLedgerXlsx(page.rows);
+      input.format === 'csv' ? exportLedgerCsv(page.rows) : await exportLedgerXlsx(page.rows);
     return {
       ok: true as const,
       data: {

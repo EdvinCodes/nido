@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import { decodeBytes } from './detect-encoding';
 import { detectDelimiter, parseCsvText, type Delimiter } from './detect-delimiter';
 import { detectHeaderRowIndex, guessColumnMapping } from './detect-header';
@@ -19,11 +18,11 @@ export function parseStatementText(text: string, options?: ParseStatementOptions
   return buildParsedStatement(rows, delimiter, options);
 }
 
-export function parseStatementBytes(
+export async function parseStatementBytes(
   bytes: Uint8Array,
   fileName: string,
   options?: ParseStatementOptions,
-): ParsedStatement {
+): Promise<ParsedStatement> {
   const lower = fileName.toLowerCase();
   if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
     return parseXlsxBytes(bytes, options);
@@ -33,7 +32,11 @@ export function parseStatementBytes(
   return { ...statement, encoding };
 }
 
-function parseXlsxBytes(bytes: Uint8Array, options?: ParseStatementOptions): ParsedStatement {
+async function parseXlsxBytes(
+  bytes: Uint8Array,
+  options?: ParseStatementOptions,
+): Promise<ParsedStatement> {
+  const XLSX = await import('xlsx');
   const workbook = XLSX.read(bytes, { type: 'array', cellDates: false });
   const sheetIndex = options?.sheetIndex ?? 0;
   const sheetName = workbook.SheetNames[sheetIndex] ?? workbook.SheetNames[0];
@@ -94,17 +97,18 @@ export type ParseStatementFileResult = ParsedStatement & {
 };
 
 /** Entry point: parse CSV/XLSX bytes into structured statement metadata. */
-export function parseStatementFile(
+export async function parseStatementFile(
   bytes: Uint8Array,
   fileName: string,
   options?: ParseStatementOptions,
-): ParseStatementFileResult {
-  const parsed = parseStatementBytes(bytes, fileName, options);
+): Promise<ParseStatementFileResult> {
+  const parsed = await parseStatementBytes(bytes, fileName, options);
   const suggestedMapping = guessColumnMapping(parsed.headers);
   return { ...parsed, suggestedMapping };
 }
 
-export function listXlsxSheets(bytes: Uint8Array): string[] {
+export async function listXlsxSheets(bytes: Uint8Array): Promise<string[]> {
+  const XLSX = await import('xlsx');
   const workbook = XLSX.read(bytes, { type: 'array', bookSheets: true });
   return workbook.SheetNames;
 }

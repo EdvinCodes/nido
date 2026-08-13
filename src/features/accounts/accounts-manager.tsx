@@ -64,10 +64,11 @@ function SortableRow({
         <button
           type="button"
           className="cursor-grab text-muted-foreground"
+          aria-label={t('reorderHandle', { name: account.name })}
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="size-4" />
+          <GripVertical className="size-4" aria-hidden />
         </button>
       ) : null}
       <span

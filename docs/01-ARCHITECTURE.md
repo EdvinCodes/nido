@@ -202,9 +202,19 @@ their space. When one partner adds an expense, it appears on the other's screen 
 second without a refresh. Subscriptions are filtered server-side by `space_id` and are
 additionally protected by RLS on the replicated rows.
 
-**Background.** `pg_cron` schedules Edge Functions: budget threshold evaluation and push
-delivery (hourly), recurring rule materialization (daily 03:00 in the space timezone), FX
-rate refresh (daily), bank sync (every 6 h when enabled), and a monthly close snapshot.
+**Background.** `pg_cron` POSTs to Edge Functions with `Authorization: Bearer <CRON_SECRET>`:
+budget alerts (hourly), budget reconcile (02:15 UTC nightly), recurring materialization
+(03:00 UTC daily; `run_recurring_all` still uses each space's timezone for "today"),
+insights (Monday 08:00 UTC), FX refresh, bank sync, attachment purge, period-close, and
+push-queue flush. Hosted projects must set Postgres GUCs so jobs do not hard-code a project
+URL:
+
+```sql
+alter role postgres set app.settings.supabase_url = 'https://<ref>.supabase.co';
+alter role postgres set app.settings.cron_secret = '<same value as CRON_SECRET>';
+```
+
+Local fallback is `http://host.docker.internal:54321` and `local-dev-cron`.
 
 ## 5. Authentication and authorization
 

@@ -1,8 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import { AssistantPanel } from '@/features/assistant/assistant-panel';
 import type { AiConversationRow } from '@/features/assistant/queries';
+
+const AssistantPanel = dynamic(
+  () => import('@/features/assistant/assistant-panel').then((m) => m.AssistantPanel),
+  { ssr: false },
+);
 
 type AssistantContextValue = {
   open: boolean;

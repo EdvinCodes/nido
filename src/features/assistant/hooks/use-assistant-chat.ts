@@ -9,6 +9,7 @@ import {
 } from 'ai';
 import { useCallback, useRef, useState } from 'react';
 import { createUserUiMessage, dbMessagesToUi } from '../lib/message-mapper';
+import { dropLastUserTurn } from '../lib/retry-messages';
 import type { AiConversationRow, AiMessageRow } from '../queries';
 
 export type ChatStatus = 'ready' | 'submitted' | 'streaming' | 'error';
@@ -136,15 +137,9 @@ export function useAssistantChat({
   );
 
   const retry = useCallback(async () => {
-    setMessages((prev) => {
-      const lastUserIndex = prev.findLastIndex((m) => m.role === 'user');
-      if (lastUserIndex < 0) return prev;
-      const trimmed = prev.slice(0, lastUserIndex + 1);
-      return trimmed;
-    });
-    if (lastPromptRef.current) {
-      await send(lastPromptRef.current);
-    }
+    if (!lastPromptRef.current) return;
+    setMessages((prev) => dropLastUserTurn(prev));
+    await send(lastPromptRef.current);
   }, [send]);
 
   const reset = useCallback((nextConversationId: string | null, rows: AiMessageRow[] = []) => {

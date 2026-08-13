@@ -108,6 +108,7 @@ export function AppShell({
           spaceId={spaceId}
           spaceKind={spaceKind}
           isAiConfigured={isAiConfigured}
+          assistantConfigured={assistantConfigured}
         />
         <CommandPalette spaceId={spaceId} isAiConfigured={isAiConfigured} />
         <KeyboardShortcuts

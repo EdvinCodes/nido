@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Bot,
   Flag,
   LayoutDashboard,
   MoreHorizontal,
@@ -28,11 +29,13 @@ export function MobileTabBar({
   spaceId,
   spaceKind,
   isAiConfigured = false,
+  assistantConfigured = false,
 }: {
   activePath: string;
   spaceId: string;
   spaceKind: string;
   isAiConfigured?: boolean;
+  assistantConfigured?: boolean;
 }) {
   const t = useTranslations('nav');
   const tAttachments = useTranslations('attachments');
@@ -64,6 +67,9 @@ export function MobileTabBar({
       : []),
     { key: 'subscriptions' as const, href: `${base}/subscriptions`, icon: Repeat },
     { key: 'reports' as const, href: `${base}/reports`, icon: LayoutDashboard },
+    ...(assistantConfigured
+      ? [{ key: 'assistant' as const, href: `${base}/assistant`, icon: Bot }]
+      : []),
     { key: 'settings' as const, href: `${base}/settings/members`, icon: Settings },
     { key: 'profile' as const, href: `${base}/settings/profile`, icon: UserRound },
   ];

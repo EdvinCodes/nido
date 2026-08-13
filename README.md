@@ -19,8 +19,9 @@ tame subscriptions, and eventually just _ask_ your data where the money is going
 
 ---
 
-> **Status: MVP nearly complete (phase 11 of 13).** Phases 00–10 are shipped; landing polish
-> and the AI assistant remain. Track progress in [`docs/phases/README.md`](./docs/phases/README.md).
+> **Status: phases 00–11 shipped; phase 12 (AI assistant) in progress.** The assistant
+> works when a provider is configured; the 30/30 numeric eval gate is not a v1 blocker.
+> Track progress in [`docs/phases/README.md`](./docs/phases/README.md).
 
 ![Nido ledger screenshot](./public/screenshots/marketing/hero.png)
 

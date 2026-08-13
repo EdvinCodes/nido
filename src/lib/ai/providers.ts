@@ -3,8 +3,14 @@ import { google } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
 import type { LanguageModel } from 'ai';
 import { getServerEnv } from '@/lib/env';
+import {
+  listConfiguredProvidersFrom,
+  type AiProviderName,
+  type ProviderEnvSlice,
+} from '@/lib/ai/provider-names';
 
-export type AiProviderName = 'openai' | 'anthropic' | 'google' | 'ollama';
+export type { AiProviderName, ProviderEnvSlice };
+export { listConfiguredProvidersFrom };
 
 const DEFAULT_MODELS: Record<AiProviderName, string> = {
   openai: 'gpt-4o-mini',
@@ -35,13 +41,23 @@ export function isProviderConfigured(provider: AiProviderName): boolean {
   }
 }
 
-/** Resolves the active AI SDK model, or null when the assistant is disabled. */
-export function getModel(): LanguageModel | null {
+export function listConfiguredProviders(): AiProviderName[] {
+  return listConfiguredProvidersFrom(getServerEnv());
+}
+
+function modelIdFor(provider: AiProviderName, override?: AiProviderName): string {
   const env = getServerEnv();
-  const provider = env.AI_PROVIDER;
+  if (override && override !== env.AI_PROVIDER) return DEFAULT_MODELS[provider];
+  return env.AI_MODEL ?? DEFAULT_MODELS[provider];
+}
+
+/** Resolves the active AI SDK model, or null when the assistant is disabled. */
+export function getModel(providerOverride?: AiProviderName): LanguageModel | null {
+  const env = getServerEnv();
+  const provider = providerOverride ?? env.AI_PROVIDER;
   if (!provider || !isProviderConfigured(provider)) return null;
 
-  const modelId = env.AI_MODEL ?? DEFAULT_MODELS[provider];
+  const modelId = modelIdFor(provider, providerOverride);
 
   switch (provider) {
     case 'anthropic':
@@ -64,9 +80,9 @@ export function getModel(): LanguageModel | null {
   }
 }
 
-export function getModelLabel(): string | null {
+export function getModelLabel(providerOverride?: AiProviderName): string | null {
   const env = getServerEnv();
-  if (!env.AI_PROVIDER) return null;
-  const modelId = env.AI_MODEL ?? DEFAULT_MODELS[env.AI_PROVIDER];
-  return `${env.AI_PROVIDER}/${modelId}`;
+  const provider = providerOverride ?? env.AI_PROVIDER;
+  if (!provider) return null;
+  return `${provider}/${modelIdFor(provider, providerOverride)}`;
 }

@@ -23,6 +23,7 @@ import {
   type SuggestedPrompt,
 } from '@/features/assistant/lib/suggested-prompts';
 import type { AiConversationRow, AiMessageRow } from '@/features/assistant/queries';
+import type { AiProviderName } from '@/lib/ai/provider-names';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { route } from '@/lib/routes';
@@ -32,6 +33,7 @@ export function AssistantView({
   spaceId,
   consentActive,
   modelLabel,
+  configuredProviders = [],
   conversations,
   initialConversationId,
   initialMessages,
@@ -41,6 +43,7 @@ export function AssistantView({
   spaceId: string;
   consentActive: boolean;
   modelLabel: string | null;
+  configuredProviders?: AiProviderName[];
   conversations: AiConversationRow[];
   initialConversationId?: string | null;
   initialMessages?: AiMessageRow[];
@@ -51,6 +54,9 @@ export function AssistantView({
   const tHistory = useTranslations('assistant.history');
   const [input, setInput] = useState('');
   const [historyOpen, setHistoryOpen] = useState(variant === 'page');
+  const [retryProvider, setRetryProvider] = useState<AiProviderName | ''>(
+    configuredProviders[0] ?? '',
+  );
   const [pending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -231,10 +237,43 @@ export function AssistantView({
           </div>
           <div className="flex items-center gap-1">
             {chat.status === 'error' ? (
-              <Button type="button" size="sm" variant="ghost" onClick={() => void chat.retry()}>
-                <RotateCcw className="size-4" />
-                {t('retry')}
-              </Button>
+              <>
+                {configuredProviders.length > 1 ? (
+                  <select
+                    className="h-8 max-w-36 rounded-md border border-border bg-background px-2 text-xs"
+                    aria-label={t('retryProvider')}
+                    value={retryProvider}
+                    onChange={(event) => {
+                      setRetryProvider(event.target.value as AiProviderName);
+                    }}
+                  >
+                    {configuredProviders.map((name) => {
+                      const label =
+                        name === 'openai'
+                          ? t('provider.openai')
+                          : name === 'anthropic'
+                            ? t('provider.anthropic')
+                            : name === 'google'
+                              ? t('provider.google')
+                              : t('provider.ollama');
+                      return (
+                        <option key={name} value={name}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                ) : null}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => void chat.retry(retryProvider === '' ? undefined : retryProvider)}
+                >
+                  <RotateCcw className="size-4" />
+                  {t('retry')}
+                </Button>
+              </>
             ) : null}
             {isBusy ? (
               <Button

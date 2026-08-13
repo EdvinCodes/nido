@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { AssistantView } from '@/features/assistant/assistant-view';
 import { getAiConsent, isConsentActive, listConversations } from '@/features/assistant/queries';
 import { isAssistantConfigured } from '@/lib/ai/assistant-enabled';
-import { getModelLabel } from '@/lib/ai/providers';
+import { getModelLabel, listConfiguredProviders } from '@/lib/ai/providers';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AssistantPage({ params }: { params: Promise<{ spaceId: string }> }) {
@@ -40,6 +40,7 @@ export default async function AssistantPage({ params }: { params: Promise<{ spac
         spaceId={spaceId}
         consentActive={isConsentActive(consent)}
         modelLabel={getModelLabel()}
+        configuredProviders={listConfiguredProviders()}
         conversations={conversations}
         suggestedContext={{
           hasBudgets: (budgetCount ?? 0) > 0,

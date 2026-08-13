@@ -841,7 +841,20 @@
       "consentRequired": "Activa el asistente en Ajustes → IA antes de usarlo.",
       "thinking": "Pensando…",
       "stop": "Detener",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "close": "Cerrar",
+      "rateLimit": "Has alcanzado el límite diario de {limit} mensajes. Prueba mañana.",
+      "retryProvider": "Reintentar con otro modelo",
+      "chartTrend": "Tendencia de gasto",
+      "chartCompare": "Comparación de periodos",
+      "chartPeriodA": "Periodo anterior",
+      "chartPeriodB": "Periodo posterior",
+      "provider": {
+        "openai": "OpenAI",
+        "anthropic": "Anthropic",
+        "google": "Google",
+        "ollama": "Ollama"
+      }
     },
     "history": {
       "title": "Historial",

@@ -11,6 +11,7 @@ import { useCallback, useRef, useState } from 'react';
 import { createUserUiMessage, dbMessagesToUi } from '../lib/message-mapper';
 import { dropLastUserTurn } from '../lib/retry-messages';
 import type { AiConversationRow, AiMessageRow } from '../queries';
+import type { AiProviderName } from '@/lib/ai/provider-names';
 
 export type ChatStatus = 'ready' | 'submitted' | 'streaming' | 'error';
 
@@ -63,7 +64,7 @@ export function useAssistantChat({
   }, []);
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, provider?: AiProviderName) => {
       const trimmed = text.trim();
       if (!trimmed || status === 'streaming' || status === 'submitted') return;
 
@@ -85,6 +86,7 @@ export function useAssistantChat({
             spaceId,
             conversationId: conversationId ?? undefined,
             message: trimmed,
+            ...(provider ? { provider } : {}),
           }),
           signal: abortController.signal,
         });
@@ -136,11 +138,14 @@ export function useAssistantChat({
     [conversationId, modelLabel, spaceId, status],
   );
 
-  const retry = useCallback(async () => {
-    if (!lastPromptRef.current) return;
-    setMessages((prev) => dropLastUserTurn(prev));
-    await send(lastPromptRef.current);
-  }, [send]);
+  const retry = useCallback(
+    async (provider?: AiProviderName) => {
+      if (!lastPromptRef.current) return;
+      setMessages((prev) => dropLastUserTurn(prev));
+      await send(lastPromptRef.current, provider);
+    },
+    [send],
+  );
 
   const reset = useCallback((nextConversationId: string | null, rows: AiMessageRow[] = []) => {
     setConversationId(nextConversationId);

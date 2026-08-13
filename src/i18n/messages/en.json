@@ -841,7 +841,20 @@
       "consentRequired": "Enable the assistant under Settings → AI first.",
       "thinking": "Thinking…",
       "stop": "Stop",
-      "retry": "Retry"
+      "retry": "Retry",
+      "close": "Close",
+      "rateLimit": "Daily limit of {limit} messages reached. Try again tomorrow.",
+      "retryProvider": "Retry with a different model",
+      "chartTrend": "Spending trend",
+      "chartCompare": "Period comparison",
+      "chartPeriodA": "Earlier period",
+      "chartPeriodB": "Later period",
+      "provider": {
+        "openai": "OpenAI",
+        "anthropic": "Anthropic",
+        "google": "Google",
+        "ollama": "Ollama"
+      }
     },
     "history": {
       "title": "History",

@@ -6,7 +6,7 @@ import {
   stepCountIs,
   type UIMessage,
 } from 'ai';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { createAssistantTools } from '@/features/assistant/tools';
 import { buildSystemPrompt } from '@/features/assistant/lib/system-prompt';
 import { prepareHistoryForModel } from '@/features/assistant/lib/history';
@@ -19,7 +19,7 @@ import {
   isConsentActive,
   loadConversationMessages,
 } from '@/features/assistant/queries';
-import { getModel, getModelLabel } from '@/lib/ai/providers';
+import { getModel, getModelLabel, listConfiguredProviders } from '@/lib/ai/providers';
 import { isAssistantConfigured } from '@/lib/ai/assistant-enabled';
 import { createClient } from '@/lib/supabase/server';
 import { todayIn } from '@/lib/dates';
@@ -30,11 +30,6 @@ const DAILY_LIMIT = Number(process.env.AI_DAILY_MESSAGE_LIMIT ?? 50);
 
 export async function POST(req: Request): Promise<Response> {
   if (!isAssistantConfigured()) {
-    return new Response(JSON.stringify({ error: 'ai_not_configured' }), { status: 404 });
-  }
-
-  const model = getModel();
-  if (!model) {
     return new Response(JSON.stringify({ error: 'ai_not_configured' }), { status: 404 });
   }
 
@@ -52,7 +47,15 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  const { spaceId, conversationId, message } = parsed.data;
+  const { spaceId, conversationId, message, provider: providerOverride } = parsed.data;
+  if (providerOverride && !listConfiguredProviders().includes(providerOverride)) {
+    return new Response(JSON.stringify({ error: 'invalid_provider' }), { status: 400 });
+  }
+
+  const model = getModel(providerOverride);
+  if (!model) {
+    return new Response(JSON.stringify({ error: 'ai_not_configured' }), { status: 404 });
+  }
   const supabase = await createClient();
   const {
     data: { user },
@@ -79,10 +82,11 @@ export async function POST(req: Request): Promise<Response> {
 
   const usedToday = await countUserMessagesToday(user.id);
   if (usedToday >= DAILY_LIMIT) {
+    const t = await getTranslations('assistant.panel');
     return new Response(
       JSON.stringify({
         error: 'rate_limit',
-        message: `Daily limit of ${DAILY_LIMIT} messages reached. Try again tomorrow.`,
+        message: t('rateLimit', { limit: DAILY_LIMIT }),
       }),
       { status: 429 },
     );
@@ -176,7 +180,7 @@ export async function POST(req: Request): Promise<Response> {
     stopWhen: stepCountIs(8),
   });
 
-  const modelLabel = getModelLabel();
+  const modelLabel = getModelLabel(providerOverride);
   const activeConvId = convId;
   let inputTokens = 0;
   let outputTokens = 0;

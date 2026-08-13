@@ -6,7 +6,7 @@ import { PwaShortcutHandler } from '@/components/pwa/shortcut-handler';
 import { AssistantProvider } from '@/features/assistant/assistant-context';
 import { getAiConsent, isConsentActive, listConversations } from '@/features/assistant/queries';
 import { isAssistantConfigured } from '@/lib/ai/assistant-enabled';
-import { getModelLabel } from '@/lib/ai/providers';
+import { getModelLabel, listConfiguredProviders } from '@/lib/ai/providers';
 import { isAiConfigured } from '@/lib/ai/is-configured';
 import { listAccounts } from '@/features/accounts/queries';
 import { ConnectionStatus } from '@/features/offline/connection-status';
@@ -99,6 +99,7 @@ export default async function SpaceLayout({
             spaceId={spaceId}
             consentActive={assistantConsentActive}
             modelLabel={assistantConfigured ? getModelLabel() : null}
+            configuredProviders={assistantConfigured ? listConfiguredProviders() : []}
             conversations={conversations}
             suggestedContext={{
               hasBudgets: (budgetCount.count ?? 0) > 0,

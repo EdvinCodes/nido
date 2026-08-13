@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { AssistantView } from '@/features/assistant/assistant-view';
 import type { AiConversationRow } from '@/features/assistant/queries';
+import type { AiProviderName } from '@/lib/ai/provider-names';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ export function AssistantPanel({
   spaceId,
   consentActive,
   modelLabel,
+  configuredProviders,
   conversations,
   suggestedContext,
 }: {
@@ -22,6 +24,7 @@ export function AssistantPanel({
   spaceId: string;
   consentActive: boolean;
   modelLabel: string | null;
+  configuredProviders: AiProviderName[];
   conversations: AiConversationRow[];
   suggestedContext: { hasBudgets: boolean; hasGoals: boolean; hasSubscriptions: boolean };
 }) {
@@ -46,6 +49,7 @@ export function AssistantPanel({
             spaceId={spaceId}
             consentActive={consentActive}
             modelLabel={modelLabel}
+            configuredProviders={configuredProviders}
             conversations={conversations}
             suggestedContext={suggestedContext}
             variant="panel"
@@ -69,6 +73,7 @@ export function AssistantPanel({
               spaceId={spaceId}
               consentActive={consentActive}
               modelLabel={modelLabel}
+              configuredProviders={configuredProviders}
               conversations={conversations}
               suggestedContext={suggestedContext}
               variant="panel"
@@ -89,11 +94,18 @@ function PanelChrome({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const t = useTranslations('assistant.panel');
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold">{title}</h2>
-        <Button type="button" size="icon-sm" variant="ghost" onClick={onClose} aria-label="Close">
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          onClick={onClose}
+          aria-label={t('close')}
+        >
           <X className="size-4" />
         </Button>
       </div>

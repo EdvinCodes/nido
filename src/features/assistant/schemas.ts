@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
+export const aiProviderNameSchema = z.enum(['openai', 'anthropic', 'google', 'ollama']);
+
 export const chatRequestSchema = z.object({
   spaceId: z.uuid(),
   conversationId: z.uuid().optional(),
   message: z.string().min(1).max(4000),
+  provider: aiProviderNameSchema.optional(),
 });
 
 export const consentSchema = z.object({

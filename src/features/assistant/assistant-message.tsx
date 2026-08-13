@@ -6,6 +6,8 @@ import type { ReactNode } from 'react';
 import type { UIMessage } from 'ai';
 import { getToolName, isToolUIPart } from 'ai';
 import { splitCitationText } from '@/features/assistant/lib/citations';
+import { comparisonSeriesFromToolParts } from '@/features/assistant/lib/inline-chart-series';
+import { AssistantInlineChart } from '@/features/assistant/assistant-inline-chart';
 import { toolProgressLabel } from '@/features/assistant/lib/tool-labels';
 import {
   extractModelFromUiMessage,
@@ -113,6 +115,13 @@ export function AssistantMessage({ message, spaceId }: { message: UIMessage; spa
   const textParts = message.parts.filter((part) => part.type === 'text');
   const toolParts = message.parts.filter((part) => isToolUIPart(part));
   const model = extractModelFromUiMessage(message);
+  const chartSeries = comparisonSeriesFromToolParts(
+    toolParts.map((part) => ({
+      type: part.type,
+      state: part.state,
+      output: 'output' in part ? part.output : undefined,
+    })),
+  );
 
   return (
     <div className="space-y-2">
@@ -131,6 +140,7 @@ export function AssistantMessage({ message, spaceId }: { message: UIMessage; spa
           </p>
         );
       })}
+      {chartSeries ? <AssistantInlineChart series={chartSeries} /> : null}
       {textParts.map((part, index) => (
         <AssistantMarkdown key={index} text={part.text} spaceId={spaceId} />
       ))}

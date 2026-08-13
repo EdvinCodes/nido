@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { AiConversationRow } from '@/features/assistant/queries';
+import type { AiProviderName } from '@/lib/ai/provider-names';
 
 const AssistantPanel = dynamic(
   () => import('@/features/assistant/assistant-panel').then((m) => m.AssistantPanel),
@@ -23,6 +24,7 @@ export function AssistantProvider({
   spaceId,
   consentActive,
   modelLabel,
+  configuredProviders,
   conversations,
   suggestedContext,
 }: {
@@ -30,6 +32,7 @@ export function AssistantProvider({
   spaceId: string;
   consentActive: boolean;
   modelLabel: string | null;
+  configuredProviders: AiProviderName[];
   conversations: AiConversationRow[];
   suggestedContext: { hasBudgets: boolean; hasGoals: boolean; hasSubscriptions: boolean };
 }) {
@@ -61,6 +64,7 @@ export function AssistantProvider({
           spaceId={spaceId}
           consentActive={consentActive}
           modelLabel={modelLabel}
+          configuredProviders={configuredProviders}
           conversations={conversations}
           suggestedContext={suggestedContext}
         />

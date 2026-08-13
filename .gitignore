@@ -19,7 +19,8 @@ next-env.d.ts
 # Testing
 coverage/
 .nyc_output/
-playwright-report/
+lighthouse-reports/
+.next/analyze/
 test-results/
 blob-report/
 .playwright/

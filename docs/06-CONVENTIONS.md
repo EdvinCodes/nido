@@ -4,20 +4,20 @@
 
 ## 1. Naming
 
-| Thing | Convention | Example |
-| --- | --- | --- |
-| Files and folders | `kebab-case` | `split-editor.tsx`, `budget-periods.ts` |
-| React components | `PascalCase`, one per file, named export | `export function SplitEditor()` |
-| Hooks | `useCamelCase` | `useSpaceMembers` |
-| Server Actions | `verbNoun` | `createTransaction`, `confirmSettlement` |
-| Zod schemas | `nounVerbSchema` | `createTransactionSchema` |
-| Types | `PascalCase`, no `I` prefix | `TransactionWithSplits` |
-| Constants | `SCREAMING_SNAKE_CASE` | `MAX_ATTACHMENTS_PER_TRANSACTION` |
-| Database | `snake_case`, plural tables | `transaction_splits` |
-| SQL functions | `nido.snake_case`, verb first | `nido.allocate`, `nido.is_member` |
-| Migrations | `YYYYMMDDHHMMSS_description.sql` | `20260812093000_create_transactions.sql` |
-| i18n keys | dot-namespaced by feature | `ledger.split.remainderWarning` |
-| Test files | `*.test.ts` next to the source | `allocate.test.ts` |
+| Thing             | Convention                               | Example                                  |
+| ----------------- | ---------------------------------------- | ---------------------------------------- |
+| Files and folders | `kebab-case`                             | `split-editor.tsx`, `budget-periods.ts`  |
+| React components  | `PascalCase`, one per file, named export | `export function SplitEditor()`          |
+| Hooks             | `useCamelCase`                           | `useSpaceMembers`                        |
+| Server Actions    | `verbNoun`                               | `createTransaction`, `confirmSettlement` |
+| Zod schemas       | `nounVerbSchema`                         | `createTransactionSchema`                |
+| Types             | `PascalCase`, no `I` prefix              | `TransactionWithSplits`                  |
+| Constants         | `SCREAMING_SNAKE_CASE`                   | `MAX_ATTACHMENTS_PER_TRANSACTION`        |
+| Database          | `snake_case`, plural tables              | `transaction_splits`                     |
+| SQL functions     | `nido.snake_case`, verb first            | `nido.allocate`, `nido.is_member`        |
+| Migrations        | `YYYYMMDDHHMMSS_description.sql`         | `20260812093000_create_transactions.sql` |
+| i18n keys         | dot-namespaced by feature                | `ledger.split.remainderWarning`          |
+| Test files        | `*.test.ts` next to the source           | `allocate.test.ts`                       |
 
 Booleans read as assertions: `isActive`, `hasAttachment`, `canEdit`. Not `active`, not
 `attachment`, not `editable`.
@@ -36,7 +36,7 @@ A variable called `amount` with no suffix is a bug waiting to happen and fails r
   "noImplicitOverride": true,
   "exactOptionalPropertyTypes": true,
   "verbatimModuleSyntax": true,
-  "moduleResolution": "bundler"
+  "moduleResolution": "bundler",
 }
 ```
 
@@ -92,13 +92,13 @@ A variable called `amount` with no suffix is a bug waiting to happen and fails r
 
 ## 5. Testing
 
-| Layer | Tool | What belongs there |
-| --- | --- | --- |
-| Pure logic | Vitest | Allocation, rounding, period boundaries, debt simplification, FX conversion, CSV parsing, fingerprinting. Property-based tests with `fast-check` where an invariant exists. |
-| Components | Vitest + Testing Library | Split editor behaviour, amount input parsing, form validation, empty and error states. Query by role and label, never by test id unless there is no alternative. |
-| Database | pgTAP | Every RLS policy (positive and negative), every trigger invariant, every SQL function. |
-| Integration | Vitest against local Supabase | Server Actions end to end with a real database and a real session. |
-| End to end | Playwright | The critical journeys below, at desktop and mobile viewports. |
+| Layer       | Tool                          | What belongs there                                                                                                                                                          |
+| ----------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pure logic  | Vitest                        | Allocation, rounding, period boundaries, debt simplification, FX conversion, CSV parsing, fingerprinting. Property-based tests with `fast-check` where an invariant exists. |
+| Components  | Vitest + Testing Library      | Split editor behaviour, amount input parsing, form validation, empty and error states. Query by role and label, never by test id unless there is no alternative.            |
+| Database    | pgTAP                         | Every RLS policy (positive and negative), every trigger invariant, every SQL function.                                                                                      |
+| Integration | Vitest against local Supabase | Server Actions end to end with a real database and a real session.                                                                                                          |
+| End to end  | Playwright                    | The critical journeys below, at desktop and mobile viewports.                                                                                                               |
 
 **Critical journeys that must always have an e2e test:** sign up → onboarding → first
 transaction; add a shared expense and verify both balances; create a budget, exceed it, and
@@ -128,7 +128,7 @@ docs(phases): mark phase 3 as done
 chore(deps): bump next to 16.3.2
 ```
 
-Subject in the imperative, ≤ 72 characters, no trailing period. Body explains *why* when it
+Subject in the imperative, ≤ 72 characters, no trailing period. Body explains _why_ when it
 is not obvious. Footer references issues.
 
 **Pull requests** (when the workflow uses them): title in the same format, a description
@@ -158,25 +158,28 @@ A task is done when all of this is true. There is no partial credit.
 
 `package.json` exposes exactly these, and the agent uses them rather than raw commands:
 
-| Script | Does |
-| --- | --- |
-| `dev` | Next dev server with Turbopack |
-| `build` / `start` | Production build and serve |
-| `typecheck` | `tsc --noEmit` |
-| `lint` / `lint:fix` | ESLint over the repo |
-| `format` | Prettier write |
-| `test` / `test:watch` | Vitest |
-| `test:db` | pgTAP against local Supabase |
-| `test:e2e` / `test:e2e:ui` | Playwright |
-| `verify` | typecheck && lint && test && build |
-| `db:start` / `db:stop` | Local Supabase stack |
-| `db:reset` | Drop, migrate, seed |
-| `db:migrate` | Apply pending migrations |
-| `db:new <name>` | Create a timestamped migration file |
-| `db:types` | Regenerate `database.types.ts` |
-| `db:push` | Apply migrations to the linked remote project |
-| `push:keys` | Generate VAPID keys |
-| `ui:add <component>` | `shadcn add` |
+| Script                     | Does                                                           |
+| -------------------------- | -------------------------------------------------------------- |
+| `dev`                      | Next dev server with Turbopack                                 |
+| `build` / `start`          | Production build and serve                                     |
+| `typecheck`                | `tsc --noEmit`                                                 |
+| `lint` / `lint:fix`        | ESLint over the repo                                           |
+| `format`                   | Prettier write                                                 |
+| `test` / `test:watch`      | Vitest                                                         |
+| `test:db`                  | pgTAP against local Supabase                                   |
+| `test:e2e` / `test:e2e:ui` | Playwright                                                     |
+| `verify`                   | typecheck && lint && test && build                             |
+| `analyze`                  | Production build with `@next/bundle-analyzer` (`ANALYZE=true`) |
+| `bundle:baseline`          | Gzipped `.next/static` JS sizes after a normal build           |
+| `perf:audit`               | Lighthouse on `pnpm start` (landing, dashboard, ledger)        |
+| `db:start` / `db:stop`     | Local Supabase stack                                           |
+| `db:reset`                 | Drop, migrate, seed                                            |
+| `db:migrate`               | Apply pending migrations                                       |
+| `db:new <name>`            | Create a timestamped migration file                            |
+| `db:types`                 | Regenerate `database.types.ts`                                 |
+| `db:push`                  | Apply migrations to the linked remote project                  |
+| `push:keys`                | Generate VAPID keys                                            |
+| `ui:add <component>`       | `shadcn add`                                                   |
 
 ---
 

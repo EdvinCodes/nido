@@ -1,8 +1,14 @@
 import type { NextConfig } from 'next';
+import bundleAnalyzer from '@next/bundle-analyzer';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSerwist } from '@serwist/turbopack';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+  analyzerMode: 'static',
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -40,4 +46,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSerwist(withNextIntl(nextConfig));
+export default withBundleAnalyzer(withSerwist(withNextIntl(nextConfig)));

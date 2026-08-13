@@ -58,6 +58,15 @@ Wave 2 landed:
 - Inline Recharts from `getTrend` / `comparePeriods` tool output (dynamic import).
 - `insights-weekly` copy polish for Anthropic and Google, not only OpenAI.
 
+Wave 3 (ops, 2026-08-13) landed without raising Docker RAM:
+
+- `pg_cron` jobs for `budget-alerts`, `budget-reconcile`, `recurring-run`, `insights-weekly`
+  (`20260813100000_schedule_ops_crons.sql`). Hosted GUCs still required.
+- `pnpm analyze` / `pnpm bundle:baseline` / `pnpm perf:audit`. Numbers in
+  [`PERF-BASELINE.md`](./PERF-BASELINE.md). Landing Lighthouse a11y/SEO/BP 100, perf 75
+  (hero PNG LCP). Dashboard/ledger and the 6 GB e2e re-run were not executed on the work machine.
+- No `v0.x` tag.
+
 ## Remaining before Done
 
 **Parked 2026-08-12** for product polish; ledger edit + `update_transaction` fix landed the same day.
@@ -70,5 +79,7 @@ not for the 30/30 numeric gate.
 1. Full eval 30/30 with Anthropic or OpenAI (or a stronger local tool model).
 2. Confirm Ollama stays on loopback when used.
 3. Green `pnpm test:e2e` on a machine with ≥6GB Docker RAM (or re-run the 2 failed specs).
-4. Schedule `insights-weekly` via `pg_cron` (Wave 3 / deploy).
+   **Skipped 2026-08-13** — work machine stays on the 4 GB Docker cap.
+4. Apply `20260813100000_schedule_ops_crons.sql` when local Supabase is up (`pnpm db:migrate`),
+   and set hosted GUCs `app.settings.supabase_url` / `app.settings.cron_secret`.
 5. Mark Done + `chore(phase): complete phase 12 — AI assistant`.

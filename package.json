@@ -29,6 +29,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "analyze": "node scripts/analyze.mjs",
+    "bundle:baseline": "node scripts/bundle-baseline.mjs",
+    "perf:audit": "pnpm dlx tsx scripts/perf-audit.ts",
     "screenshots": "pnpm dlx tsx scripts/capture-screenshots.ts",
     "check:i18n": "node scripts/check-i18n.mjs",
     "db:start": "supabase start",
@@ -88,6 +91,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
+    "@next/bundle-analyzer": "^16.3.0",
     "@playwright/test": "^1.62.1",
     "@serwist/turbopack": "^9.5.12",
     "@tailwindcss/postcss": "^4",

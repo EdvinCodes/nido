@@ -43,6 +43,21 @@ AI_PROVIDER=anthropic pnpm dlx tsx e2e/ai-eval/run.ts
 Phase gate still requires **100% numeric accuracy**. Prefer Anthropic/OpenAI for the full
 30-question run; keep Ollama for privacy/smoke.
 
+## Product status (2026-08-13)
+
+The assistant is **usable in production** when a provider is configured: consent, tools,
+citations, rate-limit copy, retry (with a model picker when several keys exist), and
+inline trend/compare charts. The **30/30 numeric eval is parked on purpose** and is not
+a v1 blocker.
+
+Wave 2 landed:
+
+- Unit tests for all twelve tools (known-correct figures, `<<<DATA>>>` wrapping).
+- E2E: consent, 429 copy, citation `?ids=` → ledger, injection merchant as ordinary data.
+- Retry provider override only when `listConfiguredProviders().length > 1`.
+- Inline Recharts from `getTrend` / `comparePeriods` tool output (dynamic import).
+- `insights-weekly` copy polish for Anthropic and Google, not only OpenAI.
+
 ## Remaining before Done
 
 **Parked 2026-08-12** for product polish; ledger edit + `update_transaction` fix landed the same day.
@@ -55,4 +70,5 @@ not for the 30/30 numeric gate.
 1. Full eval 30/30 with Anthropic or OpenAI (or a stronger local tool model).
 2. Confirm Ollama stays on loopback when used.
 3. Green `pnpm test:e2e` on a machine with ≥6GB Docker RAM (or re-run the 2 failed specs).
-4. Mark Done + `chore(phase): complete phase 12 — AI assistant`.
+4. Schedule `insights-weekly` via `pg_cron` (Wave 3 / deploy).
+5. Mark Done + `chore(phase): complete phase 12 — AI assistant`.

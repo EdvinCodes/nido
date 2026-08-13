@@ -11,6 +11,9 @@ type InsightCandidate = {
   subject_key?: string | null;
 };
 
+const POLISH_RULE =
+  'Rewrite the household finance insight in one clear, plain sentence. Do not add facts. Do not invent numbers.';
+
 /** Model only rewrites the sentence; never decides whether a finding is true. */
 async function polishInsightBody(kind: string, body: string): Promise<string> {
   const provider = Deno.env.get('AI_PROVIDER');
@@ -27,6 +30,8 @@ async function polishInsightBody(kind: string, body: string): Promise<string> {
         : Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY');
   if (!apiKey) return body;
 
+  const userContent = `Kind: ${kind}\nFact: ${body}`;
+
   try {
     if (provider === 'openai') {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -39,12 +44,8 @@ async function polishInsightBody(kind: string, body: string): Promise<string> {
           model: Deno.env.get('AI_MODEL') ?? 'gpt-4o-mini',
           temperature: 0.2,
           messages: [
-            {
-              role: 'system',
-              content:
-                'Rewrite the household finance insight in one clear, plain sentence. Do not add facts. Do not invent numbers.',
-            },
-            { role: 'user', content: `Kind: ${kind}\nFact: ${body}` },
+            { role: 'system', content: POLISH_RULE },
+            { role: 'user', content: userContent },
           ],
         }),
       });
@@ -53,6 +54,52 @@ async function polishInsightBody(kind: string, body: string): Promise<string> {
         choices?: Array<{ message?: { content?: string } }>;
       };
       const text = json.choices?.[0]?.message?.content?.trim();
+      return text || body;
+    }
+
+    if (provider === 'anthropic') {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: Deno.env.get('AI_MODEL') ?? 'claude-sonnet-4-20250514',
+          max_tokens: 256,
+          temperature: 0.2,
+          system: POLISH_RULE,
+          messages: [{ role: 'user', content: userContent }],
+        }),
+      });
+      if (!res.ok) return body;
+      const json = (await res.json()) as {
+        content?: Array<{ type?: string; text?: string }>;
+      };
+      const text = json.content?.find((block) => block.type === 'text')?.text?.trim();
+      return text || body;
+    }
+
+    if (provider === 'google') {
+      const model = Deno.env.get('AI_MODEL') ?? 'gemini-2.0-flash';
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: POLISH_RULE }] },
+            contents: [{ role: 'user', parts: [{ text: userContent }] }],
+            generationConfig: { temperature: 0.2 },
+          }),
+        },
+      );
+      if (!res.ok) return body;
+      const json = (await res.json()) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      };
+      const text = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       return text || body;
     }
   } catch {
